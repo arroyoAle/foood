@@ -5,7 +5,7 @@ import 'package:spin_wheel/partials/top_bar.dart';
 class ListsHomePage extends StatefulWidget {
   const ListsHomePage({super.key});
 
-  final String title = 'Spin Wheel Page';
+  final String title = 'Lists Home Page';
   @override
   State<ListsHomePage> createState() => _ListsHomePageState();
 }
