@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:spin_wheel/pages/home.dart';
+import 'package:spin_wheel/pages/lists.dart';
+import 'package:spin_wheel/pages/recipes.dart';
+import 'package:spin_wheel/pages/spin_wheel.dart';
 import 'package:spin_wheel/partials/drawer.dart';
 import 'package:spin_wheel/partials/top_bar.dart';
 
@@ -14,11 +17,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Foood',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const MyHomePage(),
+        '/spinWheel': (context) => const SpinWheelPage(),
+        '/lists': (context) => const ListsHomePage(),
+        '/recipes': (context) => const RecipesHomePage(),
+      },
     );
   }
 }

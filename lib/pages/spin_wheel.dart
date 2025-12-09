@@ -3,6 +3,7 @@ import 'package:spin_wheel/partials/drawer.dart';
 import 'package:spin_wheel/partials/top_bar.dart';
 
 class SpinWheelPage extends StatefulWidget {
+  const SpinWheelPage({super.key});
 
   final String title = 'Spin Wheel Page';
   @override

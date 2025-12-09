@@ -5,7 +5,7 @@ import 'package:spin_wheel/partials/top_bar.dart';
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
-  final String title = 'Flutter Demo Home Page';
+  final String title = 'Foood Home Page';
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
