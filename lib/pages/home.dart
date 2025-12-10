@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:spin_wheel/partials/drawer.dart';
-import 'package:spin_wheel/partials/top_bar.dart';
+import 'package:foood/partials/drawer.dart';
+import 'package:foood/partials/top_bar.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});

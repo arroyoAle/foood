@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:spin_wheel/partials/drawer.dart';
-import 'package:spin_wheel/partials/top_bar.dart';
+import 'package:foood/partials/drawer.dart';
+import 'package:foood/partials/top_bar.dart';
 
 class RecipesHomePage extends StatefulWidget {
   const RecipesHomePage({super.key});
@@ -15,7 +15,7 @@ class _RecipesHomePageState extends State<RecipesHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: TopBarPartial(title: widget.title),
-      drawer: DrawerPartial(currentPage: 'spinPage'),
+      drawer: DrawerPartial(currentPage: 'recipes_page'),
     );
   }
 }
