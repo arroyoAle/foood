@@ -1,4 +1,4 @@
-package com.example.spin_wheel
+package com.example.foood
 
 import io.flutter.embedding.android.FlutterActivity
 
