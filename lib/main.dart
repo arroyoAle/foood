@@ -3,7 +3,7 @@ import 'package:foood/pages/home.dart';
 import 'package:foood/pages/lists.dart';
 import 'package:foood/pages/recipes.dart';
 import 'package:foood/pages/spin_wheel.dart';
-import 'package:foood/partials/pageRoutes.dart';
+import 'package:foood/partials/page_routes.dart';
 
 void main() {
   runApp(const MyApp());
