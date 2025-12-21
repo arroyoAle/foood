@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:foood/forms.dart';
 import 'package:foood/models/item.dart';
 import 'package:foood/models/shopping_list.dart';
 import 'package:foood/partials/drawer.dart';
@@ -16,7 +17,7 @@ class _ListsHomePageState extends State<ListsHomePage> {
   ShoppingList shoppingList = ShoppingList(name: 'test', items: [Item('test1', 'g', 400, false)]);
 
   void _addNewItem(){
-
+    _dialogBuilder(context);
   }
 
   @override
@@ -42,11 +43,26 @@ class _ListsHomePageState extends State<ListsHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addNewItem,
-        tooltip: 'Increment',
+        tooltip: 'Add new item',
         child: const Icon(Icons.add),
       )
     );
   }
 
-  // Future _dialogBuilder
+  Future<void> _dialogBuilder(BuildContext context) {
+    return showDialog(context: context, builder: (BuildContext context) {
+      return Dialog(
+        child: SingleChildScrollView(
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            child: ItemForm(),
+
+
+          // title: Text('Add new item'),
+          // content: ItemForm(),
+        ),
+        ),
+      );
+    });
+  }
 }
