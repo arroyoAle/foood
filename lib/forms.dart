@@ -1,22 +1,5 @@
 import 'package:flutter/material.dart';
-
-class UnitsInput extends StatelessWidget {
-  const UnitsInput({super.key, required this.radioValue});
-
-  final RadioValue? radioValue;
-
-  @override
-  Widget build(BuildContext context) {
-    if (radioValue == RadioValue.weight){
-      return Text('weight');
-    } else if (radioValue == RadioValue.liquid) {
-      return Text('liquid');
-    } else if (radioValue == RadioValue.count) {
-      return Text('count');
-    }
-    return Container();
-  }
-}
+import 'package:foood/models/item.dart';
 
 class ItemForm extends StatefulWidget {
   const ItemForm({super.key});
@@ -27,13 +10,17 @@ class ItemForm extends StatefulWidget {
   }
 }
 
-enum RadioValue { weight, liquid, count }
+List<String> units = ['kg', 'g', 'l', 'ml', 'count'];
 
 class ItemFormState extends State<ItemForm> {
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController quantityController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  RadioValue? _radioValue;
+  String? _selectedUnits;
 
-  void _handleRadioInput(RadioValue? value) {
+
+  void onAdd() {
+    Item item = Item(nameController.text, _selectedUnits!, int.parse(quantityController.text), false);
 
   }
 
@@ -42,56 +29,71 @@ class ItemFormState extends State<ItemForm> {
     return Form(
       key: _formKey,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: <Widget>[
           Container(
             alignment: Alignment.centerLeft,
-            child: Text('Add new item'),
+            child: Text(
+              'Add new item',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
           ),
-          TextFormField(
+          Container(
+            padding: const EdgeInsets.fromLTRB(0, 10, 10, 10),
+            child: TextFormField(
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Item name',
+            ),
+            controller: nameController,
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter some text';
               }
               return null;
-            },
+            }),
           ),
-          Container(
-            alignment: Alignment.centerLeft,
-            child: Text('Item details'),
-          ),
-          Container(
-            alignment: Alignment.center,
-            child: RadioGroup(
-              groupValue: _radioValue,
-              onChanged: (RadioValue? value) {
-                setState(() {
-                  _radioValue = value;
-                });
-                _handleRadioInput(value);
-              },
-              child: Row(
-                children: [
-                  Radio<RadioValue>(
-                    value: RadioValue.weight,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                flex: 1,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(0, 10, 10, 10),
+                  child: TextFormField(
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Item quantity',
                   ),
-                  Text('kg'),
-                  Radio<RadioValue>(
-                    value: RadioValue.liquid,
-                  ),
-                  // Radio(value: Text('ml')),
-                  Text('ml'),
-                  Radio(
-                    value: RadioValue.count
-                  ),
-                  Text('count'),
-                ],
+                  controller: quantityController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter some text';
+                    }
+                    return null;
+                  }),
+                ),
+              ),
+              Container(
+                alignment: Alignment.centerRight,
+                child: DropdownMenu<String>(
+                  label: Text('Units'),
+                  dropdownMenuEntries: units.map<DropdownMenuEntry<String>>(
+                    (String unit) {
+                      return DropdownMenuEntry<String>(
+                        value: unit,
+                        label: unit,
+                      );
+                    }).toList(),
+                  onSelected: (String? value) {
+                    setState(() {
+                      _selectedUnits = value;
+                    });
+                  },
+                )
               )
-            ),
-          ),
-          Container(
-            alignment: Alignment.center,
-            child: UnitsInput(radioValue: _radioValue),
+            ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -108,13 +110,11 @@ class ItemFormState extends State<ItemForm> {
                   foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 ),
                 onPressed: () {
-                  // Validate returns true if the form is valid, or false otherwise.
                   if (_formKey.currentState!.validate()) {
-                    // If the form is valid, display a snackbar. In the real world,
-                    // you'd often call a server or save the information in a database.
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('New item added')),
                     );
+                    onAdd;
                     Navigator.pop(context);
                   }
                 },

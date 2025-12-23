@@ -54,13 +54,9 @@ class _ListsHomePageState extends State<ListsHomePage> {
       return Dialog(
         child: SingleChildScrollView(
           child: Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(15),
             child: ItemForm(),
-
-
-          // title: Text('Add new item'),
-          // content: ItemForm(),
-        ),
+          ),
         ),
       );
     });
