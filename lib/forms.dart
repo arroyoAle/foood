@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:foood/models/item.dart';
+import 'package:foood/helpers/shopping_list_manager.dart';
 
 class ItemForm extends StatefulWidget {
-  const ItemForm({super.key});
+  final ShoppingListManager manager;
+
+  const ItemForm({super.key, required this.manager});
 
   @override
   ItemFormState createState() {
@@ -19,9 +21,18 @@ class ItemFormState extends State<ItemForm> {
   String? _selectedUnits;
 
 
-  void onAdd() {
-    Item item = Item(nameController.text, _selectedUnits!, int.parse(quantityController.text), false);
+  Future<void> onAdd() async {
+    await widget.manager.addNewItem(
+        name: nameController.text,
+        units: _selectedUnits!,
+        quantity: int.parse(quantityController.text));
 
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('New item added')),
+      );
+      Navigator.pop(context, true);
+    }
   }
 
   @override
@@ -57,11 +68,11 @@ class ItemFormState extends State<ItemForm> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                flex: 1,
+              Flexible(
                 child: Container(
                   padding: const EdgeInsets.fromLTRB(0, 10, 10, 10),
                   child: TextFormField(
+                    keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Item quantity',
@@ -75,22 +86,31 @@ class ItemFormState extends State<ItemForm> {
                   }),
                 ),
               ),
-              Container(
-                alignment: Alignment.centerRight,
-                child: DropdownMenu<String>(
-                  label: Text('Units'),
-                  dropdownMenuEntries: units.map<DropdownMenuEntry<String>>(
-                    (String unit) {
-                      return DropdownMenuEntry<String>(
+              Flexible(
+                child: Container(
+                  alignment: Alignment.centerRight,
+                  child:
+                  DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Units',
+                    ),
+                    items: units.map((unit) => DropdownMenuItem(
                         value: unit,
-                        label: unit,
-                      );
-                    }).toList(),
-                  onSelected: (String? value) {
-                    setState(() {
-                      _selectedUnits = value;
-                    });
-                  },
+                        child: Text(unit)
+                    )).toList(),
+                    onChanged: (String? value) {
+                      setState(() {
+                        _selectedUnits = value;
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select an option';
+                      }
+                      return null;
+                    },
+                  )
                 )
               )
             ],
@@ -100,24 +120,17 @@ class ItemFormState extends State<ItemForm> {
             children: [
               ElevatedButton(
                 onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.pop(context, false);
                   },
                 child: const Text('Cancel'),
               ),
+              const SizedBox(width: 8,),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 ),
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('New item added')),
-                    );
-                    onAdd;
-                    Navigator.pop(context);
-                  }
-                },
+                onPressed: onAdd,
                 child: const Text('Add'),
               ),
             ]

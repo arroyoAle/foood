@@ -4,8 +4,9 @@ part 'item.g.dart';
 
 @JsonSerializable()
 class Item {
-  Item(this.name, this.units, this.quantity, this.selected);
+  Item(this.id, this.name, this.units, this.quantity, this.selected);
 
+  String id;
   String name;
   String units;
   int quantity;
