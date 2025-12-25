@@ -15,7 +15,6 @@ class ListsHomePage extends StatefulWidget {
 class _ListsHomePageState extends State<ListsHomePage> {
   final ShoppingListManager _shoppingListManager = ShoppingListManager();
   late Future<void> _loadingFuture;
-  // ShoppingList shoppingList = ShoppingListManager().shoppingList;
 
   @override
   void initState() {
@@ -38,43 +37,53 @@ class _ListsHomePageState extends State<ListsHomePage> {
       appBar: TopBarPartial(title: widget.title),
       drawer: DrawerPartial(currentPage: 'lists_page'),
       body: FutureBuilder(
-          future: _loadingFuture,
-          builder: (context, snapshot) {
-            // --- While Loading ---
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
+        future: _loadingFuture,
+        builder: (context, snapshot) {
+          // --- While Loading ---
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-            // --- If an Error Occurs ---
-            if (snapshot.hasError) {
-              return Center(
-                  child: Text('Error loading list: ${snapshot.error}'));
-            }
+          // --- If an Error Occurs ---
+          if (snapshot.hasError) {
+            return Center(
+                child: Text('Error loading list: ${snapshot.error}'));
+          }
 
-            // --- When Data is Loaded Successfully ---
-            // Now it's safe to access the shopping list from the manager
-            final shoppingList = _shoppingListManager.shoppingList;
+          // --- When Data is Loaded Successfully ---
+          // Now it's safe to access the shopping list from the manager
+          final shoppingList = _shoppingListManager.shoppingList;
 
+          if (shoppingList.items.isEmpty) {
+            return const Center(
+              child: Text(
+                "No items in this list. \n\nAdd a new item with the '+' button below.",
+                textAlign: TextAlign.center,
+              ),
+            );
+          } else {
             return ListView.builder(
               itemCount: shoppingList.items.length,
               itemBuilder: (context, index) =>
-                  Card(
-                    child: CheckboxListTile(
-                      value: shoppingList.items[index].selected,
-                      title: Text(shoppingList.items[index].name),
-                      secondary: Text(
-                          '${shoppingList.items[index].quantity} ${shoppingList
-                              .items[index].units}'),
-                      onChanged: (bool? value) {
-                        setState(() {
-                          shoppingList.items[index].selected = value!;
-                        });
-                      },
-                      controlAffinity: ListTileControlAffinity.leading,
-                    ),
+                Card(
+                  child: CheckboxListTile(
+                    value: shoppingList.items[index].selected,
+                    title: Text(shoppingList.items[index].name),
+                    secondary: Text(
+                        '${shoppingList.items[index]
+                            .quantity} ${shoppingList
+                            .items[index].units}'),
+                    onChanged: (bool? value) {
+                      setState(() {
+                        shoppingList.items[index].selected = value!;
+                      });
+                    },
+                    controlAffinity: ListTileControlAffinity.leading,
                   ),
+                ),
             );
-          },
+          }
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addNewItem,
