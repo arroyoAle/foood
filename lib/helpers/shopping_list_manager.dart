@@ -27,8 +27,11 @@ class ShoppingListManager {
     required String name,
     required String units,
     required int quantity,
+    int? ordering,
   }) async {
     final String newId = Uuid().v4();
+
+    ordering ??= shoppingList.items.length + 1;
 
     final newItem = Item(
       id: newId,
@@ -36,6 +39,7 @@ class ShoppingListManager {
       units: units,
       quantity: quantity,
       selected: false,
+      ordering: ordering,
     );
 
     shoppingList.items.add(newItem);

@@ -22,6 +22,10 @@ class ItemFormState extends State<ItemForm> {
 
 
   Future<void> onAdd() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
     await widget.manager.addNewItem(
         name: nameController.text,
         units: _selectedUnits!,
@@ -80,7 +84,7 @@ class ItemFormState extends State<ItemForm> {
                   controller: quantityController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter some text';
+                      return 'Enter a quantity';
                     }
                     return null;
                   }),
@@ -106,7 +110,7 @@ class ItemFormState extends State<ItemForm> {
                     },
                     validator: (value) {
                       if (value == null) {
-                        return 'Please select an option';
+                        return 'Select an option';
                       }
                       return null;
                     },

@@ -50,7 +50,7 @@ class _ListsHomePageState extends State<ListsHomePage> {
           // --- If an Error Occurs ---
           if (snapshot.hasError) {
             return Center(
-                child: Text('Error loading list: ${snapshot.error}'));
+                child: Text('Error loading list: ${snapshot.error}  ${snapshot}'));
           }
 
           // --- When Data is Loaded Successfully ---

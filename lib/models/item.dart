@@ -9,13 +9,19 @@ class Item {
     required this.name,
     required this.units,
     required this.quantity,
-    required this.selected});
+    required this.selected,
+    required this.ordering,
+  });
 
   String id;
   String name;
   String units;
+  @JsonKey(defaultValue: 0)
   int quantity;
+  @JsonKey(defaultValue: false)
   bool selected;
+  @JsonKey(defaultValue: 0)
+  int ordering = 0;
 
   factory Item.fromJson(Map<String, dynamic> json) => _$ItemFromJson(json);
 
