@@ -4,7 +4,12 @@ part 'item.g.dart';
 
 @JsonSerializable()
 class Item {
-  Item(this.id, this.name, this.units, this.quantity, this.selected);
+  Item({
+    required this.id,
+    required this.name,
+    required this.units,
+    required this.quantity,
+    required this.selected});
 
   String id;
   String name;

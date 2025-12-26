@@ -5,7 +5,9 @@ import 'package:foood/partials/drawer.dart';
 import 'package:foood/partials/top_bar.dart';
 
 class ListsHomePage extends StatefulWidget {
-  const ListsHomePage({super.key});
+  const ListsHomePage({super.key, this.manager});
+
+  final ShoppingListManager? manager;
 
   final String title = 'Lists Home Page';
   @override
@@ -13,12 +15,13 @@ class ListsHomePage extends StatefulWidget {
 }
 
 class _ListsHomePageState extends State<ListsHomePage> {
-  final ShoppingListManager _shoppingListManager = ShoppingListManager();
+  late final ShoppingListManager _shoppingListManager;
   late Future<void> _loadingFuture;
 
   @override
   void initState() {
     super.initState();
+    _shoppingListManager = widget.manager ?? ShoppingListManager();
     _loadingFuture = _shoppingListManager.loadList('testing_shopping_list');
   }
 
@@ -76,6 +79,7 @@ class _ListsHomePageState extends State<ListsHomePage> {
                     onChanged: (bool? value) {
                       setState(() {
                         shoppingList.items[index].selected = value!;
+                        _shoppingListManager.saveList();
                       });
                     },
                     controlAffinity: ListTileControlAffinity.leading,
