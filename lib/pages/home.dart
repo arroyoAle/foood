@@ -29,11 +29,6 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            // CalendarDatePicker(
-            //     initialDate: DateTime.now(),
-            //     firstDate: DateTime.now().subtract(const Duration(days: 10000)),
-            //     lastDate: DateTime.now().add(const Duration(days: 10000)),
-            //     onDateChanged: ),
             const Text('You have pushed the button this many times:'),
             Text(
               '$_counter',
