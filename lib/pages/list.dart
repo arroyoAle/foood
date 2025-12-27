@@ -16,13 +16,11 @@ class ListPage extends StatefulWidget {
 
 class _ListPageState extends State<ListPage> {
   late final ShoppingListManager _shoppingListManager;
-  late Future<void> _loadingFuture;
 
   @override
   void initState() {
     super.initState();
     _shoppingListManager = widget.manager;
-    // _loadingFuture = _shoppingListManager.setActiveList('test_shopping_list');
 
   }
 
