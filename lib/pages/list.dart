@@ -4,25 +4,26 @@ import 'package:foood/helpers/shopping_list_manager.dart';
 import 'package:foood/partials/drawer.dart';
 import 'package:foood/partials/top_bar.dart';
 
-class ListsHomePage extends StatefulWidget {
-  const ListsHomePage({super.key, this.manager});
+class ListPage extends StatefulWidget {
+  const ListPage({super.key, required this.manager});
 
-  final ShoppingListManager? manager;
+  final ShoppingListManager manager;
+  // final String title = 'Lists Home Page';
 
-  final String title = 'Lists Home Page';
   @override
-  State<ListsHomePage> createState() => _ListsHomePageState();
+  State<ListPage> createState() => _ListPageState();
 }
 
-class _ListsHomePageState extends State<ListsHomePage> {
+class _ListPageState extends State<ListPage> {
   late final ShoppingListManager _shoppingListManager;
   late Future<void> _loadingFuture;
 
   @override
   void initState() {
     super.initState();
-    _shoppingListManager = widget.manager ?? ShoppingListManager();
-    _loadingFuture = _shoppingListManager.loadList('testing_shopping_list');
+    _shoppingListManager = widget.manager;
+    // _loadingFuture = _shoppingListManager.setActiveList('test_shopping_list');
+
   }
 
   void _addNewItem() async {
@@ -36,36 +37,41 @@ class _ListsHomePageState extends State<ListsHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final shoppingList = _shoppingListManager.activeList!;
+
     return Scaffold(
-      appBar: TopBarPartial(title: widget.title),
+      appBar: TopBarPartial(title: shoppingList.name),
       drawer: DrawerPartial(currentPage: 'lists_page'),
-      body: FutureBuilder(
-        future: _loadingFuture,
-        builder: (context, snapshot) {
-          // --- While Loading ---
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          // --- If an Error Occurs ---
-          if (snapshot.hasError) {
-            return Center(
-                child: Text('Error loading list: ${snapshot.error}  ${snapshot}'));
-          }
-
-          // --- When Data is Loaded Successfully ---
-          // Now it's safe to access the shopping list from the manager
-          final shoppingList = _shoppingListManager.shoppingList;
-
-          if (shoppingList.items.isEmpty) {
-            return const Center(
-              child: Text(
-                "No items in this list. \n\nAdd a new item with the '+' button below.",
-                textAlign: TextAlign.center,
-              ),
-            );
-          } else {
-            return ListView.builder(
+      body:
+      // FutureBuilder(
+      //   future: _loadingFuture,
+      //   builder: (context, snapshot) {
+      //     // --- While Loading ---
+      //     if (snapshot.connectionState == ConnectionState.waiting) {
+      //       return const Center(child: CircularProgressIndicator());
+      //     }
+      //
+      //     // --- If an Error Occurs ---
+      //     if (snapshot.hasError) {
+      //       return Center(
+      //         child: Text('Error loading list: ${snapshot.error}')
+      //       );
+      //     }
+      //
+      //     // --- When Data is Loaded Successfully ---
+      //     // Now it's safe to access the shopping list from the manager
+      //     final shoppingList = _shoppingListManager.activeList!;
+      //
+      //     if (shoppingList.items.isEmpty) {
+      //       return const Center(
+      //         child: Text(
+      //           "No items in this list. \n\nAdd a new item with the '+' button below.",
+      //           textAlign: TextAlign.center,
+      //         ),
+      //       );
+      //     } else {
+      //       return
+              ListView.builder(
               itemCount: shoppingList.items.length,
               itemBuilder: (context, index) =>
                 Card(
@@ -79,16 +85,16 @@ class _ListsHomePageState extends State<ListsHomePage> {
                     onChanged: (bool? value) {
                       setState(() {
                         shoppingList.items[index].selected = value!;
-                        _shoppingListManager.saveList();
+                        _shoppingListManager.saveActiveList();
                       });
                     },
                     controlAffinity: ListTileControlAffinity.leading,
                   ),
                 ),
-            );
-          }
-        },
-      ),
+            ),
+          // }
+        // },
+      // ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addNewItem,
         tooltip: 'Add new item',

@@ -3,35 +3,64 @@ import 'package:foood/models/item.dart';
 import 'package:foood/helpers/storage.dart';
 import 'package:foood/models/shopping_list.dart';
 
-const String _shoppingListsFileName = 'shopping_lists';
+const String _shoppingListNamesFileName = 'shopping_lists';
 
 class ShoppingListManager {
-  final Storage _storage = Storage();
-  late ShoppingList shoppingList;
+  final Storage _storage;
+  List<ShoppingList> _allLists = [];
+  ShoppingList? activeList;
 
-  Future<void> loadList(String listName) async {
-    final data = await _storage.read(_shoppingListsFileName);
-    if (data is Map<String, dynamic> && data.isNotEmpty) {
-      shoppingList = ShoppingList.fromJson(data);
-    } else {
-      final String newId = Uuid().v4();
-      shoppingList = ShoppingList(id: newId, name: listName, items: []);
+  List<ShoppingList> get allLists => _allLists;
+
+  ShoppingListManager({Storage? storage}) : _storage = storage ?? Storage();
+
+  Future<void> loadAllLists() async {
+    final lists = await _storage.read(_shoppingListNamesFileName);
+    _allLists = [];
+
+    if (lists is Map && lists.isNotEmpty) {
+      for (var listName in lists.values) {
+        final listJson = await _storage.read(listName as String);
+        if (listJson is Map<String, dynamic> && listJson.isNotEmpty) {
+          _allLists.add(ShoppingList.fromJson(listJson));
+        }
+      }
     }
   }
 
-  Future<void> saveList() async {
-    await _storage.write(_shoppingListsFileName, shoppingList.toJson());
+  void setActiveList(ShoppingList list) {
+    activeList = list;
   }
 
-  Future<void> addNewItem({
+  Future<ShoppingList> createNewList(String listName) async {
+    if (_allLists.any((list) => list.name == listName)) {
+      throw Exception('A list with this name already exists.');
+    }
+
+    final newList = ShoppingList(id: Uuid().v4(), name: listName, items: []);
+    _allLists.add(newList);
+
+    await _storage.write(newList.name, newList.toJson());
+    await _updateListNames();
+
+    return newList;
+  }
+
+  Future<void> saveActiveList() async {
+    if (activeList == null) return;
+    await _storage.write(activeList!.name, activeList!.toJson());
+  }
+
+  Future<void> addNewItemToActiveList({
     required String name,
     required String units,
     required int quantity,
     int? ordering,
   }) async {
-    final String newId = Uuid().v4();
+    if (activeList == null) return;
 
-    ordering ??= shoppingList.items.length + 1;
+    final String newId = Uuid().v4();
+    ordering ??= activeList!.items.length + 1;
 
     final newItem = Item(
       id: newId,
@@ -42,8 +71,15 @@ class ShoppingListManager {
       ordering: ordering,
     );
 
-    shoppingList.items.add(newItem);
+    activeList!.items.add(newItem);
 
-    await saveList();
+    await saveActiveList();
+  }
+
+  Future<void> _updateListNames() async {
+    final allListNames = Map.fromEntries(_allLists.map(
+            (list) => MapEntry(list.id, list.name))
+    );
+    await _storage.write(_shoppingListNamesFileName, allListNames);
   }
 }

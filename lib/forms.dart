@@ -26,7 +26,7 @@ class ItemFormState extends State<ItemForm> {
       return;
     }
 
-    await widget.manager.addNewItem(
+    await widget.manager.addNewItemToActiveList(
         name: nameController.text,
         units: _selectedUnits!,
         quantity: int.parse(quantityController.text));
