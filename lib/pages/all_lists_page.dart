@@ -7,21 +7,23 @@ import '../partials/drawer.dart';
 import '../partials/top_bar.dart';
 
 class AllListsPage extends StatefulWidget {
-  const AllListsPage({super.key});
+  const AllListsPage({super.key, this.manager});
 
   final String title = 'Lists Home Page';
+  final ShoppingListManager? manager;
 
   @override
   State<AllListsPage> createState() => _AllListsPageState();
 }
 
 class _AllListsPageState extends State<AllListsPage> {
-  final ShoppingListManager _manager = ShoppingListManager();
+  late final ShoppingListManager _manager;
   late Future<void> _loadingFuture;
 
   @override
   void initState() {
     super.initState();
+    _manager = widget.manager ?? ShoppingListManager();
     _loadingFuture = _manager.loadAllLists();
   }
 
@@ -64,9 +66,10 @@ class _AllListsPageState extends State<AllListsPage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () { /* TODO: Add dialog to create a new list */ },
-        child: const Icon(Icons.add),
+        onPressed: () { ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Currently does nothing'))); },
         tooltip: 'Create New List',
+        child: const Icon(Icons.add),
       ),
     );
   }
