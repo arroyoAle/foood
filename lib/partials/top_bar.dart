@@ -22,5 +22,6 @@ class TopBarPartial extends StatelessWidget implements PreferredSizeWidget{
           ),
       );
   }
-    Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+    @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
