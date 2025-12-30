@@ -9,7 +9,6 @@ class ShoppingListManager {
   final Storage _storage;
   List<ShoppingList> _allLists = [];
   ShoppingList? activeList;
-
   List<ShoppingList> get allLists => _allLists;
 
   ShoppingListManager({Storage? storage}) : _storage = storage ?? Storage();

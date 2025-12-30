@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:foood/pages/all_lists_page.dart';
+import 'package:foood/pages/all_lists.dart';
 import 'package:foood/pages/home.dart';
-import 'package:foood/pages/recipes.dart';
+import 'package:foood/pages/all_recipes.dart';
 import 'package:foood/pages/spin_wheel.dart';
 import 'package:foood/partials/page_routes.dart';
 
@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
           case '/lists':
             page = const AllListsPage();
           case '/recipes':
-            page = const RecipesHomePage();
+            page = const AllRecipesPage();
           case '/':
           default:
             page = const MyHomePage();

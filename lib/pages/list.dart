@@ -20,7 +20,6 @@ class _ListPageState extends State<ListPage> {
   void initState() {
     super.initState();
     _shoppingListManager = widget.manager;
-
   }
 
   void _addNewItem() async {

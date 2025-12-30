@@ -8,7 +8,7 @@ import 'package:foood/models/shopping_list.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
-import 'shopping_list_manager_tests.mocks.dart';
+import 'shopping_list_manager_unit_tests.mocks.dart';
 
 @GenerateMocks([Storage, File])
 void main() {
