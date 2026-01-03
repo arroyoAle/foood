@@ -9,11 +9,16 @@ class RecipeManager {
   List<Recipe> get allRecipes => _recipes;
 
   Future<void> loadRecipes() async {
-    final data = await _storage.read(_recipeNamesFileName);
-    if (data is List) {
-      _recipes = data.map(
-              (recipeJson) => Recipe.fromJson(recipeJson as Map<String, dynamic>)
-      ).toList();
+    final recipeNames = await _storage.read(_recipeNamesFileName);
+    _recipes = [];
+
+    if (recipeNames is Map && recipeNames.isNotEmpty) {
+      for (var recipeName in recipeNames.values) {
+        final listJson = await _storage.read(recipeName as String);
+        if (listJson is Map<String, dynamic> && listJson.isNotEmpty) {
+          _recipes.add(Recipe.fromJson(listJson));
+        }
+      }
     }
   }
 

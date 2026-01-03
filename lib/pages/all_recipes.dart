@@ -31,21 +31,10 @@ class _AllRecipesPageState extends State<AllRecipesPage> {
     });
   }
 
-  // void _navigateToDetail(Recipe recipe) {
-  //   Navigator.of(context).push(
-  //     MaterialPageRoute(
-  //       builder: (context) =>
-  //           RecipePage(
-  //               manager: manager),
-  //     ),
-  //   ).then(() => _refresh()); // Refresh the list when returning.
-  // }
-
   void _openList(Recipe recipe) {
     _manager.setActiveRecipe(recipe);
     Navigator.of(context).push(
       MaterialPageRoute(
-        // builder: (context) => RecipePage(),
         builder: (context) => RecipePage(manager: _manager),
       ),
     ).then((_) {
