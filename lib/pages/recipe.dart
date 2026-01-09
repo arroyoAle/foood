@@ -110,7 +110,7 @@ class _RecipePageState extends State<RecipePage> with SingleTickerProviderStateM
                         title: Text(_editableRecipe.ingredients[index].toString()),
                         //   todo: on tap show popup about ingredient
                       ),
-                    ) : 
+                    ) :
                     Card(
                       child: ListTile(
                         // TODO: Change style
