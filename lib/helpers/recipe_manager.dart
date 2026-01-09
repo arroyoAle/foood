@@ -1,6 +1,8 @@
 import 'package:foood/helpers/storage.dart';
 import 'package:foood/models/recipe.dart';
 
+import '../models/item.dart';
+
 class RecipeManager {
   final Storage _storage = Storage();
   final String _recipeNamesFileName = 'recipes_data';
@@ -51,5 +53,13 @@ class RecipeManager {
             (recipe) => MapEntry(recipe.id, recipe.name))
     );
     await _storage.write(_recipeNamesFileName, allRecipeNames);
+  }
+
+  Future<void> addIngredientToRecipe(String recipeId, Item ingredient) async {
+
+  }
+
+  Future<void> addInstructionToRecipe(String recipeId, String instruction) async {
+
   }
 }

@@ -35,7 +35,7 @@ class _AllRecipesPageState extends State<AllRecipesPage> {
     _manager.setActiveRecipe(recipe);
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => RecipePage(manager: _manager),
+        builder: (context) => RecipePage(recipeManager: _manager),
       ),
     ).then((_) {
       setState(() {
