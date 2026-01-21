@@ -19,7 +19,8 @@ class _AllRecipesPageState extends State<AllRecipesPage> {
   late final RecipeManager _manager;
   late Future<void> _loadingFuture;
 
-  @override void initState() {
+  @override
+  void initState() {
     super.initState();
     _manager = widget.manager ?? RecipeManager();
     _loadingFuture = _manager.loadRecipes();
@@ -50,7 +51,7 @@ class _AllRecipesPageState extends State<AllRecipesPage> {
     return Scaffold(
       appBar: TopBarPartial(title: widget.title),
       drawer: DrawerPartial(currentPage: 'recipes_page'),
-      body: FutureBuilder( future: _loadingFuture,
+      body: FutureBuilder(future: _loadingFuture,
         builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting)  {
           return const Center(child: CircularProgressIndicator( ) ) ;

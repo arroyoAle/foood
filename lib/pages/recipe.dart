@@ -9,7 +9,6 @@ class RecipePage extends StatefulWidget {
   const RecipePage({ super.key, required this.recipeManager });
 
   final RecipeManager recipeManager;
-  // final Recipe recipe;
   final String title = 'Recipe Page';
 
 
@@ -45,7 +44,7 @@ class _RecipePageState extends State<RecipePage> with SingleTickerProviderStateM
   }
 
   Future<void> _addNewIngredient() async {
-    final bool? ingredientAdded = await _dialogBuilder(context, IngredientForm(manager: recipeManager));
+    final bool? ingredientAdded = await _dialogBuilder(context, IngredientForm(recipeManager: recipeManager));
     if (ingredientAdded == true) {
       setState(() {
 
