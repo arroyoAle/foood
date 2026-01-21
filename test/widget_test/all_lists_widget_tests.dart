@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foood/models/shopping_list.dart';
-import 'package:foood/pages/all_lists_page.dart';
+import 'package:foood/pages/all_lists.dart';
 import 'package:foood/pages/list.dart';
 import 'package:mockito/mockito.dart';
 

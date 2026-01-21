@@ -8,6 +8,7 @@ class Item {
     required this.id,
     required this.name,
     required this.units,
+    // todo: need to change this to a list of quantities for each item
     required this.quantity,
     required this.selected,
     required this.ordering,

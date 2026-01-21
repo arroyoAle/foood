@@ -66,8 +66,10 @@ class _AllListsPageState extends State<AllListsPage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () { ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Currently does nothing'))); },
+        onPressed: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Currently does nothing')));
+          },
         tooltip: 'Create New List',
         child: const Icon(Icons.add),
       ),
