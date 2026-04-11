@@ -33,7 +33,7 @@ class ItemFormState extends State<ItemForm> {
     await widget.manager.addNewItemToActiveList(
         name: nameController.text,
         units: _selectedUnits!,
-        quantity: int.parse(quantityController.text));
+        quantity: double.parse(quantityController.text));
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

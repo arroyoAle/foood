@@ -93,7 +93,7 @@ class MockShoppingListManager extends _i1.Mock
   _i4.Future<void> addNewItemToActiveList({
     required String? name,
     required String? units,
-    required int? quantity,
+    required double? quantity,
     int? ordering,
   }) =>
       (super.noSuchMethod(

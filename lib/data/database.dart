@@ -81,11 +81,11 @@ class ShoppingDao extends DatabaseAccessor<AppDatabase>
         .getSingleOrNull();
   }
 
-  Future<int> getPantryStock(String itemId) async {
+  Future<double> getPantryStock(String itemId) async {    // return type double
     final row = await (select(pantryItems)
       ..where((p) => p.itemId.equals(itemId)))
         .getSingleOrNull();
-    return row?.quantity.toInt() ?? 0;
+    return row?.quantity ?? 0;
   }
 
   Future<void> insertItem(Insertable<Item> item) =>

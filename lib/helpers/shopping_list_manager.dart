@@ -54,7 +54,7 @@ class ShoppingListManager {
   Future<void> addNewItemToActiveList({
     required String name,
     required String units,
-    required int quantity,
+    required double quantity,
     int? ordering,
   }) async {
     if (activeList == null) return;

@@ -16,9 +16,9 @@ class ListItem {
 });
   String id;
   String itemId;
-  int quantityRequired;
-  int quantityInPantry;
-  int quantityToBuy;
+  double quantityRequired;
+  double quantityInPantry;
+  double quantityToBuy;
   String units;
   bool selected;
   int ordering;

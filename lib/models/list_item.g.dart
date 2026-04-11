@@ -9,9 +9,9 @@ part of 'list_item.dart';
 ListItem _$ListItemFromJson(Map<String, dynamic> json) => ListItem(
   id: json['id'] as String,
   itemId: json['itemId'] as String,
-  quantityRequired: (json['quantityRequired'] as num).toInt(),
-  quantityInPantry: (json['quantityInPantry'] as num).toInt(),
-  quantityToBuy: (json['quantityToBuy'] as num).toInt(),
+  quantityRequired: (json['quantityRequired'] as num).toDouble(),
+  quantityInPantry: (json['quantityInPantry'] as num).toDouble(),
+  quantityToBuy: (json['quantityToBuy'] as num).toDouble(),
   units: json['units'] as String,
   selected: json['selected'] as bool,
   ordering: (json['ordering'] as num).toInt(),
