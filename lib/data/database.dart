@@ -11,7 +11,7 @@ part 'database.g.dart';
 class Items extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
-  TextColumn get defaultUnits => text()();           // was defaultUnit
+  TextColumn get defaultUnits => text()();
   TextColumn get category => text().withDefault(const Constant('Uncategorised'))();
 
   @override
@@ -20,9 +20,9 @@ class Items extends Table {
 
 class PantryItems extends Table {
   TextColumn get id => text()();
-  TextColumn get itemId => text().references(Items, #id)(); // was ingredientId
+  TextColumn get itemId => text().references(Items, #id)();
   RealColumn get quantity => real()();
-  TextColumn get units => text()();                  // was unit
+  TextColumn get units => text()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -81,7 +81,7 @@ class ShoppingDao extends DatabaseAccessor<AppDatabase>
         .getSingleOrNull();
   }
 
-  Future<double> getPantryStock(String itemId) async {    // return type double
+  Future<double> getPantryStock(String itemId) async {
     final row = await (select(pantryItems)
       ..where((p) => p.itemId.equals(itemId)))
         .getSingleOrNull();

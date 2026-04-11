@@ -2,6 +2,7 @@ import 'package:uuid/uuid.dart';
 import 'package:foood/data/storage.dart';
 import 'package:foood/models/shopping_list.dart';
 
+import '../data/database.dart';
 import '../models/list_item.dart';
 
 const String _shoppingListNamesFileName = 'shopping_lists';
@@ -59,12 +60,21 @@ class ShoppingListManager {
   }) async {
     if (activeList == null) return;
 
-    final String newId = Uuid().v4();
+    final String newItemId = Uuid().v4();
+    final String newListItemId = Uuid().v4();
     ordering ??= activeList!.items.length + 1;
 
+    final newItem = Item(
+      id: newItemId,
+      name: name,
+      defaultUnits: units,
+      category: 'Uncategorised',
+    );
+
     final newListItem = ListItem(
-      id: newId,
-      itemId: name,
+      id: newListItemId,
+      itemId: newItem.id,
+      item: newItem,
       units: units,
       quantityRequired: quantity,
       quantityInPantry: 0,

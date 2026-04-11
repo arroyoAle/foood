@@ -1,13 +1,14 @@
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
-import '../data/database.dart';
+import '../data/database.dart' as database;
 import '../models/list_item.dart';
+import '../models/item.dart';
 
 const _uuid = Uuid();
 
 class ShoppingRepository {
-  final AppDatabase db;
+  final database.AppDatabase db;
 
   ShoppingRepository(this.db);
 
@@ -19,7 +20,6 @@ class ShoppingRepository {
     final existing = await db.shoppingDao.findItemByName(name);
 
     if (existing != null) {
-      // Map Drift row → your Item model
       return Item(
         id: existing.id,
         name: existing.name,
@@ -30,7 +30,7 @@ class ShoppingRepository {
 
     final id = _uuid.v4();
     await db.shoppingDao.insertItem(
-      ItemsCompanion.insert(
+      database.ItemsCompanion.insert(
         id: id,
         name: name,
         defaultUnits: units,
@@ -60,7 +60,7 @@ class ShoppingRepository {
     final ordering = await db.shoppingDao.getNextOrdering(shoppingListId);
 
     await db.shoppingDao.insertShoppingListItem(
-      ShoppingListItemsCompanion.insert(
+      database.ShoppingListItemsCompanion.insert(
         id: id,
         shoppingListId: shoppingListId,
         itemId: item.id,
@@ -76,6 +76,7 @@ class ShoppingRepository {
     return ListItem(
       id: id,
       itemId: item.id,
+      item: item,
       quantityRequired: quantity,
       quantityInPantry: inPantry,
       quantityToBuy: toBuy,
@@ -85,41 +86,30 @@ class ShoppingRepository {
     );
   }
 
-  // Returns items paired with their Item details for display
-  Future<Map<String, List<(ListItem, Item)>>> getGroupedList(
-      String shoppingListId,
-      ) async {
+  Future<List<ListItem>> getList(String shoppingListId) async {
     final rows = await db.shoppingDao.getItemsWithDetails(shoppingListId);
 
-    final pairs = rows.map((row) {
+    return rows.map((row) {
       final listItem = row.readTable(db.shoppingListItems);
       final item = row.readTable(db.items);
 
-      return (
-      ListItem(
+      return ListItem(
         id: listItem.id,
         itemId: listItem.itemId,
+        item: Item(
+          id: item.id,
+          name: item.name,
+          defaultUnits: item.defaultUnits,
+          category: item.category,
+        ),
         quantityRequired: listItem.quantityRequired,
         quantityInPantry: listItem.quantityInPantry,
         quantityToBuy: listItem.quantityToBuy,
         units: listItem.units,
         selected: listItem.selected,
         ordering: listItem.ordering,
-      ),
-      Item(
-        id: item.id,
-        name: item.name,
-        defaultUnits: item.defaultUnits,
-        category: item.category,
-      ),
       );
     }).toList();
-
-    final grouped = <String, List<(ListItem, Item)>>{};
-    for (final pair in pairs) {
-      grouped.putIfAbsent(pair.$2.category, () => []).add(pair);
-    }
-    return grouped;
   }
 
   Future<void> updateSelected(String listItemId, bool selected) =>

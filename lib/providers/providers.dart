@@ -1,0 +1,24 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../data/database.dart' as db;
+import '../models/list_item.dart';
+import '../notifiers/shopping_list_notifier.dart';
+import '../repositories/shopping_list_repository.dart';
+
+final databaseProvider = Provider<db.AppDatabase>((ref) {
+  final database = db.AppDatabase();
+  ref.onDispose(database.close);
+  return database;
+});
+
+final shoppingRepositoryProvider = Provider<ShoppingRepository>((ref) {
+  return ShoppingRepository(ref.watch(databaseProvider));
+});
+
+final activeShoppingListIdProvider = Provider<String>((ref) {
+  throw UnimplementedError('Override activeShoppingListIdProvider in your widget tree');
+});
+
+final shoppingListProvider =
+AsyncNotifierProvider<ShoppingListNotifier, List<ListItem>>(
+  ShoppingListNotifier.new,
+);

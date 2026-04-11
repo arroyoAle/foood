@@ -3,10 +3,9 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i4;
+import 'dart:async' as _i3;
 
-import 'package:foood/helpers/shopping_list_manager.dart' as _i3;
-import 'package:foood/models/shopping_list.dart' as _i2;
+import 'package:foood/helpers/shopping_list_manager.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint
@@ -24,73 +23,63 @@ import 'package:mockito/mockito.dart' as _i1;
 // ignore_for_file: subtype_of_sealed_class
 // ignore_for_file: invalid_use_of_internal_member
 
-class _FakeShoppingList_0 extends _i1.SmartFake implements _i2.ShoppingList {
-  _FakeShoppingList_0(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
-}
-
 /// A class which mocks [ShoppingListManager].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockShoppingListManager extends _i1.Mock
-    implements _i3.ShoppingListManager {
+    implements _i2.ShoppingListManager {
   MockShoppingListManager() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  List<_i2.ShoppingList> get allLists =>
+  List<dynamic> get allLists =>
       (super.noSuchMethod(
             Invocation.getter(#allLists),
-            returnValue: <_i2.ShoppingList>[],
+            returnValue: <dynamic>[],
           )
-          as List<_i2.ShoppingList>);
+          as List<dynamic>);
 
   @override
-  set activeList(_i2.ShoppingList? value) => super.noSuchMethod(
+  set activeList(dynamic value) => super.noSuchMethod(
     Invocation.setter(#activeList, value),
     returnValueForMissingStub: null,
   );
 
   @override
-  _i4.Future<void> loadAllLists() =>
+  _i3.Future<void> loadAllLists() =>
       (super.noSuchMethod(
             Invocation.method(#loadAllLists, []),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i3.Future<void>);
 
   @override
-  void setActiveList(_i2.ShoppingList? list) => super.noSuchMethod(
+  void setActiveList(dynamic list) => super.noSuchMethod(
     Invocation.method(#setActiveList, [list]),
     returnValueForMissingStub: null,
   );
 
   @override
-  _i4.Future<_i2.ShoppingList> createNewList(String? listName) =>
+  _i3.Future<dynamic> createNewList(String? listName) =>
       (super.noSuchMethod(
             Invocation.method(#createNewList, [listName]),
-            returnValue: _i4.Future<_i2.ShoppingList>.value(
-              _FakeShoppingList_0(
-                this,
-                Invocation.method(#createNewList, [listName]),
-              ),
-            ),
+            returnValue: _i3.Future<dynamic>.value(),
           )
-          as _i4.Future<_i2.ShoppingList>);
+          as _i3.Future<dynamic>);
 
   @override
-  _i4.Future<void> saveActiveList() =>
+  _i3.Future<void> saveActiveList() =>
       (super.noSuchMethod(
             Invocation.method(#saveActiveList, []),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i3.Future<void>);
 
   @override
-  _i4.Future<void> addNewItemToActiveList({
+  _i3.Future<void> addNewItemToActiveList({
     required String? name,
     required String? units,
     required double? quantity,
@@ -103,8 +92,8 @@ class MockShoppingListManager extends _i1.Mock
               #quantity: quantity,
               #ordering: ordering,
             }),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i3.Future<void>);
 }

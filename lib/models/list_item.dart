@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import 'item.dart';
+
 part 'list_item.g.dart';
 
 @JsonSerializable()
@@ -7,6 +9,7 @@ class ListItem {
   ListItem({
     required this.id,
     required this.itemId,
+    required this.item,
     required this.quantityRequired,
     required this.quantityInPantry,
     required this.quantityToBuy,
@@ -16,6 +19,7 @@ class ListItem {
 });
   String id;
   String itemId;
+  Item item;
   double quantityRequired;
   double quantityInPantry;
   double quantityToBuy;

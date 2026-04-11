@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foood/helpers/shopping_list_manager.dart';
 import 'package:foood/models/shopping_list.dart';
-import 'package:foood/pages/list.dart';
+import 'package:foood/pages/shopping_lists/shopping_list_screen.dart';
+import 'package:foood/providers/providers.dart';
 
 import '../partials/drawer.dart';
 import '../partials/top_bar.dart';
@@ -28,10 +30,14 @@ class _AllListsPageState extends State<AllListsPage> {
   }
 
   void _openList(ShoppingList list) {
-    _manager.setActiveList(list);
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ListPage(manager: _manager),
+        builder: (context) => ProviderScope(
+          overrides: [
+            activeShoppingListIdProvider.overrideWithValue(list.id),
+          ],
+          child: const ShoppingListScreen(),
+        ),
       ),
     ).then((_) {
       setState(() {
@@ -56,11 +62,13 @@ class _AllListsPageState extends State<AllListsPage> {
           return ListView.builder(
             itemCount: lists.length,
             itemBuilder: (context, index) {
-              return Card(child: ListTile(
-                title: Text(lists[index].name),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => _openList(lists[index]),
-              ));
+              return Card(
+                child: ListTile(
+                  title: Text(lists[index].name),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => _openList(lists[index]),
+                ),
+              );
             },
           );
         },
@@ -68,8 +76,9 @@ class _AllListsPageState extends State<AllListsPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Currently does nothing')));
-          },
+            const SnackBar(content: Text('Currently does nothing')),
+          );
+        },
         tooltip: 'Create New List',
         child: const Icon(Icons.add),
       ),
