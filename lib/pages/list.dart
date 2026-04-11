@@ -52,10 +52,10 @@ class _ListPageState extends State<ListPage> {
             Card(
               child: CheckboxListTile(
                 value: shoppingList.items[index].selected,
-                title: Text(shoppingList.items[index].name),
+                title: Text(shoppingList.items[index].itemId),
                 secondary: Text(
                     '${shoppingList.items[index]
-                        .quantity} ${shoppingList
+                        .quantityRequired} ${shoppingList
                         .items[index].units}'),
                 onChanged: (bool? value) {
                   setState(() {

@@ -1,4 +1,4 @@
-import 'package:foood/helpers/storage.dart';
+import 'package:foood/data/storage.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/item.dart';

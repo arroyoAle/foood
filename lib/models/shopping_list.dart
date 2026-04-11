@@ -1,17 +1,18 @@
-import 'item.dart';
+import 'package:foood/models/list_item.dart';
+
 
 class ShoppingList {
-  ShoppingList({required this.id, required this.name, List<Item>? items,}) : items = items ?? [];
+  ShoppingList({required this.id, required this.name, List<ListItem>? items,}) : items = items ?? [];
 
   String id;
   String name;
-  List<Item> items;
+  List<ListItem> items;
 
   factory ShoppingList.fromJson(Map<String, dynamic> json) {
-    var itemsList = <Item>[];
+    var itemsList = <ListItem>[];
     if (json['items'] != null && json['items'] is List) {
       itemsList = (json['items'] as List)
-          .map((itemJson) => Item.fromJson(itemJson))
+          .map((itemJson) => ListItem.fromJson(itemJson))
           .toList();
     }
 

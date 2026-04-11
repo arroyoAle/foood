@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:foood/helpers/storage.dart';
+import 'package:foood/data/storage.dart';
 
 class FakePathProviderPlatform extends Fake
     with MockPlatformInterfaceMixin

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foood/helpers/shopping_list_manager.dart';
-import 'package:foood/helpers/storage.dart';
+import 'package:foood/data/storage.dart';
 import 'package:foood/models/item.dart';
 import 'package:foood/models/shopping_list.dart';
 import 'package:mockito/annotations.dart';

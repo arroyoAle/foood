@@ -1,4 +1,4 @@
-import 'package:foood/helpers/storage.dart';
+import 'package:foood/data/storage.dart';
 import 'package:foood/models/recipe.dart';
 
 import '../models/item.dart';

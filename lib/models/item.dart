@@ -7,22 +7,14 @@ class Item {
   Item({
     required this.id,
     required this.name,
-    required this.units,
-    // todo: need to change this to a list of quantities for each item
-    required this.quantity,
-    required this.selected,
-    required this.ordering,
+    required this.defaultUnits,
+    required this.category,
   });
 
   String id;
   String name;
-  String units;
-  @JsonKey(defaultValue: 0)
-  int quantity;
-  @JsonKey(defaultValue: false)
-  bool selected;
-  @JsonKey(defaultValue: 0)
-  int ordering = 0;
+  String defaultUnits;
+  String category;
 
   factory Item.fromJson(Map<String, dynamic> json) => _$ItemFromJson(json);
 

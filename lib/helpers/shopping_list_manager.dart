@@ -1,7 +1,8 @@
 import 'package:uuid/uuid.dart';
-import 'package:foood/models/item.dart';
-import 'package:foood/helpers/storage.dart';
+import 'package:foood/data/storage.dart';
 import 'package:foood/models/shopping_list.dart';
+
+import '../models/list_item.dart';
 
 const String _shoppingListNamesFileName = 'shopping_lists';
 
@@ -61,16 +62,18 @@ class ShoppingListManager {
     final String newId = Uuid().v4();
     ordering ??= activeList!.items.length + 1;
 
-    final newItem = Item(
+    final newListItem = ListItem(
       id: newId,
-      name: name,
+      itemId: name,
       units: units,
-      quantity: quantity,
+      quantityRequired: quantity,
+      quantityInPantry: 0,
+      quantityToBuy: 0,
       selected: false,
       ordering: ordering,
     );
 
-    activeList!.items.add(newItem);
+    activeList!.items.add(newListItem);
 
     await saveActiveList();
   }
