@@ -11,8 +11,8 @@ part 'database.g.dart';
 class Items extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
+  TextColumn get defaultUnits => text()();           // was defaultUnit
   TextColumn get category => text().withDefault(const Constant('Uncategorised'))();
-  TextColumn get defaultUnit => text()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -20,9 +20,9 @@ class Items extends Table {
 
 class PantryItems extends Table {
   TextColumn get id => text()();
-  TextColumn get itemId => text().references(Items, #id)();
+  TextColumn get itemId => text().references(Items, #id)(); // was ingredientId
   RealColumn get quantity => real()();
-  TextColumn get unit => text()();
+  TextColumn get units => text()();                  // was unit
 
   @override
   Set<Column> get primaryKey => {id};
@@ -36,16 +36,16 @@ class ShoppingLists extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-class ListItems extends Table {
+class ShoppingListItems extends Table {
   TextColumn get id => text()();
-  TextColumn get listId => text().references(ShoppingLists, #id)();
+  TextColumn get shoppingListId => text().references(ShoppingLists, #id)();
   TextColumn get itemId => text().references(Items, #id)();
   RealColumn get quantityRequired => real()();
   RealColumn get quantityInPantry => real()();
   RealColumn get quantityToBuy => real()();
-  TextColumn get unit => text()();
-  BoolColumn get checked => boolean().withDefault(const Constant(false))();
-  BoolColumn get addedManually => boolean().withDefault(const Constant(false))();
+  TextColumn get units => text()();
+  BoolColumn get selected => boolean().withDefault(const Constant(false))();
+  IntColumn get ordering => integer()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -53,21 +53,21 @@ class ListItems extends Table {
 
 // --- DAO ---
 
-@DriftAccessor(tables: [ListItems, Items, PantryItems])
+@DriftAccessor(tables: [ShoppingListItems, Items, PantryItems])
 class ShoppingDao extends DatabaseAccessor<AppDatabase>
     with _$ShoppingDaoMixin {
   ShoppingDao(super.db);
 
-  // Joined query — returns raw rows with ingredient fields included
-  Future<List<TypedResult>> getItemsWithIngredients(String listId) {
-    final query = select(listItems).join([
+  Future<List<TypedResult>> getItemsWithDetails(String listId) {
+    final query = select(shoppingListItems).join([
       innerJoin(
         items,
-        items.id.equalsExp(ListItems().itemId),
+        items.id.equalsExp(shoppingListItems.itemId),
       ),
     ])
-      ..where(listItems.listId.equals(listId))
+      ..where(shoppingListItems.shoppingListId.equals(listId))
       ..orderBy([
+        OrderingTerm.asc(shoppingListItems.ordering),
         OrderingTerm.asc(items.category),
         OrderingTerm.asc(items.name),
       ]);
@@ -81,27 +81,38 @@ class ShoppingDao extends DatabaseAccessor<AppDatabase>
         .getSingleOrNull();
   }
 
-  Future<double> getPantryStock(String itemId) async {
+  Future<int> getPantryStock(String itemId) async {
     final row = await (select(pantryItems)
       ..where((p) => p.itemId.equals(itemId)))
         .getSingleOrNull();
-    return row?.quantity ?? 0;
+    return row?.quantity.toInt() ?? 0;
   }
 
   Future<void> insertItem(Insertable<Item> item) =>
       into(items).insert(item);
 
-  Future<void> insertListItem(Insertable<ListItem> item) =>
-      into(listItems).insert(item);
+  Future<void> insertShoppingListItem(Insertable<ShoppingListItem> item) =>
+      into(shoppingListItems).insert(item);
 
-  Future<void> updateChecked(String itemId, bool checked) =>
-      (update(listItems)..where((i) => i.id.equals(itemId)))
-          .write(ListItemsCompanion(checked: Value(checked)));
+  Future<int> getNextOrdering(String listId) async {
+    final query = selectOnly(shoppingListItems)
+      ..addColumns([shoppingListItems.ordering.max()])
+      ..where(shoppingListItems.shoppingListId.equals(listId));
+    final result = await query.getSingleOrNull();
+    return (result?.read(shoppingListItems.ordering.max()) ?? 0) + 1;
+  }
+
+  Future<void> updateSelected(String itemId, bool selected) =>
+  (update(shoppingListItems)..where((i) => i.id.equals(itemId)))
+      .write(ShoppingListItemsCompanion(selected: Value(selected)));
 }
 
 // --- Database ---
 
-@DriftDatabase(tables: [Items, PantryItems, ShoppingLists, ListItems], daos: [ShoppingDao])
+@DriftDatabase(
+  tables: [Items, PantryItems, ShoppingLists, ShoppingListItems],
+  daos: [ShoppingDao],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
