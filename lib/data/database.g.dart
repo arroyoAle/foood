@@ -662,6 +662,15 @@ class $ShoppingListsTable extends ShoppingLists
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _generatedAtMeta = const VerificationMeta(
     'generatedAt',
   );
@@ -674,7 +683,7 @@ class $ShoppingListsTable extends ShoppingLists
     requiredDuringInsert: true,
   );
   @override
-  List<GeneratedColumn> get $columns => [id, generatedAt];
+  List<GeneratedColumn> get $columns => [id, name, generatedAt];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -691,6 +700,14 @@ class $ShoppingListsTable extends ShoppingLists
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     } else if (isInserting) {
       context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
     }
     if (data.containsKey('generated_at')) {
       context.handle(
@@ -716,6 +733,10 @@ class $ShoppingListsTable extends ShoppingLists
         DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
       generatedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}generated_at'],
@@ -731,12 +752,18 @@ class $ShoppingListsTable extends ShoppingLists
 
 class ShoppingList extends DataClass implements Insertable<ShoppingList> {
   final String id;
+  final String name;
   final DateTime generatedAt;
-  const ShoppingList({required this.id, required this.generatedAt});
+  const ShoppingList({
+    required this.id,
+    required this.name,
+    required this.generatedAt,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
     map['generated_at'] = Variable<DateTime>(generatedAt);
     return map;
   }
@@ -744,6 +771,7 @@ class ShoppingList extends DataClass implements Insertable<ShoppingList> {
   ShoppingListsCompanion toCompanion(bool nullToAbsent) {
     return ShoppingListsCompanion(
       id: Value(id),
+      name: Value(name),
       generatedAt: Value(generatedAt),
     );
   }
@@ -755,6 +783,7 @@ class ShoppingList extends DataClass implements Insertable<ShoppingList> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ShoppingList(
       id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
       generatedAt: serializer.fromJson<DateTime>(json['generatedAt']),
     );
   }
@@ -763,17 +792,21 @@ class ShoppingList extends DataClass implements Insertable<ShoppingList> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
       'generatedAt': serializer.toJson<DateTime>(generatedAt),
     };
   }
 
-  ShoppingList copyWith({String? id, DateTime? generatedAt}) => ShoppingList(
-    id: id ?? this.id,
-    generatedAt: generatedAt ?? this.generatedAt,
-  );
+  ShoppingList copyWith({String? id, String? name, DateTime? generatedAt}) =>
+      ShoppingList(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        generatedAt: generatedAt ?? this.generatedAt,
+      );
   ShoppingList copyWithCompanion(ShoppingListsCompanion data) {
     return ShoppingList(
       id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
       generatedAt: data.generatedAt.present
           ? data.generatedAt.value
           : this.generatedAt,
@@ -784,43 +817,51 @@ class ShoppingList extends DataClass implements Insertable<ShoppingList> {
   String toString() {
     return (StringBuffer('ShoppingList(')
           ..write('id: $id, ')
+          ..write('name: $name, ')
           ..write('generatedAt: $generatedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, generatedAt);
+  int get hashCode => Object.hash(id, name, generatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is ShoppingList &&
           other.id == this.id &&
+          other.name == this.name &&
           other.generatedAt == this.generatedAt);
 }
 
 class ShoppingListsCompanion extends UpdateCompanion<ShoppingList> {
   final Value<String> id;
+  final Value<String> name;
   final Value<DateTime> generatedAt;
   final Value<int> rowid;
   const ShoppingListsCompanion({
     this.id = const Value.absent(),
+    this.name = const Value.absent(),
     this.generatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   ShoppingListsCompanion.insert({
     required String id,
+    required String name,
     required DateTime generatedAt,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
+       name = Value(name),
        generatedAt = Value(generatedAt);
   static Insertable<ShoppingList> custom({
     Expression<String>? id,
+    Expression<String>? name,
     Expression<DateTime>? generatedAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
+      if (name != null) 'name': name,
       if (generatedAt != null) 'generated_at': generatedAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -828,11 +869,13 @@ class ShoppingListsCompanion extends UpdateCompanion<ShoppingList> {
 
   ShoppingListsCompanion copyWith({
     Value<String>? id,
+    Value<String>? name,
     Value<DateTime>? generatedAt,
     Value<int>? rowid,
   }) {
     return ShoppingListsCompanion(
       id: id ?? this.id,
+      name: name ?? this.name,
       generatedAt: generatedAt ?? this.generatedAt,
       rowid: rowid ?? this.rowid,
     );
@@ -843,6 +886,9 @@ class ShoppingListsCompanion extends UpdateCompanion<ShoppingList> {
     final map = <String, Expression>{};
     if (id.present) {
       map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
     }
     if (generatedAt.present) {
       map['generated_at'] = Variable<DateTime>(generatedAt.value);
@@ -857,6 +903,7 @@ class ShoppingListsCompanion extends UpdateCompanion<ShoppingList> {
   String toString() {
     return (StringBuffer('ShoppingListsCompanion(')
           ..write('id: $id, ')
+          ..write('name: $name, ')
           ..write('generatedAt: $generatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -2157,12 +2204,14 @@ typedef $$PantryItemsTableProcessedTableManager =
 typedef $$ShoppingListsTableCreateCompanionBuilder =
     ShoppingListsCompanion Function({
       required String id,
+      required String name,
       required DateTime generatedAt,
       Value<int> rowid,
     });
 typedef $$ShoppingListsTableUpdateCompanionBuilder =
     ShoppingListsCompanion Function({
       Value<String> id,
+      Value<String> name,
       Value<DateTime> generatedAt,
       Value<int> rowid,
     });
@@ -2214,6 +2263,11 @@ class $$ShoppingListsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<DateTime> get generatedAt => $composableBuilder(
     column: $table.generatedAt,
     builder: (column) => ColumnFilters(column),
@@ -2259,6 +2313,11 @@ class $$ShoppingListsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get generatedAt => $composableBuilder(
     column: $table.generatedAt,
     builder: (column) => ColumnOrderings(column),
@@ -2276,6 +2335,9 @@ class $$ShoppingListsTableAnnotationComposer
   });
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
 
   GeneratedColumn<DateTime> get generatedAt => $composableBuilder(
     column: $table.generatedAt,
@@ -2338,20 +2400,24 @@ class $$ShoppingListsTableTableManager
           updateCompanionCallback:
               ({
                 Value<String> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
                 Value<DateTime> generatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ShoppingListsCompanion(
                 id: id,
+                name: name,
                 generatedAt: generatedAt,
                 rowid: rowid,
               ),
           createCompanionCallback:
               ({
                 required String id,
+                required String name,
                 required DateTime generatedAt,
                 Value<int> rowid = const Value.absent(),
               }) => ShoppingListsCompanion.insert(
                 id: id,
+                name: name,
                 generatedAt: generatedAt,
                 rowid: rowid,
               ),

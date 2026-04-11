@@ -1,84 +1,98 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foood/helpers/shopping_list_manager.dart';
-import 'package:foood/models/shopping_list.dart';
 import 'package:foood/pages/shopping_lists/shopping_list_screen.dart';
 import 'package:foood/providers/providers.dart';
 
+import '../data/database.dart' as db;
+import '../notifiers/shopping_list_notifier.dart';
 import '../partials/drawer.dart';
 import '../partials/top_bar.dart';
 
-class AllListsPage extends StatefulWidget {
-  const AllListsPage({super.key, this.manager});
+class AllListsPage extends ConsumerWidget {
+  const AllListsPage({super.key});
 
   final String title = 'Lists Home Page';
-  final ShoppingListManager? manager;
 
-  @override
-  State<AllListsPage> createState() => _AllListsPageState();
-}
-
-class _AllListsPageState extends State<AllListsPage> {
-  late final ShoppingListManager _manager;
-  late Future<void> _loadingFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _manager = widget.manager ?? ShoppingListManager();
-    _loadingFuture = _manager.loadAllLists();
-  }
-
-  void _openList(ShoppingList list) {
+  void _openList(BuildContext context, db.ShoppingList list) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => ProviderScope(
           overrides: [
             activeShoppingListIdProvider.overrideWithValue(list.id),
+            shoppingListProvider.overrideWith(ShoppingListNotifier.new),
           ],
           child: const ShoppingListScreen(),
         ),
       ),
-    ).then((_) {
-      setState(() {
-        _loadingFuture = _manager.loadAllLists();
-      });
-    });
+    );
+  }
+
+  void _showCreateListDialog(BuildContext context, WidgetRef ref) {
+    final controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('New List'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: const InputDecoration(labelText: 'List name'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final name = controller.text.trim();
+              if (name.isEmpty) return;
+              try {
+                await ref.read(allListsProvider.notifier).createList(name);
+                if (context.mounted) Navigator.of(context).pop();
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(e.toString())),
+                  );
+                }
+              }
+            },
+            child: const Text('Create'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: TopBarPartial(title: widget.title),
-      drawer: DrawerPartial(currentPage: 'lists_page'),
-      body: FutureBuilder<void>(
-        future: _loadingFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+  Widget build(BuildContext context, WidgetRef ref) {
+    final listsAsync = ref.watch(allListsProvider);
 
-          final lists = _manager.allLists;
-          return ListView.builder(
-            itemCount: lists.length,
-            itemBuilder: (context, index) {
-              return Card(
-                child: ListTile(
-                  title: Text(lists[index].name),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _openList(lists[index]),
-                ),
-              );
-            },
-          );
-        },
+    return Scaffold(
+      appBar: TopBarPartial(title: title),
+      drawer: DrawerPartial(currentPage: 'lists_page'),
+      body: listsAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text('Error: $e')),
+        data: (lists) => lists.isEmpty
+            ? const Center(child: Text('No lists yet. Create one to get started.'))
+            : ListView.builder(
+          itemCount: lists.length,
+          itemBuilder: (context, index) {
+            return Card(
+              child: ListTile(
+                title: Text(lists[index].name),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => _openList(context, lists[index]),
+              ),
+            );
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Currently does nothing')),
-          );
-        },
+        onPressed: () => _showCreateListDialog(context, ref),
         tooltip: 'Create New List',
         child: const Icon(Icons.add),
       ),

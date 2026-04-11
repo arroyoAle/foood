@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:uuid/uuid.dart';
 
 part 'database.g.dart';
 
@@ -30,6 +31,7 @@ class PantryItems extends Table {
 
 class ShoppingLists extends Table {
   TextColumn get id => text()();
+  TextColumn get name => text()();
   DateTimeColumn get generatedAt => dateTime()();
 
   @override
@@ -105,6 +107,22 @@ class ShoppingDao extends DatabaseAccessor<AppDatabase>
   Future<void> updateSelected(String itemId, bool selected) =>
   (update(shoppingListItems)..where((i) => i.id.equals(itemId)))
       .write(ShoppingListItemsCompanion(selected: Value(selected)));
+
+  Future<List<ShoppingList>> getAllLists() {
+    return select(shoppingLists).get();
+  }
+
+  Future<ShoppingList> createList(String name) async {
+    final id = const Uuid().v4();
+    final list = ShoppingListsCompanion.insert(
+      id: id,
+      name: name,
+      generatedAt: DateTime.now(),
+    );
+    await into(shoppingLists).insert(list);
+    return ShoppingList(id: id, name: name, generatedAt: DateTime.now());
+  }
+
 }
 
 // --- Database ---

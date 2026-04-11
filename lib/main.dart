@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foood/pages/all_lists.dart';
 import 'package:foood/pages/home.dart';
 import 'package:foood/pages/all_recipes.dart';
@@ -6,7 +7,7 @@ import 'package:foood/pages/spin_wheel.dart';
 import 'package:foood/partials/page_routes.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
