@@ -63,7 +63,7 @@ class AllRecipesPage extends ConsumerWidget {
                   onPressed: () => Navigator.pop(context),
                   child: const Text('Cancel'),
                 ),
-                TextButton(
+                FilledButton(
                   onPressed: () async {
                     if (nameController.text.isNotEmpty) {
                       await ref.read(recipesProvider.notifier).createRecipe(nameController.text);
