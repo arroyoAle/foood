@@ -76,5 +76,35 @@ void main() {
       final itemsInList = await repository.getList(list.id);
       expect(itemsInList.first.selected, isTrue);
     });
+
+    test('updateManualItem updates item details and quantity', () async {
+      final list = await database.shoppingDao.createList('Test List');
+      final listItem = await repository.addManualItem(
+        shoppingListId: list.id,
+        name: 'Milk',
+        quantity: 2.0,
+        units: 'L',
+      );
+      
+      await repository.updateManualItem(
+        listItemId: listItem.id,
+        itemId: listItem.itemId,
+        name: 'Organic Milk',
+        quantity: 3.0,
+        units: 'ml',
+        category: 'Fridge',
+      );
+      
+      final updatedList = await repository.getList(list.id);
+      final updatedItem = updatedList.first;
+      
+      expect(updatedItem.item.name, 'Organic Milk');
+      expect(updatedItem.quantityRequired, 3.0);
+      expect(updatedItem.units, 'ml');
+      expect(updatedItem.item.category, 'Fridge');
+      
+      // Verify quantityToBuy is also updated (assuming 0 in pantry)
+      expect(updatedItem.quantityToBuy, 3.0);
+    });
   });
 }
