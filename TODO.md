@@ -21,7 +21,6 @@
 - [ ] Add drag and drop support to re-order items
 
 ### 4. Recipe Management
-
 - [ ] Save name changes
 - [ ] Support editing ingredients and instructions
 - [ ] Support adding images to recipes.
@@ -29,7 +28,6 @@
 - [ ] Add search and filter functionality to `AllRecipesPage`.
 
 ### 5. Pantry Management
-
 - [ ] Update `PantryItems` schema (expiry date, location, last updated).
 - [ ] Create Pantry Management screen (list view, add/edit items).
 
@@ -41,6 +39,7 @@
 
 ### 1. Shopping List
 - [ ] Implement auto-generation logic: Aggregate ingredients from Meal Plan - Deduct Pantry = Shopping List.
+- [ ] Create custom categories
 
 ### 2. Recipe Management
 - [ ] Add Recipe Scraping from URLs (Parse ingredients and steps).
@@ -52,7 +51,7 @@
 
 ---
 
-## 🛠 Technical & Infrastructure
+## Technical & Infrastructure
 
 ### 1. Data & Persistence
 - [ ] Refine `Items` table to handle unit normalisation (e.g., g vs kg, ml vs l).
@@ -65,7 +64,7 @@
 
 ---
 
-## ✅ Completed Tasks
+## Completed Tasks
 - [x] Initial project setup (Flutter, Riverpod, Drift).
 - [x] Basic Recipe and Shopping List CRUD structure.
 - [x] Basic drawer navigation.
