@@ -53,6 +53,35 @@ class ShoppingListItems extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+class Recipes extends Table {
+  TextColumn get id => text()();
+  TextColumn get name => text()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+class RecipeIngredients extends Table {
+  TextColumn get id => text()();
+  TextColumn get recipeId => text().references(Recipes, #id)();
+  TextColumn get itemId => text().references(Items, #id)();
+  RealColumn get quantity => real()();
+  TextColumn get units => text()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+class Instructions extends Table {
+  TextColumn get id => text()();
+  TextColumn get recipeId => text().references(Recipes, #id)();
+  TextColumn get textContent => text()();
+  IntColumn get ordering => integer()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 // --- DAO ---
 
 @DriftAccessor(tables: [ShoppingListItems, Items, PantryItems])
@@ -125,14 +154,51 @@ class ShoppingDao extends DatabaseAccessor<AppDatabase>
 
 }
 
+@DriftAccessor(tables: [Recipes, RecipeIngredients, Instructions, Items])
+class RecipeDao extends DatabaseAccessor<AppDatabase> with _$RecipeDaoMixin {
+  RecipeDao(super.db);
+
+  Future<List<Recipe>> getAllRecipes() => select(recipes).get();
+
+  Future<List<TypedResult>> getRecipeIngredients(String recipeId) {
+    return (select(recipeIngredients).join([
+      innerJoin(items, items.id.equalsExp(recipeIngredients.itemId)),
+    ])..where(recipeIngredients.recipeId.equals(recipeId)))
+        .get();
+  }
+
+  Future<List<Instruction>> getRecipeInstructions(String recipeId) {
+    return (select(instructions)
+          ..where((t) => t.recipeId.equals(recipeId))
+          ..orderBy([(t) => OrderingTerm.asc(t.ordering)]))
+        .get();
+  }
+
+  Future<void> insertRecipe(Insertable<Recipe> recipe) => into(recipes).insert(recipe);
+
+  Future<void> insertRecipeIngredient(Insertable<RecipeIngredient> ingredient) =>
+      into(recipeIngredients).insert(ingredient);
+
+  Future<void> insertInstruction(Insertable<Instruction> instruction) =>
+      into(instructions).insert(instruction);
+
+  Future<int> getNextInstructionOrdering(String recipeId) async {
+    final query = selectOnly(instructions)
+      ..addColumns([instructions.ordering.max()])
+      ..where(instructions.recipeId.equals(recipeId));
+    final result = await query.getSingleOrNull();
+    return (result?.read(instructions.ordering.max()) ?? 0) + 1;
+  }
+}
+
 // --- Database ---
 
 @DriftDatabase(
-  tables: [Items, PantryItems, ShoppingLists, ShoppingListItems],
-  daos: [ShoppingDao],
+  tables: [Items, PantryItems, ShoppingLists, ShoppingListItems, Recipes, RecipeIngredients, Instructions],
+  daos: [ShoppingDao, RecipeDao],
 )
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+  AppDatabase([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
   int get schemaVersion => 1;

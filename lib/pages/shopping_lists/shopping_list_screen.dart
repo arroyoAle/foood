@@ -18,7 +18,9 @@ class ShoppingListScreen extends ConsumerWidget {
             ? GroupedList(items: listAsync.value!)
             : const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
-        data: (items) => GroupedList(items: items),
+        data: (items) => items.isEmpty
+            ? const Center(child: Text('No items yet'))
+            : GroupedList(items: items),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => showModalBottomSheet(
