@@ -48,6 +48,11 @@ A Flutter application designed to simplify grocery shopping, meal planning, and 
     flutter run
     ```
 
+### Installation
+- run `flutter build apk --split-per-abi`
+- run `flutter devices`
+- run `flutter install --device-id <id-from-above-command> --use-application-binary="build/app/outputs/flutter-apk/<your-arch-file>"`
+
 ## Project Structure
 
 - `lib/data/`: Database definition and Drift configurations.
