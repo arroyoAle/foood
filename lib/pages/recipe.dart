@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foood/forms.dart';
-import 'package:foood/partials/drawer.dart';
 import 'package:foood/partials/top_bar.dart';
 import '../providers/providers.dart';
 
@@ -67,8 +66,10 @@ class _RecipePageState extends ConsumerState<RecipePage> with SingleTickerProvid
     }
 
     return Scaffold(
-      appBar: TopBarPartial(title: widget.title),
-      drawer: DrawerPartial(currentPage: 'recipes_page'),
+      appBar: AppBar(
+        title: const Text('Recipe'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

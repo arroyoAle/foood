@@ -12,7 +12,10 @@ class ShoppingListScreen extends ConsumerWidget {
     final listAsync = ref.watch(shoppingListProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Shopping List')),
+      appBar: AppBar(
+        title: const Text('Shopping List'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      ),
       body: listAsync.when(
         loading: () => listAsync.value != null
             ? GroupedList(items: listAsync.value!)
