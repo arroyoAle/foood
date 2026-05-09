@@ -44,6 +44,7 @@
 
 ### 2. Recipe Management
 - [ ] Add Recipe Scraping from URLs (Parse ingredients and steps).
+- [ ] Share and receive recipes
 
 ### 3. Pantry Management
 - [ ] Implement low-stock alerts.
