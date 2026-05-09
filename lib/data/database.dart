@@ -137,6 +137,36 @@ class ShoppingDao extends DatabaseAccessor<AppDatabase>
   (update(shoppingListItems)..where((i) => i.id.equals(itemId)))
       .write(ShoppingListItemsCompanion(selected: Value(selected)));
 
+  Future<void> updateShoppingListItem({
+    required String id,
+    required double quantityRequired,
+    required double quantityToBuy,
+    required String units,
+  }) {
+    return (update(shoppingListItems)..where((i) => i.id.equals(id))).write(
+      ShoppingListItemsCompanion(
+        quantityRequired: Value(quantityRequired),
+        quantityToBuy: Value(quantityToBuy),
+        units: Value(units),
+      ),
+    );
+  }
+
+  Future<void> updateItem({
+    required String id,
+    required String name,
+    required String category,
+    required String units,
+  }) {
+    return (update(items)..where((i) => i.id.equals(id))).write(
+      ItemsCompanion(
+        name: Value(name),
+        category: Value(category),
+        defaultUnits: Value(units),
+      ),
+    );
+  }
+
   Future<List<ShoppingList>> getAllLists() {
     return select(shoppingLists).get();
   }

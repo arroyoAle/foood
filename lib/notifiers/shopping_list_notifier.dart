@@ -41,6 +41,31 @@ class ShoppingListNotifier extends AsyncNotifier<List<ListItem>> {
     await repo.updateSelected(listItem.id, !listItem.selected);
   }
 
+  Future<void> updateManualItem({
+    required String listItemId,
+    required String itemId,
+    required String name,
+    required double quantity,
+    required String units,
+    required String category,
+  }) async {
+    final listId = ref.read(activeShoppingListIdProvider);
+    final repo = ref.read(shoppingRepositoryProvider);
+
+    state = const AsyncLoading<List<ListItem>>().copyWithPrevious(state);
+    state = await AsyncValue.guard(() async {
+      await repo.updateManualItem(
+        listItemId: listItemId,
+        itemId: itemId,
+        name: name,
+        quantity: quantity,
+        units: units,
+        category: category,
+      );
+      return repo.getList(listId);
+    });
+  }
+
   List<ListItem> _updateItem(
       List<ListItem> current,
       String listItemId,

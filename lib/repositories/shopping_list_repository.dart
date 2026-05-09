@@ -114,4 +114,33 @@ class ShoppingRepository {
 
   Future<void> updateSelected(String listItemId, bool selected) =>
       db.shoppingDao.updateSelected(listItemId, selected);
+
+  Future<void> updateManualItem({
+    required String listItemId,
+    required String itemId,
+    required String name,
+    required double quantity,
+    required String units,
+    required String category,
+  }) async {
+    // Update the underlying Item
+    await db.shoppingDao.updateItem(
+      id: itemId,
+      name: name,
+      category: category,
+      units: units,
+    );
+
+    // Calculate new quantityToBuy
+    final inPantry = await db.shoppingDao.getPantryStock(itemId);
+    final toBuy = (quantity - inPantry).clamp(0.0, quantity);
+
+    // Update the ShoppingListItem
+    await db.shoppingDao.updateShoppingListItem(
+      id: listItemId,
+      quantityRequired: quantity,
+      quantityToBuy: toBuy,
+      units: units,
+    );
+  }
 }
