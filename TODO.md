@@ -52,7 +52,7 @@
 
 ---
 
-## 🛠 Technical & Infrastructure
+## Technical & Infrastructure
 
 ### 1. Data & Persistence
 - [ ] Refine `Items` table to handle unit normalisation (e.g., g vs kg, ml vs l).
@@ -65,7 +65,7 @@
 
 ---
 
-## ✅ Completed Tasks
+## Completed Tasks
 - [x] Initial project setup (Flutter, Riverpod, Drift).
 - [x] Basic Recipe and Shopping List CRUD structure.
 - [x] Basic drawer navigation.
