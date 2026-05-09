@@ -30,11 +30,11 @@ class DrawerPartial extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const DrawerHeader(
+          DrawerHeader(
             decoration: BoxDecoration(
-              color: Colors.blue,
+              color: Theme.of(context).colorScheme.primary,
             ),
-            child: Text(
+            child: const Text(
               'Menu',
               style: TextStyle(
                 color: Colors.white,
