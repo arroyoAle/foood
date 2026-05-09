@@ -15,12 +15,23 @@ class GroupedList extends StatelessWidget {
     return ListView(
       children: [
         _buildSectionHeader(context, 'To Buy'),
+
         if (unselectedItems.isNotEmpty) ...[
           ..._buildGroupedItems(context, unselectedItems),
+        ] else ...[
+          Container(
+            alignment: Alignment.center,
+            child: Text("No items to buy"),
+          )
         ],
         _buildSectionHeader(context, 'In Cart'),
         if (selectedItems.isNotEmpty) ...[
           ..._buildGroupedItems(context, selectedItems),
+        ] else ...[
+          Container(
+            alignment: Alignment.center,
+            child: Text("No items in cart"),
+          )
         ],
       ],
     );

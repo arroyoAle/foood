@@ -108,6 +108,10 @@ void main() {
     // Initially "In Cart" and "To Buy" should both exist
     expect(find.text('To Buy'), findsOneWidget);
     expect(find.text('In Cart'), findsOneWidget);
+    
+    // Apples is in "To Buy", so "In Cart" should show empty message
+    expect(find.text('No items in cart'), findsOneWidget);
+    expect(find.text('No items to buy'), findsNothing);
 
     // Tap checkbox for Apples
     final checkbox = find.byType(Checkbox);
@@ -117,6 +121,10 @@ void main() {
     // Both headers should still exist
     expect(find.text('In Cart'), findsOneWidget);
     expect(find.text('To Buy'), findsOneWidget);
+    
+    // Apples moved to "In Cart", so "To Buy" should show empty message
+    expect(find.text('No items to buy'), findsOneWidget);
+    expect(find.text('No items in cart'), findsNothing);
   });
 
   testWidgets('Items are grouped by category within sections', (WidgetTester tester) async {
