@@ -9,17 +9,13 @@ part of 'item.dart';
 Item _$ItemFromJson(Map<String, dynamic> json) => Item(
   id: json['id'] as String,
   name: json['name'] as String,
-  units: json['units'] as String,
-  quantity: (json['quantity'] as num?)?.toInt() ?? 0,
-  selected: json['selected'] as bool? ?? false,
-  ordering: (json['ordering'] as num?)?.toInt() ?? 0,
+  defaultUnits: json['defaultUnits'] as String,
+  category: json['category'] as String,
 );
 
 Map<String, dynamic> _$ItemToJson(Item instance) => <String, dynamic>{
   'id': instance.id,
   'name': instance.name,
-  'units': instance.units,
-  'quantity': instance.quantity,
-  'selected': instance.selected,
-  'ordering': instance.ordering,
+  'defaultUnits': instance.defaultUnits,
+  'category': instance.category,
 };

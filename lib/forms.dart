@@ -1,329 +1,183 @@
 import 'package:flutter/material.dart';
-import 'package:foood/helpers/recipe_manager.dart';
-import 'package:foood/helpers/shopping_list_manager.dart';
-import 'package:foood/models/item.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:foood/providers/providers.dart';
 
-import 'helpers/item_manager.dart';
 
-class ItemForm extends StatefulWidget {
-  final ShoppingListManager manager;
-
-  const ItemForm({super.key, required this.manager});
+class IngredientForm extends ConsumerStatefulWidget {
+  const IngredientForm({super.key});
 
   @override
-  ItemFormState createState() {
-    return ItemFormState();
-  }
+  ConsumerState<IngredientForm> createState() => _IngredientFormState();
 }
 
-List<String> units = ['kg', 'g', 'l', 'ml', 'count'];
-
-class ItemFormState extends State<ItemForm> {
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController quantityController = TextEditingController();
-  final _itemFormKey = GlobalKey<FormState>();
-  String? _selectedUnits;
-
-
-  Future<void> onAdd() async {
-    if (!_itemFormKey.currentState!.validate()) {
-      return;
-    }
-
-    await widget.manager.addNewItemToActiveList(
-        name: nameController.text,
-        units: _selectedUnits!,
-        quantity: int.parse(quantityController.text));
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('New item added')),
-      );
-      Navigator.pop(context, true);
-    }
-  }
+class _IngredientFormState extends ConsumerState<IngredientForm> {
+  final _formKey = GlobalKey<FormState>();
+  String? _selectedItemId;
+  final _quantityController = TextEditingController(text: '1.0');
+  final _unitController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _itemFormKey,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Container(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'Add new item',
-              style: Theme.of(context).textTheme.headlineMedium,
+    final itemsAsync = ref.watch(itemsProvider);
+
+    return itemsAsync.when(
+      data: (items) => Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Add Ingredient',
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
-          ),
-          Container(
-            padding: const EdgeInsets.fromLTRB(0, 10, 10, 10),
-            child: TextFormField(
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'Item name',
-            ),
-            controller: nameController,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter some text';
-              }
-              return null;
-            }),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(0, 10, 10, 10),
-                  child: TextFormField(
-                    keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Item quantity',
-                  ),
-                  controller: quantityController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Enter a quantity';
-                    }
-                    return null;
-                  }),
-                ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              decoration: const InputDecoration(
+                labelText: 'Ingredient',
+                border: OutlineInputBorder(),
               ),
-              Flexible(
-                child: Container(
-                  alignment: Alignment.centerRight,
-                  child:
-                  DropdownButtonFormField<String>(
-                    decoration: InputDecoration(
+              items: items.map((item) => DropdownMenuItem(
+                value: item.id,
+                child: Text(item.name),
+              )).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedItemId = value;
+                  final item = items.firstWhere((i) => i.id == value);
+                  _unitController.text = item.defaultUnits;
+                });
+              },
+              validator: (value) => value == null ? 'Please select an ingredient' : null,
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: TextFormField(
+                    controller: _quantityController,
+                    decoration: const InputDecoration(
+                      labelText: 'Qty',
                       border: OutlineInputBorder(),
-                      labelText: 'Units',
                     ),
-                    items: units.map((unit) => DropdownMenuItem(
-                        value: unit,
-                        child: Text(unit)
-                    )).toList(),
-                    onChanged: (String? value) {
-                      setState(() {
-                        _selectedUnits = value;
-                      });
-                    },
+                    keyboardType: TextInputType.number,
                     validator: (value) {
-                      if (value == null) {
-                        return 'Select an option';
+                      if (value == null || double.tryParse(value) == null) {
+                        return 'Invalid';
                       }
                       return null;
                     },
-                  )
-                )
-              )
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                    Navigator.pop(context, false);
-                  },
-                child: const Text('Cancel'),
-              ),
-              const SizedBox(width: 8,),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  ),
                 ),
-                onPressed: onAdd,
-                child: const Text('Add'),
-              ),
-            ]
-          ),
-        ]
+                const SizedBox(width: 16),
+                Expanded(
+                  flex: 2,
+                  child: TextFormField(
+                    controller: _unitController,
+                    decoration: const InputDecoration(
+                      labelText: 'Unit',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) => value == null || value.isEmpty ? 'Required' : null,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      final recipe = ref.read(activeRecipeProvider);
+                      final item = items.firstWhere((i) => i.id == _selectedItemId);
+                      if (recipe != null) {
+                        await ref.read(recipesProvider.notifier).addIngredient(
+                          recipe.id,
+                          item,
+                          double.parse(_quantityController.text),
+                          _unitController.text,
+                        );
+                        if (context.mounted) Navigator.pop(context);
+                      }
+                    }
+                  },
+                  child: const Text('Add'),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, stack) => Center(child: Text('Error: $err')),
     );
   }
 }
 
-class IngredientForm extends StatefulWidget {
-  final RecipeManager recipeManager;
-  final ItemManager? itemManager;
-
-  const IngredientForm({super.key, required this.recipeManager, this.itemManager});
+class InstructionForm extends ConsumerStatefulWidget {
+  const InstructionForm({super.key});
 
   @override
-  IngredientFormState createState() {
-    return IngredientFormState();
-  }
+  ConsumerState<InstructionForm> createState() => _InstructionFormState();
 }
 
-class IngredientFormState extends State<IngredientForm> {
-  late final ItemManager _itemManager;
-  late Future<void> _loadingFuture;
-  final _ingredientFormKey = GlobalKey<FormState>();
+class _InstructionFormState extends ConsumerState<InstructionForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _controller = TextEditingController();
 
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    _itemManager = widget.itemManager ?? ItemManager();
-    _loadingFuture = _itemManager.loadAllItems();
-  }
-
-
-  Future<void> _onAdd() async {
-    // if (!_ingredientFormKey!.validate()) {
-    //   return;
-    // }
-
-  }
-
-  @override
-  Widget build(BuildContext context){
-    return FutureBuilder(future: _loadingFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        return
-          Form(
-            child: Column(
-              key: _ingredientFormKey,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Container(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Add new ingredient',
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.fromLTRB(0, 10, 10, 10),
-                  // todo: make into searchable dropdown https://pub.dev/packages/dropdown_search
-                  child: DropdownButtonFormField<String>(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Ingredient',
-                    ),
-                    items: _itemManager.allItems.map((item) => DropdownMenuItem(
-                        value: item.id,
-                        child: Text(item.name)
-                    )).toList(),
-                    onChanged: (String? ingredient) {
-                      setState(() {
-
-                      });
-                    },
-                  ),
-                ),
-                Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context, false);
-                        },
-                        child: const Text('Cancel'),
-                      ),
-                      const SizedBox(width: 8,),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.primary,
-                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                        ),
-                        onPressed: _onAdd,
-                        child: const Text('Add'),
-                      ),
-                    ]
-                ),
-              ],
-            ),
-          );
-    });
-  }
-}
-
-class InstructionForm extends StatefulWidget {
-  final RecipeManager recipeManager;
-
-  const InstructionForm({super.key, required this.recipeManager});
-
-  @override
-  InstructionFormState createState() {
-    return InstructionFormState();
-  }
-}
-
-class InstructionFormState extends State<InstructionForm> {
-  final TextEditingController instructionController = TextEditingController();
-  final _instructionFormKey = GlobalKey<FormState>();
-  late final ItemManager _manager;
-
-  @override
-  void initState() {
-    super.initState();
-    _manager = ItemManager();
-  }
-
-  Future<void> _onAdd() async {
-
-  }
-
-  @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Form(
-      key: _instructionFormKey,
+      key: _formKey,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'Add new instruction',
-              style: Theme.of(context).textTheme.headlineMedium,
+          Text(
+            'Add Instruction',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 16),
+          TextFormField(
+            controller: _controller,
+            decoration: const InputDecoration(
+              labelText: 'Instruction',
+              border: OutlineInputBorder(),
             ),
+            maxLines: 3,
+            validator: (value) => value == null || value.isEmpty ? 'Please enter instruction' : null,
           ),
-          Container(
-            padding: const EdgeInsets.fromLTRB(0, 10, 10, 10),
-            child: TextFormField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Instruction',
-                ),
-                controller: instructionController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter some text';
-                  }
-                  return null;
-                }),
-          ),
+          const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context, false);
-                },
+              TextButton(
+                onPressed: () => Navigator.pop(context),
                 child: const Text('Cancel'),
               ),
-              const SizedBox(width: 8,),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                ),
-                onPressed: _onAdd,
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    final recipe = ref.read(activeRecipeProvider);
+                    if (recipe != null) {
+                      await ref.read(recipesProvider.notifier).addInstruction(
+                        recipe.id,
+                        _controller.text,
+                      );
+                      if (context.mounted) Navigator.pop(context);
+                    }
+                  }
+                },
                 child: const Text('Add'),
               ),
-            ]
+            ],
           ),
         ],
       ),

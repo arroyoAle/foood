@@ -1,77 +1,61 @@
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:foood/models/shopping_list.dart';
+import 'package:foood/data/database.dart' as db;
 import 'package:foood/pages/all_lists.dart';
-import 'package:foood/pages/list.dart';
-import 'package:mockito/mockito.dart';
-
-import 'lists_widget_tests.mocks.dart';
-
+import 'package:foood/providers/providers.dart';
+import 'package:foood/pages/shopping_lists/shopping_list_screen.dart';
 
 void main() {
-  late MockShoppingListManager mockManager;
+  late db.AppDatabase database;
 
   setUp(() {
-    mockManager = MockShoppingListManager();
+    database = db.AppDatabase(NativeDatabase.memory());
+  });
+
+  tearDown(() async {
+    await database.close();
   });
 
   Future<void> pumpAllListsPage(WidgetTester tester) async {
-    await tester.pumpWidget(MaterialApp(
-      home: AllListsPage(manager: mockManager),
-      routes: {
-        '/list': (context) => ListPage(manager: mockManager),
-      },
-    ));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(database),
+        ],
+        child: MaterialApp(
+          home: const AllListsPage(),
+          routes: {
+            '/list': (context) => const ShoppingListScreen(),
+          },
+        ),
+      ),
+    );
   }
 
-  final testLists = [
-    ShoppingList(id: '1', name: 'Groceries', items: []),
-    ShoppingList(id: '2', name: 'Weekend BBQ', items: []),
-  ];
-
-  testWidgets('Shows CircularProgressIndicator while loading lists', (WidgetTester tester) async {
-    when(mockManager.loadAllLists()).thenAnswer((_) async => Future.value());
-    when(mockManager.allLists).thenReturn([]);
-
-    await pumpAllListsPage(tester);
-
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
-
-    await tester.pump();
-
-    expect(find.byType(CircularProgressIndicator), findsNothing);
-    expect(find.byIcon(Icons.add), findsOneWidget);
-  });
-
-  testWidgets('Shows a message or empty state when no lists are loaded', (WidgetTester tester) async {
-    when(mockManager.loadAllLists()).thenAnswer((_) async {});
-    when(mockManager.allLists).thenReturn([]);
-
+  testWidgets('Shows empty state when no lists exist', (WidgetTester tester) async {
     await pumpAllListsPage(tester);
     await tester.pumpAndSettle();
 
-    expect(find.byType(CircularProgressIndicator), findsNothing);
-    expect(find.byType(ListTile), findsNothing);
+    expect(find.text('No lists yet. Create one to get started.'), findsOneWidget);
     expect(find.byIcon(Icons.add), findsOneWidget);
   });
 
-  testWidgets('Displays a list of shopping lists when data is loaded', (WidgetTester tester) async {
-    when(mockManager.loadAllLists()).thenAnswer((_) async {});
-    when(mockManager.allLists).thenReturn(testLists);
+  testWidgets('Displays a list of shopping lists when data exists', (WidgetTester tester) async {
+    await database.shoppingDao.createList('Groceries');
+    await database.shoppingDao.createList('Weekend BBQ');
 
     await pumpAllListsPage(tester);
     await tester.pumpAndSettle();
 
     expect(find.text('Groceries'), findsOneWidget);
     expect(find.text('Weekend BBQ'), findsOneWidget);
-    expect(find.byType(ListTile), findsNWidgets(2));
+    expect(find.byType(Card), findsNWidgets(2));
   });
 
   testWidgets('Tapping a list navigates to the list page', (WidgetTester tester) async {
-    when(mockManager.loadAllLists()).thenAnswer((_) async {});
-    when(mockManager.allLists).thenReturn(testLists);
-    when(mockManager.setActiveList(any)).thenReturn(null);
-    when(mockManager.activeList).thenReturn(testLists.first);
+    await database.shoppingDao.createList('Groceries');
 
     await pumpAllListsPage(tester);
     await tester.pumpAndSettle();
@@ -79,8 +63,21 @@ void main() {
     await tester.tap(find.text('Groceries'));
     await tester.pumpAndSettle();
 
-    verify(mockManager.setActiveList(testLists.first)).called(1);
-    expect(find.byType(AllListsPage), findsNothing);
-    expect(find.byType(ListPage), findsOneWidget);
+    expect(find.byType(ShoppingListScreen), findsOneWidget);
+    expect(find.text('Shopping List'), findsOneWidget); // AppBar title
+  });
+
+  testWidgets('Creating a new list updates the UI', (WidgetTester tester) async {
+    await pumpAllListsPage(tester);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField), 'New List');
+    await tester.tap(find.text('Create'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('New List'), findsOneWidget);
   });
 }
