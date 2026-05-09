@@ -4,7 +4,6 @@ import 'package:foood/pages/shopping_lists/shopping_list_screen.dart';
 import 'package:foood/providers/providers.dart';
 
 import '../data/database.dart' as db;
-import '../notifiers/shopping_list_notifier.dart';
 import '../partials/drawer.dart';
 import '../partials/top_bar.dart';
 
@@ -13,16 +12,11 @@ class AllListsPage extends ConsumerWidget {
 
   final String title = 'Lists Home Page';
 
-  void _openList(BuildContext context, db.ShoppingList list) {
+  void _openList(BuildContext context, WidgetRef ref, db.ShoppingList list) {
+    ref.read(activeShoppingListIdProvider.notifier).state = list.id;
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ProviderScope(
-          overrides: [
-            activeShoppingListIdProvider.overrideWithValue(list.id),
-            shoppingListProvider.overrideWith(ShoppingListNotifier.new),
-          ],
-          child: const ShoppingListScreen(),
-        ),
+        builder: (context) => const ShoppingListScreen(),
       ),
     );
   }
@@ -85,7 +79,7 @@ class AllListsPage extends ConsumerWidget {
               child: ListTile(
                 title: Text(lists[index].name),
                 trailing: const Icon(Icons.chevron_right),
-                onTap: () => _openList(context, lists[index]),
+                onTap: () => _openList(context, ref, lists[index]),
               ),
             );
           },

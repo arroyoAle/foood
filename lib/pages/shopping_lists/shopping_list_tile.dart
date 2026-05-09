@@ -10,20 +10,20 @@ class ShoppingListTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ListTile(
-      leading: Checkbox(
-        value: listItem.selected,
-        onChanged: (_) =>
-            ref.read(shoppingListProvider.notifier).toggleSelected(listItem),
+    return Card(
+        child: CheckboxListTile(
+          value: listItem.selected,
+          onChanged: (_) =>
+              ref.read(shoppingListProvider.notifier).toggleSelected(listItem),
+          title: Text(listItem.item.name,
+            style: TextStyle(
+              decoration: listItem.selected ? TextDecoration.lineThrough : null,
+              color: listItem.selected ? Colors.grey : null,
+            ),
+          ),
+          secondary: Text('${listItem.quantityToBuy} ${listItem.units}'),
+          controlAffinity: ListTileControlAffinity.leading,
       ),
-      title: Text(
-        listItem.item.name,
-        style: TextStyle(
-          decoration: listItem.selected ? TextDecoration.lineThrough : null,
-          color: listItem.selected ? Colors.grey : null,
-        ),
-      ),
-      trailing: Text('${listItem.quantityToBuy} ${listItem.units}'),
     );
   }
 }

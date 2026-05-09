@@ -15,9 +15,7 @@ final shoppingRepositoryProvider = Provider<ShoppingRepository>((ref) {
   return ShoppingRepository(ref.watch(databaseProvider));
 });
 
-final activeShoppingListIdProvider = Provider<String>((ref) {
-  throw UnimplementedError('Override activeShoppingListIdProvider in your widget tree');
-});
+final activeShoppingListIdProvider = StateProvider<String>((ref) => '');
 
 final shoppingListProvider =
 AsyncNotifierProvider<ShoppingListNotifier, List<ListItem>>(
