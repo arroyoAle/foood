@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/providers.dart';
 import 'grouped_list.dart';
-import 'add_manual_item_dialog.dart';
+import 'dialogs/item_dialog.dart';
 
 class ShoppingListScreen extends ConsumerWidget {
   const ShoppingListScreen({super.key});
@@ -28,7 +28,7 @@ class ShoppingListScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () => showDialog(
           context: context,
-          builder: (_) => const AddManualItemDialog(),
+          builder: (_) => const ItemDialog(),
         ),
         child: const Icon(Icons.add),
       ),

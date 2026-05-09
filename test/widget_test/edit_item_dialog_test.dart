@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foood/data/database.dart' as db;
+import 'package:foood/pages/shopping_lists/dialogs/item_dialog.dart';
 import 'package:foood/pages/shopping_lists/shopping_list_screen.dart';
-import 'package:foood/pages/shopping_lists/edit_item_dialog.dart';
 import 'package:foood/providers/providers.dart';
 import 'package:foood/repositories/shopping_list_repository.dart';
 
@@ -35,7 +35,7 @@ void main() {
     );
   }
 
-  testWidgets('Long pressing an item opens EditItemDialog', (WidgetTester tester) async {
+  testWidgets('Long pressing an item opens ItemDialog', (WidgetTester tester) async {
     final list = await database.shoppingDao.createList('Test List');
     await repository.addManualItem(
       shoppingListId: list.id,
@@ -53,7 +53,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify dialog is shown
-    expect(find.byType(EditItemDialog), findsOneWidget);
+    expect(find.byType(ItemDialog), findsOneWidget);
     expect(find.text('Edit Item'), findsOneWidget);
     
     // Verify initial values in dialog
@@ -62,7 +62,7 @@ void main() {
     expect(find.text('kg'), findsAtLeastNWidgets(1));
   });
 
-  testWidgets('Saving changes in EditItemDialog updates the list', (WidgetTester tester) async {
+  testWidgets('Saving changes in ItemDialog updates the list', (WidgetTester tester) async {
     final list = await database.shoppingDao.createList('Test List');
     await repository.addManualItem(
       shoppingListId: list.id,
@@ -91,7 +91,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify dialog is closed
-    expect(find.byType(EditItemDialog), findsNothing);
+    expect(find.byType(ItemDialog), findsNothing);
 
     // Verify list is updated
     expect(find.text('Green Apples'), findsOneWidget);

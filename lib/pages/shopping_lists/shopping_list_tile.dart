@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foood/models/list_item.dart';
 import '../../providers/providers.dart';
-import 'edit_item_dialog.dart';
+import 'dialogs/item_dialog.dart';
 
 class ShoppingListTile extends ConsumerWidget {
   final ListItem listItem;
@@ -15,7 +15,7 @@ class ShoppingListTile extends ConsumerWidget {
         child: InkWell(
           onLongPress: () => showDialog(
             context: context,
-            builder: (_) => EditItemDialog(listItem: listItem),
+            builder: (_) => ItemDialog(listItem: listItem),
           ),
           child: CheckboxListTile(
             value: listItem.selected,

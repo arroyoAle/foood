@@ -1,30 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foood/models/list_item.dart';
-import '../../providers/providers.dart';
+import '../../../providers/providers.dart';
 
-class EditItemDialog extends ConsumerStatefulWidget {
-  final ListItem listItem;
+class ItemDialog extends ConsumerStatefulWidget {
+  final ListItem? listItem;
 
-  const EditItemDialog({super.key, required this.listItem});
+  const ItemDialog({super.key, this.listItem});
 
   @override
-  ConsumerState<EditItemDialog> createState() => _EditItemDialogState();
+  ConsumerState<ItemDialog> createState() => _ItemDialogState();
 }
 
-class _EditItemDialogState extends ConsumerState<EditItemDialog> {
+class _ItemDialogState extends ConsumerState<ItemDialog> {
   late final TextEditingController _nameController;
   late final TextEditingController _quantityController;
   late String _unit;
   late String _category;
 
+  bool get _isEditing => widget.listItem != null;
+
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.listItem.item.name);
-    _quantityController = TextEditingController(text: widget.listItem.quantityRequired.toString());
-    _unit = widget.listItem.units;
-    _category = widget.listItem.item.category;
+    _nameController = TextEditingController(text: widget.listItem?.item.name ?? '');
+    _quantityController = TextEditingController(
+      text: widget.listItem?.quantityRequired.toString() ?? '',
+    );
+    _unit = widget.listItem?.units ?? 'whole';
+    _category = widget.listItem?.item.category ?? 'Uncategorised';
   }
 
   @override
@@ -39,14 +43,25 @@ class _EditItemDialogState extends ConsumerState<EditItemDialog> {
     final quantity = double.tryParse(_quantityController.text) ?? 1;
     if (name.isEmpty) return;
 
-    ref.read(shoppingListProvider.notifier).updateManualItem(
-      listItemId: widget.listItem.id,
-      itemId: widget.listItem.itemId,
-      name: name,
-      quantity: quantity,
-      units: _unit,
-      category: _category,
-    );
+    final notifier = ref.read(shoppingListProvider.notifier);
+
+    if (_isEditing) {
+      notifier.updateManualItem(
+        listItemId: widget.listItem!.id,
+        itemId: widget.listItem!.itemId,
+        name: name,
+        quantity: quantity,
+        units: _unit,
+        category: _category,
+      );
+    } else {
+      notifier.addManualItem(
+        name: name,
+        quantity: quantity,
+        units: _unit,
+        category: _category,
+      );
+    }
 
     Navigator.of(context).pop();
   }
@@ -54,7 +69,7 @@ class _EditItemDialogState extends ConsumerState<EditItemDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Edit Item'),
+      title: Text(_isEditing ? 'Edit Item' : 'Add Item'),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -121,7 +136,7 @@ class _EditItemDialogState extends ConsumerState<EditItemDialog> {
         ),
         FilledButton(
           onPressed: _submit,
-          child: const Text('Save'),
+          child: Text(_isEditing ? 'Save' : 'Add'),
         ),
       ],
     );
