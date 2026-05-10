@@ -24,6 +24,7 @@ class GroupedList extends StatelessWidget {
             child: Text("No items to buy"),
           )
         ],
+        Divider(),
         _buildSectionHeader(context, 'In Cart'),
         if (selectedItems.isNotEmpty) ...[
           ..._buildGroupedItems(context, selectedItems),
