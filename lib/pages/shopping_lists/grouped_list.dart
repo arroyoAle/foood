@@ -65,6 +65,8 @@ class GroupedList extends StatelessWidget {
 
       return [
         Card(
+          color: Theme.of(context).colorScheme.surface,
+          elevation: 0,
           margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
           child: ExpansionTile(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
