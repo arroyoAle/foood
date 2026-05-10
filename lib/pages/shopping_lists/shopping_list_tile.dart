@@ -12,12 +12,15 @@ class ShoppingListTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
+      color: Theme.of(context).colorScheme.onInverseSurface,
         child: InkWell(
+          borderRadius: BorderRadius.circular(12),
           onLongPress: () => showDialog(
             context: context,
             builder: (_) => ItemDialog(listItem: listItem),
           ),
           child: CheckboxListTile(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             value: listItem.selected,
             onChanged: (_) =>
                 ref.read(shoppingListProvider.notifier).toggleSelected(listItem),

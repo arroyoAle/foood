@@ -120,6 +120,7 @@ class _RecipePageState extends ConsumerState<RecipePage> with SingleTickerProvid
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: ListTile(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               title: Text(ingredient.name),
               subtitle: Text('${ingredient.category} - ${ingredient.defaultUnits}'),
             ),
@@ -128,6 +129,7 @@ class _RecipePageState extends ConsumerState<RecipePage> with SingleTickerProvid
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: ListTile(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               title: const Text('Add new ingredient'),
               leading: const Icon(Icons.add),
               onTap: _addNewIngredient,
@@ -147,6 +149,7 @@ class _RecipePageState extends ConsumerState<RecipePage> with SingleTickerProvid
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: ListTile(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               leading: CircleAvatar(child: Text('${index + 1}')),
               title: Text(instruction),
             ),
@@ -155,6 +158,7 @@ class _RecipePageState extends ConsumerState<RecipePage> with SingleTickerProvid
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: ListTile(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               title: const Text('Add new instruction'),
               leading: const Icon(Icons.add),
               onTap: _addNewInstruction,

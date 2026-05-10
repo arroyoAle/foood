@@ -77,6 +77,7 @@ class AllListsPage extends ConsumerWidget {
           itemBuilder: (context, index) {
             return Card(
               child: ListTile(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 title: Text(lists[index].name),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => _openList(context, ref, lists[index]),

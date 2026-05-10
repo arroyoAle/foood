@@ -31,6 +31,7 @@ class GroupedList extends StatelessWidget {
         ] else ...[
           Container(
             alignment: Alignment.center,
+            padding: const EdgeInsets.fromLTRB(0, 16, 0, 32),
             child: Text("No items in cart"),
           )
         ],
@@ -63,19 +64,20 @@ class GroupedList extends StatelessWidget {
       categoryItems.sort((a, b) => a.ordering.compareTo(b.ordering));
 
       return [
-        ExpansionTile(
-          title: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-            child: Text(
-              category,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
+        Card(
+          margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          child: ExpansionTile(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            collapsedShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            title: Text(
+                category,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
-            ),
-          ),
-          initiallyExpanded: true,
-          shape: Border(),
-          children: categoryItems.map((item) => ShoppingListTile(listItem: item)).toList(),
+            initiallyExpanded: true,
+            children: categoryItems.map((item) => ShoppingListTile(listItem: item)).toList(),
+          )
         )
       ];
     }).toList();
