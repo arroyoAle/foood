@@ -44,8 +44,8 @@ class GroupedList extends StatelessWidget {
       child: Text(
         title,
         style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }
@@ -63,16 +63,20 @@ class GroupedList extends StatelessWidget {
       categoryItems.sort((a, b) => a.ordering.compareTo(b.ordering));
 
       return [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-          child: Text(
-            category,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
+        ExpansionTile(
+          title: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+            child: Text(
+              category,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
           ),
-        ),
-        ...categoryItems.map((item) => ShoppingListTile(listItem: item)),
+          initiallyExpanded: true,
+          shape: Border(),
+          children: categoryItems.map((item) => ShoppingListTile(listItem: item)).toList(),
+        )
       ];
     }).toList();
   }
