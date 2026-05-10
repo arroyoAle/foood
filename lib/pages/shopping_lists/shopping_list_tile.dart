@@ -11,24 +11,30 @@ class ShoppingListTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Card(
-        child: InkWell(
-          onLongPress: () => showDialog(
-            context: context,
-            builder: (_) => ItemDialog(listItem: listItem),
-          ),
-          child: CheckboxListTile(
-            value: listItem.selected,
-            onChanged: (_) =>
-                ref.read(shoppingListProvider.notifier).toggleSelected(listItem),
-            title: Text(listItem.item.name,
-              style: TextStyle(
-                decoration: listItem.selected ? TextDecoration.lineThrough : null,
-                color: listItem.selected ? Colors.grey : null,
-              ),
+      return Container(
+        padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+        child: Card(
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onLongPress: () => showDialog(
+              context: context,
+              builder: (_) => ItemDialog(listItem: listItem),
             ),
-            secondary: Text('${listItem.quantityToBuy} ${listItem.units}'),
-            controlAffinity: ListTileControlAffinity.leading,
+            child: CheckboxListTile(
+              contentPadding: const EdgeInsets.fromLTRB(8, 0, 16, 0),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              value: listItem.selected,
+              onChanged: (_) =>
+                  ref.read(shoppingListProvider.notifier).toggleSelected(listItem),
+              title: Text(listItem.item.name,
+                style: TextStyle(
+                  decoration: listItem.selected ? TextDecoration.lineThrough : null,
+                  color: listItem.selected ? Colors.grey : null,
+                ),
+              ),
+              secondary: Text('${listItem.quantityToBuy} ${listItem.units}'),
+              controlAffinity: ListTileControlAffinity.leading,
+          ),
         ),
       ),
     );

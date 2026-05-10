@@ -24,12 +24,14 @@ class GroupedList extends StatelessWidget {
             child: Text("No items to buy"),
           )
         ],
+        Divider(),
         _buildSectionHeader(context, 'In Cart'),
         if (selectedItems.isNotEmpty) ...[
           ..._buildGroupedItems(context, selectedItems),
         ] else ...[
           Container(
             alignment: Alignment.center,
+            padding: const EdgeInsets.fromLTRB(0, 16, 0, 32),
             child: Text("No items in cart"),
           )
         ],
@@ -43,8 +45,8 @@ class GroupedList extends StatelessWidget {
       child: Text(
         title,
         style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }
@@ -62,16 +64,23 @@ class GroupedList extends StatelessWidget {
       categoryItems.sort((a, b) => a.ordering.compareTo(b.ordering));
 
       return [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-          child: Text(
-            category,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+        Card(
+          color: Theme.of(context).colorScheme.surface,
+          elevation: 0,
+          margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          child: ExpansionTile(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            collapsedShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            title: Text(
+                category,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
                   color: Theme.of(context).colorScheme.primary,
                 ),
-          ),
-        ),
-        ...categoryItems.map((item) => ShoppingListTile(listItem: item)),
+              ),
+            initiallyExpanded: true,
+            children: categoryItems.map((item) => ShoppingListTile(listItem: item)).toList(),
+          )
+        )
       ];
     }).toList();
   }
