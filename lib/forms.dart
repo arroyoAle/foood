@@ -95,11 +95,11 @@ class _IngredientFormState extends ConsumerState<IngredientForm> {
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      final recipe = ref.read(activeRecipeProvider);
+                      final recipeId = ref.read(activeRecipeIdProvider);
                       final item = items.firstWhere((i) => i.id == _selectedItemId);
-                      if (recipe != null) {
+                      if (recipeId.isNotEmpty) {
                         await ref.read(recipesProvider.notifier).addIngredient(
-                          recipe.id,
+                          recipeId,
                           item,
                           double.parse(_quantityController.text),
                           _unitController.text,
@@ -165,10 +165,10 @@ class _InstructionFormState extends ConsumerState<InstructionForm> {
               ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    final recipe = ref.read(activeRecipeProvider);
-                    if (recipe != null) {
+                    final recipeId = ref.read(activeRecipeIdProvider);
+                    if (recipeId.isNotEmpty) {
                       await ref.read(recipesProvider.notifier).addInstruction(
-                        recipe.id,
+                        recipeId,
                         _controller.text,
                       );
                       if (context.mounted) Navigator.pop(context);

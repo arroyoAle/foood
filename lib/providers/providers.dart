@@ -48,8 +48,22 @@ final recipeRepositoryProvider = Provider<RecipeRepository>((ref) {
   return RecipeRepository(ref.watch(databaseProvider));
 });
 
-final activeRecipeProvider = StateProvider<Recipe?>((ref) => null);
+final activeRecipeIdProvider = StateProvider<String>((ref) => '');
 
 final recipesProvider = AsyncNotifierProvider<RecipeNotifier, List<Recipe>>(
   RecipeNotifier.new,
 );
+
+final selectedRecipeProvider = Provider<AsyncValue<Recipe?>>((ref) {
+  final recipesAsync = ref.watch(recipesProvider);
+  final activeId = ref.watch(activeRecipeIdProvider);
+
+  return recipesAsync.whenData((recipes) {
+    if (activeId.isEmpty) return null;
+    try {
+      return recipes.firstWhere((r) => r.id == activeId);
+    } catch (_) {
+      return null;
+    }
+  });
+});

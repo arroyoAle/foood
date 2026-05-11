@@ -21,15 +21,7 @@ class RecipeNotifier extends AsyncNotifier<List<Recipe>> {
     state = const AsyncLoading<List<Recipe>>().copyWithPrevious(state);
     state = await AsyncValue.guard(() async {
       await ref.read(recipeRepositoryProvider).addIngredient(recipeId, item, quantity, units);
-      final recipes = await ref.read(recipeRepositoryProvider).getAllRecipes();
-      
-      // Update active recipe if it matches
-      final active = ref.read(activeRecipeProvider);
-      if (active?.id == recipeId) {
-        ref.read(activeRecipeProvider.notifier).state = recipes.firstWhere((r) => r.id == recipeId);
-      }
-      
-      return recipes;
+      return ref.read(recipeRepositoryProvider).getAllRecipes();
     });
   }
 
@@ -37,15 +29,7 @@ class RecipeNotifier extends AsyncNotifier<List<Recipe>> {
     state = const AsyncLoading<List<Recipe>>().copyWithPrevious(state);
     state = await AsyncValue.guard(() async {
       await ref.read(recipeRepositoryProvider).addInstruction(recipeId, text);
-      final recipes = await ref.read(recipeRepositoryProvider).getAllRecipes();
-
-      // Update active recipe if it matches
-      final active = ref.read(activeRecipeProvider);
-      if (active?.id == recipeId) {
-        ref.read(activeRecipeProvider.notifier).state = recipes.firstWhere((r) => r.id == recipeId);
-      }
-
-      return recipes;
+      return ref.read(recipeRepositoryProvider).getAllRecipes();
     });
   }
 }

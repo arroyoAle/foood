@@ -12,7 +12,7 @@ class AllRecipesPage extends ConsumerWidget {
   final String title = 'Recipes Home Page';
 
   void _openList(BuildContext context, WidgetRef ref, Recipe recipe) {
-    ref.read(activeRecipeProvider.notifier).state = recipe;
+    ref.read(activeRecipeIdProvider.notifier).state = recipe.id;
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const RecipePage(),

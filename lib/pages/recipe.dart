@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foood/forms.dart';
 import 'package:foood/partials/top_bar.dart';
 import '../providers/providers.dart';
+import '../models/recipe.dart';
 
 class RecipePage extends ConsumerStatefulWidget {
   const RecipePage({super.key});
@@ -56,62 +57,72 @@ class _RecipePageState extends ConsumerState<RecipePage> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
-    final recipe = ref.watch(activeRecipeProvider);
+    final recipeAsync = ref.watch(selectedRecipeProvider);
 
-    if (recipe == null) {
-      return Scaffold(
-        appBar: TopBarPartial(title: widget.title),
-        body: const Center(child: Text('No recipe selected')),
-      );
-    }
+    return recipeAsync.when(
+      data: (recipe) {
+        if (recipe == null) {
+          return Scaffold(
+            appBar: TopBarPartial(title: widget.title),
+            body: const Center(child: Text('No recipe selected')),
+          );
+        }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Recipe'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextFormField(
-              initialValue: recipe.name,
-              decoration: const InputDecoration(
-                labelText: 'Recipe Name',
-                border: OutlineInputBorder(),
-              ),
-              onFieldSubmitted: (value) {
-                if (value.isNotEmpty) {
-                  ref.read(recipeRepositoryProvider).updateRecipeName(recipe.id, value);
-                }
-              },
-            ),
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Recipe'),
+            backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           ),
-          TabBar(
-            controller: _tabController,
-            labelColor: Theme.of(context).primaryColor,
-            unselectedLabelColor: Colors.grey,
-            tabs: const [
-              Tab(text: 'Ingredients'),
-              Tab(text: 'Instructions'),
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextFormField(
+                  initialValue: recipe.name,
+                  decoration: const InputDecoration(
+                    labelText: 'Recipe Name',
+                    border: OutlineInputBorder(),
+                  ),
+                  onFieldSubmitted: (value) {
+                    if (value.isNotEmpty) {
+                      ref.read(recipeRepositoryProvider).updateRecipeName(recipe.id, value);
+                    }
+                  },
+                ),
+              ),
+              TabBar(
+                controller: _tabController,
+                tabs: const [
+                  Tab(text: 'Ingredients'),
+                  Tab(text: 'Instructions'),
+                ],
+              ),
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildIngredientsList(recipe),
+                    _buildInstructionsList(recipe),
+                  ],
+                ),
+              ),
             ],
           ),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildIngredientsList(recipe),
-                _buildInstructionsList(recipe),
-              ],
-            ),
-          ),
-        ],
+        );
+      },
+      loading: () => Scaffold(
+        appBar: TopBarPartial(title: widget.title),
+        body: const Center(child: CircularProgressIndicator()),
+      ),
+      error: (err, stack) => Scaffold(
+        appBar: TopBarPartial(title: widget.title),
+        body: Center(child: Text('Error: $err')),
       ),
     );
   }
 
-  Widget _buildIngredientsList(recipe) {
+  Widget _buildIngredientsList(Recipe recipe) {
     return ListView.builder(
       itemCount: recipe.ingredients.length + 1,
       itemBuilder: (context, index) {
@@ -140,7 +151,7 @@ class _RecipePageState extends ConsumerState<RecipePage> with SingleTickerProvid
     );
   }
 
-  Widget _buildInstructionsList(recipe) {
+  Widget _buildInstructionsList(Recipe recipe) {
     return ListView.builder(
       itemCount: recipe.instructions.length + 1,
       itemBuilder: (context, index) {
