@@ -82,8 +82,8 @@ void main() {
     expect(find.text('Milk'), findsOneWidget);
     
     // Verify Categories are present
-    expect(find.text('Produce'), findsOneWidget);
-    expect(find.text('Dairy'), findsOneWidget);
+    expect(find.text('Produce (1)'), findsOneWidget);
+    expect(find.text('Dairy (1)'), findsOneWidget);
   });
 
   testWidgets('Moving item from "To Buy" to "In Cart" when selected', (WidgetTester tester) async {
@@ -155,8 +155,8 @@ void main() {
     await pumpShoppingListScreen(tester, list.id);
     await tester.pumpAndSettle();
 
-    expect(find.text('Produce'), findsOneWidget); // Category header appears once
-    expect(find.text('Dairy'), findsOneWidget);
+    expect(find.text('Produce (2)'), findsOneWidget); // Category header appears once
+    expect(find.text('Dairy (1)'), findsOneWidget);
     
     expect(find.text('Apples'), findsOneWidget);
     expect(find.text('Bananas'), findsOneWidget);
