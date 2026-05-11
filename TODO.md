@@ -3,10 +3,10 @@
 ## MVP
 
 ### 1. Home Screen & Dashboard
-- [ ] Replace default counter app with a functional dashboard.
+- [x] Replace default counter app with a functional dashboard.
 - [ ] Add "Next Meal" widget.
-- [ ] Add "Quick Access" to active shopping lists.
-- [ ] Add "Recent Recipes" section.
+- [x] Add "Quick Access" to active shopping lists.
+- [x] Add "Recent Recipes" section.
 
 ### 2. Meal Planning
 - [ ] Implement `MealPlan` and `MealPlanEntry` database tables.
@@ -16,7 +16,7 @@
 
 ### 3. Shopping List Enhancements
 - [ ] Add search and filter functionality
-- [ ] Allow collapsing of categories
+- [x] Allow collapsing of categories
 - [ ] Support adding images to items for more clarity
 - [ ] Add drag and drop support to re-order items
 
