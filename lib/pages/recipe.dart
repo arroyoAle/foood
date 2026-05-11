@@ -93,8 +93,6 @@ class _RecipePageState extends ConsumerState<RecipePage> with SingleTickerProvid
               ),
               TabBar(
                 controller: _tabController,
-                labelColor: Theme.of(context).primaryColor,
-                unselectedLabelColor: Colors.grey,
                 tabs: const [
                   Tab(text: 'Ingredients'),
                   Tab(text: 'Instructions'),
