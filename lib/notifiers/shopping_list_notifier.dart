@@ -41,6 +41,33 @@ class ShoppingListNotifier extends AsyncNotifier<List<ListItem>> {
     await repo.updateSelected(listItem.id, !listItem.selected);
   }
 
+  Future<void> reorderItem(ListItem item, int offset) async {
+    if (state.value == null) return;
+    final items = state.value!;
+
+    final sameCategoryItems = items
+        .where((i) =>
+            i.selected == item.selected &&
+            i.item.category == item.item.category)
+        .toList();
+    sameCategoryItems.sort((a, b) => a.ordering.compareTo(b.ordering));
+
+    final index = sameCategoryItems.indexWhere((i) => i.id == item.id);
+    final targetIndex = index + offset;
+
+    if (targetIndex < 0 || targetIndex >= sameCategoryItems.length) return;
+
+    final targetItem = sameCategoryItems[targetIndex];
+
+    final repo = ref.read(shoppingRepositoryProvider);
+    final listId = ref.read(activeShoppingListIdProvider);
+
+    await repo.db.shoppingDao.updateOrdering(item.id, targetItem.ordering);
+    await repo.db.shoppingDao.updateOrdering(targetItem.id, item.ordering);
+
+    state = AsyncData(await repo.getList(listId));
+  }
+
   Future<void> updateManualItem({
     required String listItemId,
     required String itemId,

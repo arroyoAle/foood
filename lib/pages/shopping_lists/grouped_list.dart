@@ -4,8 +4,19 @@ import 'shopping_list_tile.dart';
 
 class GroupedList extends StatelessWidget {
   final List<ListItem> items;
+  final ScrollController? scrollController;
+  final GlobalKey? toBuyKey;
+  final GlobalKey? inCartKey;
+  final bool isReorderMode;
 
-  const GroupedList({super.key, required this.items});
+  const GroupedList({
+    super.key,
+    required this.items,
+    this.scrollController,
+    this.toBuyKey,
+    this.inCartKey,
+    this.isReorderMode = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -13,19 +24,22 @@ class GroupedList extends StatelessWidget {
     final selectedItems = items.where((i) => i.selected).toList();
 
     return ListView(
+      controller: scrollController,
+      padding: const EdgeInsets.only(bottom: 100), // Space for floating toolbar
       children: [
-        _buildSectionHeader(context, 'To Buy'),
+        _buildSectionHeader(context, 'To Buy', toBuyKey),
 
         if (unselectedItems.isNotEmpty) ...[
           ..._buildGroupedItems(context, unselectedItems),
         ] else ...[
           Container(
             alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(vertical: 16),
             child: Text("No items to buy"),
           )
         ],
-        Divider(),
-        _buildSectionHeader(context, 'In Cart'),
+        const Divider(),
+        _buildSectionHeader(context, 'In Cart', inCartKey),
         if (selectedItems.isNotEmpty) ...[
           ..._buildGroupedItems(context, selectedItems),
         ] else ...[
@@ -39,8 +53,9 @@ class GroupedList extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(BuildContext context, String title) {
+  Widget _buildSectionHeader(BuildContext context, String title, GlobalKey? key) {
     return Padding(
+      key: key,
       padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
       child: Text(
         title,
@@ -78,7 +93,10 @@ class GroupedList extends StatelessWidget {
                 ),
               ),
             initiallyExpanded: true,
-            children: categoryItems.map((item) => ShoppingListTile(listItem: item)).toList(),
+            children: categoryItems.map((item) => ShoppingListTile(
+              listItem: item,
+              isReorderMode: isReorderMode,
+            )).toList(),
           )
         )
       ];
