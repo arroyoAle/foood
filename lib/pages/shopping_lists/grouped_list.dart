@@ -87,7 +87,7 @@ class GroupedList extends StatelessWidget {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             collapsedShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             title: Text(
-                category,
+                '$category (${categoryItems.length})',
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
                   color: Theme.of(context).colorScheme.primary,
                 ),
