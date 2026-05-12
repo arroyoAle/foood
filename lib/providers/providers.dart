@@ -36,6 +36,18 @@ AsyncNotifierProvider<AllListsNotifier, List<db.ShoppingList>>(
   AllListsNotifier.new,
 );
 
+final listSearchQueryProvider = StateProvider<String>((ref) => '');
+
+final filteredAllListsProvider = Provider<AsyncValue<List<db.ShoppingList>>>((ref) {
+  final allListsAsync = ref.watch(allListsProvider);
+  final query = ref.watch(listSearchQueryProvider).toLowerCase();
+
+  return allListsAsync.whenData((lists) {
+    if (query.isEmpty) return lists;
+    return lists.where((list) => list.name.toLowerCase().contains(query)).toList();
+  });
+});
+
 // Item providers
 final itemRepositoryProvider = Provider<ItemRepository>((ref) {
   return ItemRepository(ref.watch(databaseProvider));
@@ -44,6 +56,18 @@ final itemRepositoryProvider = Provider<ItemRepository>((ref) {
 final itemsProvider = AsyncNotifierProvider<ItemNotifier, List<Item>>(
   ItemNotifier.new,
 );
+
+final itemSearchQueryProvider = StateProvider<String>((ref) => '');
+
+final filteredShoppingListProvider = Provider<AsyncValue<List<ListItem>>>((ref) {
+  final listAsync = ref.watch(shoppingListProvider);
+  final query = ref.watch(itemSearchQueryProvider).toLowerCase();
+
+  return listAsync.whenData((items) {
+    if (query.isEmpty) return items;
+    return items.where((item) => item.item.name.toLowerCase().contains(query)).toList();
+  });
+});
 
 // Recipe providers
 final recipeRepositoryProvider = Provider<RecipeRepository>((ref) {
