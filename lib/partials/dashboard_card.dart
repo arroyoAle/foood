@@ -29,14 +29,18 @@ class DashboardCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(icon, color: Theme.of(context).colorScheme.primary, size: 20),
+                  Icon(
+                    icon,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       title,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                        fontWeight: FontWeight.bold,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),

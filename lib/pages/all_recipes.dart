@@ -13,11 +13,9 @@ class AllRecipesPage extends ConsumerWidget {
 
   void _openList(BuildContext context, WidgetRef ref, Recipe recipe) {
     ref.read(activeRecipeIdProvider.notifier).state = recipe.id;
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const RecipePage(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const RecipePage()));
   }
 
   @override
@@ -66,7 +64,9 @@ class AllRecipesPage extends ConsumerWidget {
                 FilledButton(
                   onPressed: () async {
                     if (nameController.text.isNotEmpty) {
-                      await ref.read(recipesProvider.notifier).createRecipe(nameController.text);
+                      await ref
+                          .read(recipesProvider.notifier)
+                          .createRecipe(nameController.text);
                       if (context.mounted) Navigator.pop(context);
                     }
                   },

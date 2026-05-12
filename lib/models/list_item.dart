@@ -16,7 +16,7 @@ class ListItem {
     required this.units,
     required this.selected,
     required this.ordering,
-});
+  });
   String id;
   String itemId;
   Item item;
@@ -27,7 +27,8 @@ class ListItem {
   bool selected;
   int ordering;
 
-  factory ListItem.fromJson(Map<String, dynamic> json) => _$ListItemFromJson(json);
+  factory ListItem.fromJson(Map<String, dynamic> json) =>
+      _$ListItemFromJson(json);
 
   Map<String, dynamic> toJson() => _$ListItemToJson(this);
 }

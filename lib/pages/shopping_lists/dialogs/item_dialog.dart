@@ -23,7 +23,9 @@ class _ItemDialogState extends ConsumerState<ItemDialog> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.listItem?.item.name ?? '');
+    _nameController = TextEditingController(
+      text: widget.listItem?.item.name ?? '',
+    );
     _quantityController = TextEditingController(
       text: widget.listItem?.quantityRequired.toString() ?? '',
     );
@@ -121,9 +123,8 @@ class _ItemDialogState extends ConsumerState<ItemDialog> {
                 'Fridge',
                 'Freezer',
                 'Packet mixes',
-                'Snacks'
-              ].map((u) => DropdownMenuItem(value: u, child: Text(u)))
-                  .toList(),
+                'Snacks',
+              ].map((u) => DropdownMenuItem(value: u, child: Text(u))).toList(),
               onChanged: (val) => setState(() => _category = val!),
             ),
           ],

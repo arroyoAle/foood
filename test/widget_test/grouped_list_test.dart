@@ -20,21 +20,24 @@ void main() {
     await database.close();
   });
 
-  Future<void> pumpShoppingListScreen(WidgetTester tester, String listId) async {
+  Future<void> pumpShoppingListScreen(
+    WidgetTester tester,
+    String listId,
+  ) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           databaseProvider.overrideWithValue(database),
           activeShoppingListIdProvider.overrideWith((ref) => listId),
         ],
-        child: const MaterialApp(
-          home: ShoppingListScreen(),
-        ),
+        child: const MaterialApp(home: ShoppingListScreen()),
       ),
     );
   }
 
-  testWidgets('Headers are not present if the list is completely empty', (WidgetTester tester) async {
+  testWidgets('Headers are not present if the list is completely empty', (
+    WidgetTester tester,
+  ) async {
     final list = await database.shoppingDao.createList('Test List');
 
     await pumpShoppingListScreen(tester, list.id);
@@ -48,9 +51,11 @@ void main() {
     expect(find.text('In Cart'), findsNothing);
   });
 
-  testWidgets('Displays "To Buy" and "In Cart" sections correctly', (WidgetTester tester) async {
+  testWidgets('Displays "To Buy" and "In Cart" sections correctly', (
+    WidgetTester tester,
+  ) async {
     final list = await database.shoppingDao.createList('Test List');
-    
+
     // Add an unselected item
     await repository.addManualItem(
       shoppingListId: list.id,
@@ -80,13 +85,15 @@ void main() {
     // Verify Items are present
     expect(find.text('Apples'), findsOneWidget);
     expect(find.text('Milk'), findsOneWidget);
-    
+
     // Verify Categories are present
     expect(find.text('Produce (1)'), findsOneWidget);
     expect(find.text('Dairy (1)'), findsOneWidget);
   });
 
-  testWidgets('Moving item from "To Buy" to "In Cart" when selected', (WidgetTester tester) async {
+  testWidgets('Moving item from "To Buy" to "In Cart" when selected', (
+    WidgetTester tester,
+  ) async {
     final list = await database.shoppingDao.createList('Test List');
     await repository.addManualItem(
       shoppingListId: list.id,
@@ -104,11 +111,11 @@ void main() {
     // Looking at grouped_list.dart:
     // if (unselectedItems.isNotEmpty) ...[ _buildSectionHeader(context, 'To Buy'), ... ]
     // if (selectedItems.isNotEmpty) ...[ _buildSectionHeader(context, 'In Cart'), ... ]
-    
+
     // Initially "In Cart" and "To Buy" should both exist
     expect(find.text('To Buy'), findsOneWidget);
     expect(find.text('In Cart'), findsOneWidget);
-    
+
     // Apples is in "To Buy", so "In Cart" should show empty message
     expect(find.text('No items in cart'), findsOneWidget);
     expect(find.text('No items to buy'), findsNothing);
@@ -121,15 +128,17 @@ void main() {
     // Both headers should still exist
     expect(find.text('In Cart'), findsOneWidget);
     expect(find.text('To Buy'), findsOneWidget);
-    
+
     // Apples moved to "In Cart", so "To Buy" should show empty message
     expect(find.text('No items to buy'), findsOneWidget);
     expect(find.text('No items in cart'), findsNothing);
   });
 
-  testWidgets('Items are grouped by category within sections', (WidgetTester tester) async {
+  testWidgets('Items are grouped by category within sections', (
+    WidgetTester tester,
+  ) async {
     final list = await database.shoppingDao.createList('Test List');
-    
+
     await repository.addManualItem(
       shoppingListId: list.id,
       name: 'Apples',
@@ -155,9 +164,12 @@ void main() {
     await pumpShoppingListScreen(tester, list.id);
     await tester.pumpAndSettle();
 
-    expect(find.text('Produce (2)'), findsOneWidget); // Category header appears once
+    expect(
+      find.text('Produce (2)'),
+      findsOneWidget,
+    ); // Category header appears once
     expect(find.text('Dairy (1)'), findsOneWidget);
-    
+
     expect(find.text('Apples'), findsOneWidget);
     expect(find.text('Bananas'), findsOneWidget);
     expect(find.text('Milk'), findsOneWidget);

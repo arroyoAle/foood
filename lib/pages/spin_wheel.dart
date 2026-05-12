@@ -22,10 +22,7 @@ class _SpinWheelPageState extends State<SpinWheelPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text('You have pushed the button this many times:'),
-            Text(
-              'test',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+            Text('test', style: Theme.of(context).textTheme.headlineMedium),
           ],
         ),
       ),

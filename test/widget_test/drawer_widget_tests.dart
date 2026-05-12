@@ -20,9 +20,7 @@ void main() {
   Future<void> pumpMyApp(WidgetTester tester) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          databaseProvider.overrideWithValue(database),
-        ],
+        overrides: [databaseProvider.overrideWithValue(database)],
         child: const MyApp(),
       ),
     );
@@ -35,7 +33,7 @@ void main() {
 
       expect(find.text('Foood Home Page'), findsOneWidget);
       expect(menuIcon, findsOneWidget);
-      
+
       await tester.tap(menuIcon);
       await tester.pump();
 

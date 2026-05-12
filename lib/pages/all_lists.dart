@@ -14,11 +14,9 @@ class AllListsPage extends ConsumerWidget {
 
   void _openList(BuildContext context, WidgetRef ref, db.ShoppingList list) {
     ref.read(activeShoppingListIdProvider.notifier).state = list.id;
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const ShoppingListScreen(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const ShoppingListScreen()));
   }
 
   void _showCreateListDialog(BuildContext context, WidgetRef ref) {
@@ -47,9 +45,9 @@ class AllListsPage extends ConsumerWidget {
                 if (context.mounted) Navigator.of(context).pop();
               } catch (e) {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(e.toString())),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(e.toString())));
                 }
               }
             },
@@ -73,7 +71,8 @@ class AllListsPage extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
-              onChanged: (value) => ref.read(listSearchQueryProvider.notifier).state = value,
+              onChanged: (value) =>
+                  ref.read(listSearchQueryProvider.notifier).state = value,
               decoration: InputDecoration(
                 hintText: 'Search lists...',
                 prefixIcon: const Icon(Icons.search),
@@ -98,18 +97,20 @@ class AllListsPage extends ConsumerWidget {
               data: (lists) => lists.isEmpty
                   ? const Center(child: Text('No lists found.'))
                   : ListView.builder(
-                itemCount: lists.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    child: ListTile(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      title: Text(lists[index].name),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () => _openList(context, ref, lists[index]),
+                      itemCount: lists.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                          child: ListTile(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            title: Text(lists[index].name),
+                            trailing: const Icon(Icons.chevron_right),
+                            onTap: () => _openList(context, ref, lists[index]),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
           ),
         ],

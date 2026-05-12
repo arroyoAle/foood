@@ -20,12 +20,12 @@ void main() {
     test('findOrCreateItem creates a new item if it does not exist', () async {
       const name = 'Apples';
       const units = 'kg';
-      
+
       final item = await repository.findOrCreateItem(name: name, units: units);
-      
+
       expect(item.name, name);
       expect(item.defaultUnits, units);
-      
+
       final itemsInDb = await database.select(database.items).get();
       expect(itemsInDb.length, 1);
       expect(itemsInDb.first.name, name);
@@ -34,29 +34,32 @@ void main() {
     test('findOrCreateItem returns existing item if it exists', () async {
       const name = 'Apples';
       await repository.findOrCreateItem(name: name, units: 'kg');
-      
+
       final item = await repository.findOrCreateItem(name: name, units: 'lbs');
-      
+
       expect(item.name, name);
-      expect(item.defaultUnits, 'kg'); // Should not change units of existing item
-      
+      expect(
+        item.defaultUnits,
+        'kg',
+      ); // Should not change units of existing item
+
       final itemsInDb = await database.select(database.items).get();
       expect(itemsInDb.length, 1);
     });
 
     test('addManualItem adds item to shopping list', () async {
       final list = await database.shoppingDao.createList('Test List');
-      
+
       final listItem = await repository.addManualItem(
         shoppingListId: list.id,
         name: 'Milk',
         quantity: 2.0,
         units: 'L',
       );
-      
+
       expect(listItem.item.name, 'Milk');
       expect(listItem.quantityRequired, 2.0);
-      
+
       final itemsInList = await repository.getList(list.id);
       expect(itemsInList.length, 1);
       expect(itemsInList.first.id, listItem.id);
@@ -70,9 +73,9 @@ void main() {
         quantity: 2.0,
         units: 'L',
       );
-      
+
       await repository.updateSelected(listItem.id, true);
-      
+
       final itemsInList = await repository.getList(list.id);
       expect(itemsInList.first.selected, isTrue);
     });
@@ -85,7 +88,7 @@ void main() {
         quantity: 2.0,
         units: 'L',
       );
-      
+
       await repository.updateManualItem(
         listItemId: listItem.id,
         itemId: listItem.itemId,
@@ -94,15 +97,15 @@ void main() {
         units: 'ml',
         category: 'Fridge',
       );
-      
+
       final updatedList = await repository.getList(list.id);
       final updatedItem = updatedList.first;
-      
+
       expect(updatedItem.item.name, 'Organic Milk');
       expect(updatedItem.quantityRequired, 3.0);
       expect(updatedItem.units, 'ml');
       expect(updatedItem.item.category, 'Fridge');
-      
+
       // Verify quantityToBuy is also updated (assuming 0 in pantry)
       expect(updatedItem.quantityToBuy, 3.0);
     });

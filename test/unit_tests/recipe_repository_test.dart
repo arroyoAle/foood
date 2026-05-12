@@ -23,7 +23,7 @@ void main() {
     test('createRecipe creates a new recipe', () async {
       final recipe = await recipeRepository.createRecipe('Pasta');
       expect(recipe.name, 'Pasta');
-      
+
       final allRecipes = await recipeRepository.getAllRecipes();
       expect(allRecipes.length, 1);
       expect(allRecipes.first.name, 'Pasta');
@@ -31,10 +31,13 @@ void main() {
 
     test('addIngredient adds an ingredient to a recipe', () async {
       final recipe = await recipeRepository.createRecipe('Pasta');
-      final item = await shoppingRepository.findOrCreateItem(name: 'Flour', units: 'g');
-      
+      final item = await shoppingRepository.findOrCreateItem(
+        name: 'Flour',
+        units: 'g',
+      );
+
       await recipeRepository.addIngredient(recipe.id, item, 500.0, 'g');
-      
+
       final recipes = await recipeRepository.getAllRecipes();
       expect(recipes.first.ingredients.length, 1);
       expect(recipes.first.ingredients.first.name, 'Flour');
@@ -42,10 +45,10 @@ void main() {
 
     test('addInstruction adds an instruction to a recipe', () async {
       final recipe = await recipeRepository.createRecipe('Pasta');
-      
+
       await recipeRepository.addInstruction(recipe.id, 'Boil water');
       await recipeRepository.addInstruction(recipe.id, 'Add pasta');
-      
+
       final recipes = await recipeRepository.getAllRecipes();
       expect(recipes.first.instructions.length, 2);
       expect(recipes.first.instructions[0], 'Boil water');
@@ -55,7 +58,7 @@ void main() {
     test('updateRecipeName updates the name', () async {
       final recipe = await recipeRepository.createRecipe('Pasta');
       await recipeRepository.updateRecipeName(recipe.id, 'Spaghetti');
-      
+
       final recipes = await recipeRepository.getAllRecipes();
       expect(recipes.first.name, 'Spaghetti');
     });

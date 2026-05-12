@@ -128,7 +128,11 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                     tooltip: 'Jump to In Cart',
                   ),
                   const VerticalDivider(
-                      width: 20, thickness: 1, indent: 12, endIndent: 12),
+                    width: 20,
+                    thickness: 1,
+                    indent: 12,
+                    endIndent: 12,
+                  ),
                   IconButton(
                     icon: Icon(isReorderMode ? Icons.check : Icons.swap_vert),
                     onPressed: () =>
@@ -137,8 +141,9 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                     color: isReorderMode
                         ? Theme.of(context).colorScheme.primary
                         : null,
-                    tooltip:
-                        isReorderMode ? 'Done Reordering' : 'Reorder Items',
+                    tooltip: isReorderMode
+                        ? 'Done Reordering'
+                        : 'Reorder Items',
                   ),
                 ],
               ),

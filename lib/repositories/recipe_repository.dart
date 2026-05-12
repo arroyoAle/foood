@@ -47,15 +47,17 @@ class RecipeRepository {
 
   Future<Recipe> createRecipe(String name) async {
     final id = _uuid.v4();
-    final companion = db.RecipesCompanion.insert(
-      id: id,
-      name: name,
-    );
+    final companion = db.RecipesCompanion.insert(id: id, name: name);
     await _db.recipeDao.insertRecipe(companion);
     return Recipe(id: id, name: name, instructions: [], ingredients: []);
   }
 
-  Future<void> addIngredient(String recipeId, Item item, double quantity, String units) async {
+  Future<void> addIngredient(
+    String recipeId,
+    Item item,
+    double quantity,
+    String units,
+  ) async {
     await _db.recipeDao.insertRecipeIngredient(
       db.RecipeIngredientsCompanion.insert(
         id: _uuid.v4(),
@@ -80,7 +82,8 @@ class RecipeRepository {
   }
 
   Future<void> updateRecipeName(String recipeId, String name) async {
-    await (_db.update(_db.recipes)..where((t) => t.id.equals(recipeId)))
-        .write(db.RecipesCompanion(name: Value(name)));
+    await (_db.update(_db.recipes)..where((t) => t.id.equals(recipeId))).write(
+      db.RecipesCompanion(name: Value(name)),
+    );
   }
 }

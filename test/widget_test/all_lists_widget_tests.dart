@@ -21,20 +21,18 @@ void main() {
   Future<void> pumpAllListsPage(WidgetTester tester) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          databaseProvider.overrideWithValue(database),
-        ],
+        overrides: [databaseProvider.overrideWithValue(database)],
         child: MaterialApp(
           home: const AllListsPage(),
-          routes: {
-            '/list': (context) => const ShoppingListScreen(),
-          },
+          routes: {'/list': (context) => const ShoppingListScreen()},
         ),
       ),
     );
   }
 
-  testWidgets('Shows empty state when no lists exist', (WidgetTester tester) async {
+  testWidgets('Shows empty state when no lists exist', (
+    WidgetTester tester,
+  ) async {
     await pumpAllListsPage(tester);
     await tester.pumpAndSettle();
 
@@ -42,7 +40,9 @@ void main() {
     expect(find.byIcon(Icons.add), findsOneWidget);
   });
 
-  testWidgets('Displays a list of shopping lists when data exists', (WidgetTester tester) async {
+  testWidgets('Displays a list of shopping lists when data exists', (
+    WidgetTester tester,
+  ) async {
     await database.shoppingDao.createList('Groceries');
     await database.shoppingDao.createList('Weekend BBQ');
 
@@ -54,7 +54,9 @@ void main() {
     expect(find.byType(Card), findsNWidgets(2));
   });
 
-  testWidgets('Tapping a list navigates to the list page', (WidgetTester tester) async {
+  testWidgets('Tapping a list navigates to the list page', (
+    WidgetTester tester,
+  ) async {
     await database.shoppingDao.createList('Groceries');
 
     await pumpAllListsPage(tester);
@@ -67,7 +69,9 @@ void main() {
     expect(find.text('Shopping List'), findsOneWidget); // AppBar title
   });
 
-  testWidgets('Creating a new list updates the UI', (WidgetTester tester) async {
+  testWidgets('Creating a new list updates the UI', (
+    WidgetTester tester,
+  ) async {
     await pumpAllListsPage(tester);
     await tester.pumpAndSettle();
 
@@ -86,7 +90,9 @@ void main() {
     expect(find.text('New List'), findsOneWidget);
   });
 
-  testWidgets('Searching lists filters the results', (WidgetTester tester) async {
+  testWidgets('Searching lists filters the results', (
+    WidgetTester tester,
+  ) async {
     await database.shoppingDao.createList('Groceries');
     await database.shoppingDao.createList('Weekend BBQ');
 
@@ -99,7 +105,9 @@ void main() {
     // Enter search text
     final searchField = find.ancestor(
       of: find.byType(TextField),
-      matching: find.byType(Column), // The search field is in a Column, not the dialog
+      matching: find.byType(
+        Column,
+      ), // The search field is in a Column, not the dialog
     );
     await tester.enterText(searchField, 'Groc');
     await tester.pumpAndSettle();
