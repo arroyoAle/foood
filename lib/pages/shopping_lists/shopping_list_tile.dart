@@ -7,11 +7,13 @@ import 'dialogs/item_dialog.dart';
 class ShoppingListTile extends ConsumerWidget {
   final ListItem listItem;
   final bool isReorderMode;
+  final int index;
 
   const ShoppingListTile({
     super.key,
     required this.listItem,
     this.isReorderMode = false,
+    required this.index,
   });
 
   @override
@@ -21,10 +23,12 @@ class ShoppingListTile extends ConsumerWidget {
       child: Card(
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
-          onLongPress: () => showDialog(
-            context: context,
-            builder: (_) => ItemDialog(listItem: listItem),
-          ),
+          onLongPress: isReorderMode
+              ? null
+              : () => showDialog(
+                    context: context,
+                    builder: (_) => ItemDialog(listItem: listItem),
+                  ),
           child: Row(
             children: [
               Expanded(
@@ -33,9 +37,11 @@ class ShoppingListTile extends ConsumerWidget {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
                   value: listItem.selected,
-                  onChanged: (_) => ref
-                      .read(shoppingListProvider.notifier)
-                      .toggleSelected(listItem),
+                  onChanged: isReorderMode
+                      ? null
+                      : (_) => ref
+                          .read(shoppingListProvider.notifier)
+                          .toggleSelected(listItem),
                   title: Text(
                     listItem.item.name,
                     style: TextStyle(
@@ -44,26 +50,20 @@ class ShoppingListTile extends ConsumerWidget {
                       color: listItem.selected ? Colors.grey : null,
                     ),
                   ),
-                  secondary: Text('${listItem.quantityToBuy} ${listItem.units}'),
+                  secondary: isReorderMode
+                      ? null
+                      : Text('${listItem.quantityToBuy} ${listItem.units}'),
                   controlAffinity: ListTileControlAffinity.leading,
+                  enabled: !isReorderMode,
                 ),
               ),
               if (isReorderMode)
-                Column(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.keyboard_arrow_up),
-                      onPressed: () => ref
-                          .read(shoppingListProvider.notifier)
-                          .reorderItem(listItem, -1),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.keyboard_arrow_down),
-                      onPressed: () => ref
-                          .read(shoppingListProvider.notifier)
-                          .reorderItem(listItem, 1),
-                    ),
-                  ],
+                ReorderableDragStartListener(
+                  index: index,
+                  child: const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Icon(Icons.drag_handle),
+                  ),
                 ),
             ],
           ),

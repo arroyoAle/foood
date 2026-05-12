@@ -120,7 +120,7 @@ void main() {
     expect(find.byIcon(Icons.add), findsOneWidget);
   });
 
-  testWidgets('Reorder mode shows movement arrows', (WidgetTester tester) async {
+  testWidgets('Reorder mode shows drag handle and hides checkboxes', (WidgetTester tester) async {
     final list = await database.shoppingDao.createList('Test List');
     await repository.addManualItem(
       shoppingListId: list.id,
@@ -133,22 +133,26 @@ void main() {
     await pumpShoppingListScreen(tester, list.id);
     await tester.pumpAndSettle();
 
-    // Movement arrows should NOT be present initially
-    expect(find.byIcon(Icons.keyboard_arrow_up), findsNothing);
-    expect(find.byIcon(Icons.keyboard_arrow_down), findsNothing);
+    // Drag handle should NOT be present initially
+    expect(find.byIcon(Icons.drag_handle), findsNothing);
+    // Checkbox SHOULD be present initially
+    expect(find.byType(Checkbox), findsOneWidget);
 
     // Toggle reorder mode
     await tester.tap(find.byIcon(Icons.swap_vert));
     await tester.pumpAndSettle();
 
-    // Movement arrows SHOULD be present now
-    expect(find.byIcon(Icons.keyboard_arrow_up), findsOneWidget);
-    expect(find.byIcon(Icons.keyboard_arrow_down), findsOneWidget);
+    // Drag handle SHOULD be present now
+    expect(find.byIcon(Icons.drag_handle), findsOneWidget);
+    // Checkbox SHOULD be hidden/disabled now
+    final checkbox = tester.widget<CheckboxListTile>(find.byType(CheckboxListTile));
+    expect(checkbox.enabled, isFalse);
     
     // Toggle back
     await tester.tap(find.byIcon(Icons.check));
     await tester.pumpAndSettle();
     
-    expect(find.byIcon(Icons.keyboard_arrow_up), findsNothing);
+    expect(find.byIcon(Icons.drag_handle), findsNothing);
+    expect(find.byType(Checkbox), findsOneWidget);
   });
 }
