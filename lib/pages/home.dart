@@ -98,7 +98,7 @@ class MyHomePage extends ConsumerWidget {
                 loading: () => const Center(
                   child: CircularProgressIndicator(strokeWidth: 2),
                 ),
-                error: (_, __) =>
+                error: (_, _) =>
                     const Center(child: Icon(Icons.error, size: 16)),
               ),
             ),
@@ -145,21 +145,10 @@ class MyHomePage extends ConsumerWidget {
                             )
                             .toList(),
                       ),
-
-                // ListView.builder(
-                //         shrinkWrap: true,
-                //         physics: const NeverScrollableScrollPhysics(),
-                //         itemCount: recipes.length > 2 ? 2 : recipes.length,
-                //         itemBuilder: (context, index) => Text(
-                //           "• ${recipes[index].name}",
-                //           style: const TextStyle(fontSize: 12),
-                //           overflow: TextOverflow.ellipsis,
-                //         ),
-                //       ),
                 loading: () => const Center(
                   child: CircularProgressIndicator(strokeWidth: 2),
                 ),
-                error: (_, __) =>
+                error: (_, _) =>
                     const Center(child: Icon(Icons.error, size: 16)),
               ),
             ),
