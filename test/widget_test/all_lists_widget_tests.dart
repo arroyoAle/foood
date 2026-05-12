@@ -36,10 +36,7 @@ void main() {
     await pumpAllListsPage(tester);
     await tester.pumpAndSettle();
 
-    expect(
-      find.text('No lists yet. Create one to get started.'),
-      findsOneWidget,
-    );
+    expect(find.text('No lists found.'), findsOneWidget);
     expect(find.byIcon(Icons.add), findsOneWidget);
   });
 
@@ -81,10 +78,44 @@ void main() {
     await tester.tap(find.byIcon(Icons.add));
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextField), 'New List');
+    // Use a more specific finder for the dialog TextField if there are multiple TextFields
+    final textField = find.ancestor(
+      of: find.byType(TextField),
+      matching: find.byType(AlertDialog),
+    );
+    await tester.enterText(textField, 'New List');
     await tester.tap(find.text('Create'));
     await tester.pumpAndSettle();
 
     expect(find.text('New List'), findsOneWidget);
+  });
+
+  testWidgets('Searching lists filters the results', (WidgetTester tester) async {
+    await database.shoppingDao.createList('Groceries');
+    await database.shoppingDao.createList('Weekend BBQ');
+
+    await pumpAllListsPage(tester);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Groceries'), findsOneWidget);
+    expect(find.text('Weekend BBQ'), findsOneWidget);
+
+    // Enter search text
+    final searchField = find.ancestor(
+      of: find.byType(TextField),
+      matching: find.byType(Column), // The search field is in a Column, not the dialog
+    );
+    await tester.enterText(searchField, 'Groc');
+    await tester.pumpAndSettle();
+
+    expect(find.text('Groceries'), findsOneWidget);
+    expect(find.text('Weekend BBQ'), findsNothing);
+
+    // Clear search
+    await tester.tap(find.byIcon(Icons.clear));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Groceries'), findsOneWidget);
+    expect(find.text('Weekend BBQ'), findsOneWidget);
   });
 }

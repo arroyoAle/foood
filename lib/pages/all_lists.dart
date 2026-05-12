@@ -60,26 +60,47 @@ class AllListsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final listsAsync = ref.watch(allListsProvider);
+    final listsAsync = ref.watch(filteredAllListsProvider);
+    final searchQuery = ref.watch(listSearchQueryProvider);
 
     return Scaffold(
       appBar: TopBarPartial(title: title),
       drawer: DrawerPartial(currentPage: 'lists_page'),
-      body: listsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
-        data: (lists) => lists.isEmpty
-            ? const Center(
-                child: Text('No lists yet. Create one to get started.'),
-              )
-            : ListView.builder(
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              onChanged: (value) => ref.read(listSearchQueryProvider.notifier).state = value,
+              decoration: InputDecoration(
+                hintText: 'Search lists...',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: searchQuery.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          ref.read(listSearchQueryProvider.notifier).state = '';
+                        },
+                      )
+                    : null,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: listsAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: Text('Error: $e')),
+              data: (lists) => lists.isEmpty
+                  ? const Center(child: Text('No lists found.'))
+                  : ListView.builder(
                 itemCount: lists.length,
                 itemBuilder: (context, index) {
                   return Card(
                     child: ListTile(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       title: Text(lists[index].name),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => _openList(context, ref, lists[index]),
@@ -87,6 +108,9 @@ class AllListsPage extends ConsumerWidget {
                   );
                 },
               ),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCreateListDialog(context, ref),
