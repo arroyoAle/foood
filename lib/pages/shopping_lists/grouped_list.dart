@@ -29,6 +29,7 @@ class GroupedList extends StatelessWidget {
       controller: scrollController,
       padding: const EdgeInsets.only(bottom: 100), // Space for floating toolbar
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildSectionHeader(context, 'To Buy', toBuyKey),
           if (unselectedItems.isNotEmpty) ...[
