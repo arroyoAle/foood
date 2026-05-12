@@ -15,10 +15,13 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _toBuyKey = GlobalKey();
   final GlobalKey _inCartKey = GlobalKey();
+  bool _isSearching = false;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -35,13 +38,41 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final listAsync = ref.watch(shoppingListProvider);
+    final listAsync = ref.watch(filteredShoppingListProvider);
     final isReorderMode = ref.watch(isReorderModeProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Shopping List'),
+        title: _isSearching
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  hintText: 'Search items...',
+                  border: InputBorder.none,
+                ),
+                onChanged: (value) {
+                  ref.read(itemSearchQueryProvider.notifier).state = value;
+                },
+              )
+            : const Text('Shopping List'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          IconButton(
+            icon: Icon(_isSearching ? Icons.close : Icons.search),
+            onPressed: () {
+              setState(() {
+                if (_isSearching) {
+                  _isSearching = false;
+                  _searchController.clear();
+                  ref.read(itemSearchQueryProvider.notifier).state = '';
+                } else {
+                  _isSearching = true;
+                }
+              });
+            },
+          ),
+        ],
       ),
       body: listAsync.when(
         loading: () => listAsync.value != null
