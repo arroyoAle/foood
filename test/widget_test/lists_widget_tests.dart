@@ -155,4 +155,46 @@ void main() {
     expect(find.byIcon(Icons.drag_handle), findsNothing);
     expect(find.byType(Checkbox), findsOneWidget);
   });
+
+  testWidgets('Searching items filters the list', (WidgetTester tester) async {
+    final list = await database.shoppingDao.createList('Test List');
+    await repository.addManualItem(
+      shoppingListId: list.id,
+      name: 'Apples',
+      quantity: 2.0,
+      units: 'kg',
+      category: 'Produce',
+    );
+    await repository.addManualItem(
+      shoppingListId: list.id,
+      name: 'Bananas',
+      quantity: 1.0,
+      units: 'bunch',
+      category: 'Produce',
+    );
+
+    await pumpShoppingListScreen(tester, list.id);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Apples'), findsOneWidget);
+    expect(find.text('Bananas'), findsOneWidget);
+
+    // Toggle search
+    await tester.tap(find.byIcon(Icons.search));
+    await tester.pumpAndSettle();
+
+    // Enter search text
+    await tester.enterText(find.byType(TextField), 'Appl');
+    await tester.pumpAndSettle();
+
+    expect(find.text('Apples'), findsOneWidget);
+    expect(find.text('Bananas'), findsNothing);
+
+    // Close search
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Apples'), findsOneWidget);
+    expect(find.text('Bananas'), findsOneWidget);
+  });
 }

@@ -18,7 +18,7 @@
 - [ ] Add search and filter functionality
 - [x] Allow collapsing of categories
 - [ ] Support adding images to items for more clarity
-- [ ] Add drag and drop support to re-order items
+- [x] Add drag and drop support to re-order items
 
 ### 4. Recipe Management
 - [ ] Save name changes
