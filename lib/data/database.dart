@@ -152,6 +152,24 @@ class ShoppingDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
+  Future<void> updateOrdering(String id, int ordering) {
+    return (update(shoppingListItems)..where((i) => i.id.equals(id))).write(
+      ShoppingListItemsCompanion(ordering: Value(ordering)),
+    );
+  }
+
+  Future<void> updateAllOrderings(List<({String id, int ordering})> updates) async {
+    await batch((batch) {
+      for (final update in updates) {
+        batch.update(
+          shoppingListItems,
+          ShoppingListItemsCompanion(ordering: Value(update.ordering)),
+          where: (t) => t.id.equals(update.id),
+        );
+      }
+    });
+  }
+
   Future<void> updateItem({
     required String id,
     required String name,

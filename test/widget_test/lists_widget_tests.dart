@@ -43,29 +43,54 @@ void main() {
     expect(find.text('No items yet'), findsOneWidget);
   });
 
-  testWidgets('Displays items in the list', (WidgetTester tester) async {
+  testWidgets('Displays items in the list and category headings with counts', (WidgetTester tester) async {
     final list = await database.shoppingDao.createList('Test List');
     await repository.addManualItem(
       shoppingListId: list.id,
       name: 'Apples',
       quantity: 2.0,
       units: 'kg',
+      category: 'Produce',
+    );
+    await repository.addManualItem(
+      shoppingListId: list.id,
+      name: 'Bananas',
+      quantity: 1.0,
+      units: 'bunch',
+      category: 'Produce',
+    );
+    await repository.addManualItem(
+      shoppingListId: list.id,
+      name: 'Milk',
+      quantity: 1.0,
+      units: 'L',
+      category: 'Dairy',
     );
 
     await pumpShoppingListScreen(tester, list.id);
     await tester.pumpAndSettle();
 
     expect(find.text('Apples'), findsOneWidget);
-    expect(find.text('2.0 kg'), findsOneWidget);
+    expect(find.text('Bananas'), findsOneWidget);
+    expect(find.text('Milk'), findsOneWidget);
+
+    // Check category headings with counts
+    expect(find.text('Produce (2)'), findsOneWidget);
+    expect(find.text('Dairy (1)'), findsOneWidget);
+    
+    // Check section headers
+    expect(find.text('To Buy'), findsOneWidget);
+    expect(find.text('In Cart'), findsOneWidget);
   });
 
-  testWidgets('Tapping checkbox updates selection', (WidgetTester tester) async {
+  testWidgets('Tapping checkbox moves item to In Cart section', (WidgetTester tester) async {
     final list = await database.shoppingDao.createList('Test List');
     await repository.addManualItem(
       shoppingListId: list.id,
       name: 'Apples',
       quantity: 2.0,
       units: 'kg',
+      category: 'Produce',
     );
 
     await pumpShoppingListScreen(tester, list.id);
@@ -77,6 +102,57 @@ void main() {
     await tester.tap(checkbox);
     await tester.pumpAndSettle();
 
+    // After tapping, it should be selected
     expect(tester.widget<Checkbox>(checkbox).value, isTrue);
+    
+    // And Produce (1) should still exist but under "In Cart"
+    expect(find.text('Produce (1)'), findsOneWidget);
+  });
+
+  testWidgets('Floating toolbar contains jump buttons and reorder toggle', (WidgetTester tester) async {
+    final list = await database.shoppingDao.createList('Test List');
+    await pumpShoppingListScreen(tester, list.id);
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.arrow_upward), findsOneWidget);
+    expect(find.byIcon(Icons.arrow_downward), findsOneWidget);
+    expect(find.byIcon(Icons.swap_vert), findsOneWidget);
+    expect(find.byIcon(Icons.add), findsOneWidget);
+  });
+
+  testWidgets('Reorder mode shows drag handle and hides checkboxes', (WidgetTester tester) async {
+    final list = await database.shoppingDao.createList('Test List');
+    await repository.addManualItem(
+      shoppingListId: list.id,
+      name: 'Apples',
+      quantity: 2.0,
+      units: 'kg',
+      category: 'Produce',
+    );
+
+    await pumpShoppingListScreen(tester, list.id);
+    await tester.pumpAndSettle();
+
+    // Drag handle should NOT be present initially
+    expect(find.byIcon(Icons.drag_handle), findsNothing);
+    // Checkbox SHOULD be present initially
+    expect(find.byType(Checkbox), findsOneWidget);
+
+    // Toggle reorder mode
+    await tester.tap(find.byIcon(Icons.swap_vert));
+    await tester.pumpAndSettle();
+
+    // Drag handle SHOULD be present now
+    expect(find.byIcon(Icons.drag_handle), findsOneWidget);
+    // Checkbox SHOULD be hidden/disabled now
+    final checkbox = tester.widget<CheckboxListTile>(find.byType(CheckboxListTile));
+    expect(checkbox.enabled, isFalse);
+    
+    // Toggle back
+    await tester.tap(find.byIcon(Icons.check));
+    await tester.pumpAndSettle();
+    
+    expect(find.byIcon(Icons.drag_handle), findsNothing);
+    expect(find.byType(Checkbox), findsOneWidget);
   });
 }

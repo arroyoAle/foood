@@ -41,6 +41,61 @@ class ShoppingListNotifier extends AsyncNotifier<List<ListItem>> {
     await repo.updateSelected(listItem.id, !listItem.selected);
   }
 
+  Future<void> reorderItem(ListItem item, int offset) async {
+    if (state.value == null) return;
+    final items = state.value!;
+
+    final sameCategoryItems = items
+        .where((i) =>
+            i.selected == item.selected &&
+            i.item.category == item.item.category)
+        .toList();
+    sameCategoryItems.sort((a, b) => a.ordering.compareTo(b.ordering));
+
+    final index = sameCategoryItems.indexWhere((i) => i.id == item.id);
+    final targetIndex = index + offset;
+
+    if (targetIndex < 0 || targetIndex >= sameCategoryItems.length) return;
+
+    final targetItem = sameCategoryItems[targetIndex];
+
+    final repo = ref.read(shoppingRepositoryProvider);
+    final listId = ref.read(activeShoppingListIdProvider);
+
+    await repo.db.shoppingDao.updateOrdering(item.id, targetItem.ordering);
+    await repo.db.shoppingDao.updateOrdering(targetItem.id, item.ordering);
+
+    state = AsyncData(await repo.getList(listId));
+  }
+
+  Future<void> reorderItemsInCategory(
+    List<ListItem> categoryItems,
+    int oldIndex,
+    int newIndex,
+  ) async {
+    if (newIndex > oldIndex) newIndex -= 1;
+    if (oldIndex == newIndex) return;
+
+    final movedItem = categoryItems.removeAt(oldIndex);
+    categoryItems.insert(newIndex, movedItem);
+
+    final repo = ref.read(shoppingRepositoryProvider);
+    final listId = ref.read(activeShoppingListIdProvider);
+
+    // We keep the actual ordering values from the original items but redistribute them
+    // This assumes original orderings were sorted.
+    final originalOrderings = categoryItems.map((i) => i.ordering).toList();
+    originalOrderings.sort();
+
+    final updates = <({String id, int ordering})>[];
+    for (int i = 0; i < categoryItems.length; i++) {
+      updates.add((id: categoryItems[i].id, ordering: originalOrderings[i]));
+    }
+
+    await repo.db.shoppingDao.updateAllOrderings(updates);
+    state = AsyncData(await repo.getList(listId));
+  }
+
   Future<void> updateManualItem({
     required String listItemId,
     required String itemId,

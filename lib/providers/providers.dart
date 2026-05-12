@@ -29,6 +29,8 @@ AsyncNotifierProvider<ShoppingListNotifier, List<ListItem>>(
   ShoppingListNotifier.new,
 );
 
+final isReorderModeProvider = StateProvider<bool>((ref) => false);
+
 final allListsProvider =
 AsyncNotifierProvider<AllListsNotifier, List<db.ShoppingList>>(
   AllListsNotifier.new,

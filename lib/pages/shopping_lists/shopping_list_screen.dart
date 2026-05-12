@@ -4,12 +4,39 @@ import '../../providers/providers.dart';
 import 'grouped_list.dart';
 import 'dialogs/item_dialog.dart';
 
-class ShoppingListScreen extends ConsumerWidget {
+class ShoppingListScreen extends ConsumerStatefulWidget {
   const ShoppingListScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ShoppingListScreen> createState() => _ShoppingListScreenState();
+}
+
+class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _toBuyKey = GlobalKey();
+  final GlobalKey _inCartKey = GlobalKey();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToSection(GlobalKey key) {
+    final context = key.currentContext;
+    if (context != null) {
+      Scrollable.ensureVisible(
+        context,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final listAsync = ref.watch(shoppingListProvider);
+    final isReorderMode = ref.watch(isReorderModeProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -18,19 +45,83 @@ class ShoppingListScreen extends ConsumerWidget {
       ),
       body: listAsync.when(
         loading: () => listAsync.value != null
-            ? GroupedList(items: listAsync.value!)
+            ? GroupedList(
+                items: listAsync.value!,
+                scrollController: _scrollController,
+                toBuyKey: _toBuyKey,
+                inCartKey: _inCartKey,
+                isReorderMode: isReorderMode,
+              )
             : const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (items) => items.isEmpty
             ? const Center(child: Text('No items yet'))
-            : GroupedList(items: items),
+            : GroupedList(
+                items: items,
+                scrollController: _scrollController,
+                toBuyKey: _toBuyKey,
+                inCartKey: _inCartKey,
+                isReorderMode: isReorderMode,
+              ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => showDialog(
-          context: context,
-          builder: (_) => const ItemDialog(),
-        ),
-        child: const Icon(Icons.add),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            height: 56,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.secondaryContainer,
+              borderRadius: BorderRadius.circular(28),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.2),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: IntrinsicHeight(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_upward),
+                    onPressed: () => _scrollToSection(_toBuyKey),
+                    tooltip: 'Jump to To Buy',
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.arrow_downward),
+                    onPressed: () => _scrollToSection(_inCartKey),
+                    tooltip: 'Jump to In Cart',
+                  ),
+                  const VerticalDivider(
+                      width: 20, thickness: 1, indent: 12, endIndent: 12),
+                  IconButton(
+                    icon: Icon(isReorderMode ? Icons.check : Icons.swap_vert),
+                    onPressed: () =>
+                        ref.read(isReorderModeProvider.notifier).state =
+                            !isReorderMode,
+                    color: isReorderMode
+                        ? Theme.of(context).colorScheme.primary
+                        : null,
+                    tooltip:
+                        isReorderMode ? 'Done Reordering' : 'Reorder Items',
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          FloatingActionButton(
+            onPressed: () => showDialog(
+              context: context,
+              builder: (_) => const ItemDialog(),
+            ),
+            child: const Icon(Icons.add),
+          ),
+        ],
       ),
     );
   }
