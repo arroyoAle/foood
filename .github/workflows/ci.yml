@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  version-check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR Branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: head
+
+      - name: Checkout Base Branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+
+      - name: Compare Versions
+        shell: bash
+        run: |
+          NEW_VER=$(grep '^version: ' head/pubspec.yaml | cut -d' ' -f2)
+          OLD_VER=$(grep '^version: ' base/pubspec.yaml | cut -d' ' -f2)
+          
+          echo "Base Version: $OLD_VER"
+          echo "PR Version: $NEW_VER"
+          
+          # Function to check if v1 > v2
+          version_gt() {
+            local v1_name=$(echo "$1" | cut -d'+' -f1)
+            local v1_build=$(echo "$1" | cut -d'+' -f2 -s || echo 0)
+            local v2_name=$(echo "$2" | cut -d'+' -f1)
+            local v2_build=$(echo "$2" | cut -d'+' -f2 -s || echo 0)
+
+            # 1. Compare version names using sort -V
+            if [ "$v1_name" != "$v2_name" ]; then
+              if [ "$(printf '%s\n%s' "$v1_name" "$v2_name" | sort -V | head -n1)" == "$v2_name" ]; then
+                return 0 # v1_name > v2_name
+              else
+                return 1 # v1_name < v2_name
+              fi
+            fi
+
+            # 2. If version names are equal, compare build numbers numerically
+            if [ "$v1_build" -gt "$v2_build" ]; then
+              return 0
+            else
+              return 1
+            fi
+          }
+
+          if version_gt "$NEW_VER" "$OLD_VER"; then
+            echo "Success: Version bumped from $OLD_VER to $NEW_VER"
+          else
+            echo "Error: Version in pubspec.yaml ($NEW_VER) must be strictly greater than the current version in main ($OLD_VER)."
+            exit 1
+          fi
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run code generation
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analyze project source
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
