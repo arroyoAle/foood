@@ -90,7 +90,9 @@ void main() {
     expect(find.text('New List'), findsOneWidget);
   });
 
-  testWidgets('Searching lists filters the results', (WidgetTester tester) async {
+  testWidgets('Searching lists filters the results', (
+    WidgetTester tester,
+  ) async {
     await database.shoppingDao.createList('Groceries');
     await database.shoppingDao.createList('Weekend BBQ');
 
@@ -103,7 +105,9 @@ void main() {
     // Enter search text
     final searchField = find.ancestor(
       of: find.byType(TextField),
-      matching: find.byType(Column), // The search field is in a Column, not the dialog
+      matching: find.byType(
+        Column,
+      ), // The search field is in a Column, not the dialog
     );
     await tester.enterText(searchField, 'Groc');
     await tester.pumpAndSettle();
