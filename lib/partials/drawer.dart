@@ -14,9 +14,11 @@ class DrawerPartial extends StatelessWidget {
       return;
     }
     Future.delayed(const Duration(milliseconds: 300), () {
-      Navigator.popUntil(navigator.context, (route) => route.isFirst);
+      if (!context.mounted) return;
+      Navigator.popUntil(context, (route) => route.isFirst);
       if (page != 'home_page') {
-        Navigator.pushNamed(navigator.context, route);
+        if (!context.mounted) return;
+        Navigator.pushNamed(context, route);
       }
     });
   }
