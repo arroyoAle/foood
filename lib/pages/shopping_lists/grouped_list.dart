@@ -39,7 +39,7 @@ class GroupedList extends StatelessWidget {
               alignment: Alignment.center,
               padding: const EdgeInsets.symmetric(vertical: 16),
               child: const Text("No items to buy"),
-            )
+            ),
           ],
           const Divider(),
           _buildSectionHeader(context, 'In Cart', inCartKey),
@@ -50,7 +50,7 @@ class GroupedList extends StatelessWidget {
               alignment: Alignment.center,
               padding: const EdgeInsets.fromLTRB(0, 16, 0, 32),
               child: const Text("No items in cart"),
-            )
+            ),
           ],
         ],
       ),
@@ -58,15 +58,18 @@ class GroupedList extends StatelessWidget {
   }
 
   Widget _buildSectionHeader(
-      BuildContext context, String title, GlobalKey? key) {
+    BuildContext context,
+    String title,
+    GlobalKey? key,
+  ) {
     return Padding(
       key: key,
       padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
       child: Text(
         title,
-        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-          fontWeight: FontWeight.bold,
-        ),
+        style: Theme.of(
+          context,
+        ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -91,14 +94,16 @@ class GroupedList extends StatelessWidget {
             margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
             child: ExpansionTile(
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+                borderRadius: BorderRadius.circular(12),
+              ),
               collapsedShape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+                borderRadius: BorderRadius.circular(12),
+              ),
               title: Text(
                 '$category (${categoryItems.length})',
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
               initiallyExpanded: true,
               children: [
@@ -120,8 +125,10 @@ class GroupedList extends StatelessWidget {
                     ref
                         .read(shoppingListProvider.notifier)
                         .reorderItemsInCategory(
-                        categoryItems, oldIndex, newIndex
-                    );
+                          categoryItems,
+                          oldIndex,
+                          newIndex,
+                        );
                   },
                 ),
               ],

@@ -14,7 +14,8 @@ class RecipePage extends ConsumerStatefulWidget {
   ConsumerState<RecipePage> createState() => _RecipePageState();
 }
 
-class _RecipePageState extends ConsumerState<RecipePage> with SingleTickerProviderStateMixin {
+class _RecipePageState extends ConsumerState<RecipePage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -86,7 +87,9 @@ class _RecipePageState extends ConsumerState<RecipePage> with SingleTickerProvid
                   ),
                   onFieldSubmitted: (value) {
                     if (value.isNotEmpty) {
-                      ref.read(recipeRepositoryProvider).updateRecipeName(recipe.id, value);
+                      ref
+                          .read(recipeRepositoryProvider)
+                          .updateRecipeName(recipe.id, value);
                     }
                   },
                 ),
@@ -131,16 +134,22 @@ class _RecipePageState extends ConsumerState<RecipePage> with SingleTickerProvid
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: ListTile(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               title: Text(ingredient.name),
-              subtitle: Text('${ingredient.category} - ${ingredient.defaultUnits}'),
+              subtitle: Text(
+                '${ingredient.category} - ${ingredient.defaultUnits}',
+              ),
             ),
           );
         } else {
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: ListTile(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               title: const Text('Add new ingredient'),
               leading: const Icon(Icons.add),
               onTap: _addNewIngredient,
@@ -160,7 +169,9 @@ class _RecipePageState extends ConsumerState<RecipePage> with SingleTickerProvid
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: ListTile(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               leading: CircleAvatar(child: Text('${index + 1}')),
               title: Text(instruction),
             ),
@@ -169,7 +180,9 @@ class _RecipePageState extends ConsumerState<RecipePage> with SingleTickerProvid
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: ListTile(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               title: const Text('Add new instruction'),
               leading: const Icon(Icons.add),
               onTap: _addNewInstruction,

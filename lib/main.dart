@@ -21,13 +21,13 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.amber,
-          brightness: Brightness.light
+          brightness: Brightness.light,
         ),
       ),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.amber,
-          brightness: Brightness.dark
+          brightness: Brightness.dark,
         ),
       ),
       themeMode: ThemeMode.system,
@@ -46,8 +46,8 @@ class MyApp extends StatelessWidget {
             page = const MyHomePage();
         }
         // return MaterialPageRoute(builder: (context) => page);
-        return NoAnimationPageRoute(pageBuilder: (_, _, _) => page,);
-      }
+        return NoAnimationPageRoute(pageBuilder: (_, _, _) => page);
+      },
     );
   }
 }

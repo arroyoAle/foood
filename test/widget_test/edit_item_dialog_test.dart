@@ -21,21 +21,24 @@ void main() {
     await database.close();
   });
 
-  Future<void> pumpShoppingListScreen(WidgetTester tester, String listId) async {
+  Future<void> pumpShoppingListScreen(
+    WidgetTester tester,
+    String listId,
+  ) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           databaseProvider.overrideWithValue(database),
           activeShoppingListIdProvider.overrideWith((ref) => listId),
         ],
-        child: const MaterialApp(
-          home: ShoppingListScreen(),
-        ),
+        child: const MaterialApp(home: ShoppingListScreen()),
       ),
     );
   }
 
-  testWidgets('Long pressing an item opens ItemDialog', (WidgetTester tester) async {
+  testWidgets('Long pressing an item opens ItemDialog', (
+    WidgetTester tester,
+  ) async {
     final list = await database.shoppingDao.createList('Test List');
     await repository.addManualItem(
       shoppingListId: list.id,
@@ -55,14 +58,16 @@ void main() {
     // Verify dialog is shown
     expect(find.byType(ItemDialog), findsOneWidget);
     expect(find.text('Edit Item'), findsOneWidget);
-    
+
     // Verify initial values in dialog
     expect(find.widgetWithText(TextField, 'Apples'), findsOneWidget);
     expect(find.widgetWithText(TextField, '2.0'), findsOneWidget);
     expect(find.text('kg'), findsAtLeastNWidgets(1));
   });
 
-  testWidgets('Saving changes in ItemDialog updates the list', (WidgetTester tester) async {
+  testWidgets('Saving changes in ItemDialog updates the list', (
+    WidgetTester tester,
+  ) async {
     final list = await database.shoppingDao.createList('Test List');
     await repository.addManualItem(
       shoppingListId: list.id,

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foood/providers/providers.dart';
 
-
 class IngredientForm extends ConsumerStatefulWidget {
   const IngredientForm({super.key});
 
@@ -37,10 +36,14 @@ class _IngredientFormState extends ConsumerState<IngredientForm> {
                 labelText: 'Ingredient',
                 border: OutlineInputBorder(),
               ),
-              items: items.map((item) => DropdownMenuItem(
-                value: item.id,
-                child: Text(item.name),
-              )).toList(),
+              items: items
+                  .map(
+                    (item) => DropdownMenuItem(
+                      value: item.id,
+                      child: Text(item.name),
+                    ),
+                  )
+                  .toList(),
               onChanged: (value) {
                 setState(() {
                   _selectedItemId = value;
@@ -48,7 +51,8 @@ class _IngredientFormState extends ConsumerState<IngredientForm> {
                   _unitController.text = item.defaultUnits;
                 });
               },
-              validator: (value) => value == null ? 'Please select an ingredient' : null,
+              validator: (value) =>
+                  value == null ? 'Please select an ingredient' : null,
             ),
             const SizedBox(height: 16),
             Row(
@@ -79,7 +83,8 @@ class _IngredientFormState extends ConsumerState<IngredientForm> {
                       labelText: 'Unit',
                       border: OutlineInputBorder(),
                     ),
-                    validator: (value) => value == null || value.isEmpty ? 'Required' : null,
+                    validator: (value) =>
+                        value == null || value.isEmpty ? 'Required' : null,
                   ),
                 ),
               ],
@@ -96,14 +101,18 @@ class _IngredientFormState extends ConsumerState<IngredientForm> {
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       final recipeId = ref.read(activeRecipeIdProvider);
-                      final item = items.firstWhere((i) => i.id == _selectedItemId);
+                      final item = items.firstWhere(
+                        (i) => i.id == _selectedItemId,
+                      );
                       if (recipeId.isNotEmpty) {
-                        await ref.read(recipesProvider.notifier).addIngredient(
-                          recipeId,
-                          item,
-                          double.parse(_quantityController.text),
-                          _unitController.text,
-                        );
+                        await ref
+                            .read(recipesProvider.notifier)
+                            .addIngredient(
+                              recipeId,
+                              item,
+                              double.parse(_quantityController.text),
+                              _unitController.text,
+                            );
                         if (context.mounted) Navigator.pop(context);
                       }
                     }
@@ -152,7 +161,9 @@ class _InstructionFormState extends ConsumerState<InstructionForm> {
               border: OutlineInputBorder(),
             ),
             maxLines: 3,
-            validator: (value) => value == null || value.isEmpty ? 'Please enter instruction' : null,
+            validator: (value) => value == null || value.isEmpty
+                ? 'Please enter instruction'
+                : null,
           ),
           const SizedBox(height: 24),
           Row(
@@ -167,10 +178,9 @@ class _InstructionFormState extends ConsumerState<InstructionForm> {
                   if (_formKey.currentState!.validate()) {
                     final recipeId = ref.read(activeRecipeIdProvider);
                     if (recipeId.isNotEmpty) {
-                      await ref.read(recipesProvider.notifier).addInstruction(
-                        recipeId,
-                        _controller.text,
-                      );
+                      await ref
+                          .read(recipesProvider.notifier)
+                          .addInstruction(recipeId, _controller.text);
                       if (context.mounted) Navigator.pop(context);
                     }
                   }

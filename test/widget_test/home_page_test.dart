@@ -22,21 +22,22 @@ void main() {
   Future<void> pumpHomePage(WidgetTester tester) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          databaseProvider.overrideWithValue(database),
-        ],
+        overrides: [databaseProvider.overrideWithValue(database)],
         child: MaterialApp(
           home: const MyHomePage(),
           routes: {
             '/lists': (context) => const Scaffold(body: Text('All Lists Page')),
-            '/recipes': (context) => const Scaffold(body: Text('All Recipes Page')),
+            '/recipes': (context) =>
+                const Scaffold(body: Text('All Recipes Page')),
           },
         ),
       ),
     );
   }
 
-  testWidgets('Shows empty states when no data exists', (WidgetTester tester) async {
+  testWidgets('Shows empty states when no data exists', (
+    WidgetTester tester,
+  ) async {
     await pumpHomePage(tester);
     await tester.pumpAndSettle();
 
@@ -45,14 +46,16 @@ void main() {
     expect(find.text('Test meal 1'), findsOneWidget);
   });
 
-  testWidgets('Displays shopping lists and recipes when data exists', (WidgetTester tester) async {
+  testWidgets('Displays shopping lists and recipes when data exists', (
+    WidgetTester tester,
+  ) async {
     // Add shopping lists
     await database.shoppingDao.createList('Weekly Groceries');
-    
+
     // Add recipe (direct database insert since repository might be complex to mock/use)
-    await database.into(database.recipes).insert(
-      db.RecipesCompanion.insert(id: 'r1', name: 'Pasta Carbonara'),
-    );
+    await database
+        .into(database.recipes)
+        .insert(db.RecipesCompanion.insert(id: 'r1', name: 'Pasta Carbonara'));
 
     await pumpHomePage(tester);
     await tester.pumpAndSettle();
@@ -61,7 +64,9 @@ void main() {
     expect(find.text('Pasta Carbonara'), findsOneWidget);
   });
 
-  testWidgets('Tapping a shopping list navigates to ShoppingListScreen', (WidgetTester tester) async {
+  testWidgets('Tapping a shopping list navigates to ShoppingListScreen', (
+    WidgetTester tester,
+  ) async {
     await database.shoppingDao.createList('Weekly Groceries');
 
     await pumpHomePage(tester);
@@ -73,10 +78,12 @@ void main() {
     expect(find.byType(ShoppingListScreen), findsOneWidget);
   });
 
-  testWidgets('Tapping a recipe navigates to RecipePage', (WidgetTester tester) async {
-    await database.into(database.recipes).insert(
-      db.RecipesCompanion.insert(id: 'r1', name: 'Pasta Carbonara'),
-    );
+  testWidgets('Tapping a recipe navigates to RecipePage', (
+    WidgetTester tester,
+  ) async {
+    await database
+        .into(database.recipes)
+        .insert(db.RecipesCompanion.insert(id: 'r1', name: 'Pasta Carbonara'));
 
     await pumpHomePage(tester);
     await tester.pumpAndSettle();
@@ -87,7 +94,9 @@ void main() {
     expect(find.byType(RecipePage), findsOneWidget);
   });
 
-  testWidgets('Dashboard cards navigate to their sections', (WidgetTester tester) async {
+  testWidgets('Dashboard cards navigate to their sections', (
+    WidgetTester tester,
+  ) async {
     await pumpHomePage(tester);
     await tester.pumpAndSettle();
 

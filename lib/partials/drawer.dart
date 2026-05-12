@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 class DrawerPartial extends StatelessWidget {
   final String currentPage;
 
-  const DrawerPartial({
-    super.key,
-    required this.currentPage,
-  });
+  const DrawerPartial({super.key, required this.currentPage});
 
   void _navigate(BuildContext context, String route, String page) {
     final navigator = Navigator.of(context);
@@ -36,10 +33,7 @@ class DrawerPartial extends StatelessWidget {
             ),
             child: const Text(
               'Menu',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-              ),
+              style: TextStyle(color: Colors.white, fontSize: 24),
             ),
           ),
           ListTile(

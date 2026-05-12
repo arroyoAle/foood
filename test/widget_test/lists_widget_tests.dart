@@ -20,30 +20,35 @@ void main() {
     await database.close();
   });
 
-  Future<void> pumpShoppingListScreen(WidgetTester tester, String listId) async {
+  Future<void> pumpShoppingListScreen(
+    WidgetTester tester,
+    String listId,
+  ) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           databaseProvider.overrideWithValue(database),
           activeShoppingListIdProvider.overrideWith((ref) => listId),
         ],
-        child: const MaterialApp(
-          home: ShoppingListScreen(),
-        ),
+        child: const MaterialApp(home: ShoppingListScreen()),
       ),
     );
   }
 
-  testWidgets('Shows empty state message when list is empty', (WidgetTester tester) async {
+  testWidgets('Shows empty state message when list is empty', (
+    WidgetTester tester,
+  ) async {
     final list = await database.shoppingDao.createList('Test List');
-    
+
     await pumpShoppingListScreen(tester, list.id);
     await tester.pumpAndSettle();
 
     expect(find.text('No items yet'), findsOneWidget);
   });
 
-  testWidgets('Displays items in the list and category headings with counts', (WidgetTester tester) async {
+  testWidgets('Displays items in the list and category headings with counts', (
+    WidgetTester tester,
+  ) async {
     final list = await database.shoppingDao.createList('Test List');
     await repository.addManualItem(
       shoppingListId: list.id,
@@ -77,13 +82,15 @@ void main() {
     // Check category headings with counts
     expect(find.text('Produce (2)'), findsOneWidget);
     expect(find.text('Dairy (1)'), findsOneWidget);
-    
+
     // Check section headers
     expect(find.text('To Buy'), findsOneWidget);
     expect(find.text('In Cart'), findsOneWidget);
   });
 
-  testWidgets('Tapping checkbox moves item to In Cart section', (WidgetTester tester) async {
+  testWidgets('Tapping checkbox moves item to In Cart section', (
+    WidgetTester tester,
+  ) async {
     final list = await database.shoppingDao.createList('Test List');
     await repository.addManualItem(
       shoppingListId: list.id,
@@ -104,12 +111,14 @@ void main() {
 
     // After tapping, it should be selected
     expect(tester.widget<Checkbox>(checkbox).value, isTrue);
-    
+
     // And Produce (1) should still exist but under "In Cart"
     expect(find.text('Produce (1)'), findsOneWidget);
   });
 
-  testWidgets('Floating toolbar contains jump buttons and reorder toggle', (WidgetTester tester) async {
+  testWidgets('Floating toolbar contains jump buttons and reorder toggle', (
+    WidgetTester tester,
+  ) async {
     final list = await database.shoppingDao.createList('Test List');
     await pumpShoppingListScreen(tester, list.id);
     await tester.pumpAndSettle();
@@ -120,7 +129,9 @@ void main() {
     expect(find.byIcon(Icons.add), findsOneWidget);
   });
 
-  testWidgets('Reorder mode shows drag handle and hides checkboxes', (WidgetTester tester) async {
+  testWidgets('Reorder mode shows drag handle and hides checkboxes', (
+    WidgetTester tester,
+  ) async {
     final list = await database.shoppingDao.createList('Test List');
     await repository.addManualItem(
       shoppingListId: list.id,
@@ -145,13 +156,15 @@ void main() {
     // Drag handle SHOULD be present now
     expect(find.byIcon(Icons.drag_handle), findsOneWidget);
     // Checkbox SHOULD be hidden/disabled now
-    final checkbox = tester.widget<CheckboxListTile>(find.byType(CheckboxListTile));
+    final checkbox = tester.widget<CheckboxListTile>(
+      find.byType(CheckboxListTile),
+    );
     expect(checkbox.enabled, isFalse);
-    
+
     // Toggle back
     await tester.tap(find.byIcon(Icons.check));
     await tester.pumpAndSettle();
-    
+
     expect(find.byIcon(Icons.drag_handle), findsNothing);
     expect(find.byType(Checkbox), findsOneWidget);
   });

@@ -35,7 +35,9 @@ class ShoppingListNotifier extends AsyncNotifier<List<ListItem>> {
     final repo = ref.read(shoppingRepositoryProvider);
 
     if (state.value != null) {
-      state = AsyncData(_updateItem(state.value!, listItem.id, !listItem.selected));
+      state = AsyncData(
+        _updateItem(state.value!, listItem.id, !listItem.selected),
+      );
     }
 
     await repo.updateSelected(listItem.id, !listItem.selected);
@@ -46,9 +48,11 @@ class ShoppingListNotifier extends AsyncNotifier<List<ListItem>> {
     final items = state.value!;
 
     final sameCategoryItems = items
-        .where((i) =>
-            i.selected == item.selected &&
-            i.item.category == item.item.category)
+        .where(
+          (i) =>
+              i.selected == item.selected &&
+              i.item.category == item.item.category,
+        )
         .toList();
     sameCategoryItems.sort((a, b) => a.ordering.compareTo(b.ordering));
 
@@ -122,10 +126,10 @@ class ShoppingListNotifier extends AsyncNotifier<List<ListItem>> {
   }
 
   List<ListItem> _updateItem(
-      List<ListItem> current,
-      String listItemId,
-      bool newSelected,
-      ) {
+    List<ListItem> current,
+    String listItemId,
+    bool newSelected,
+  ) {
     return current.map((listItem) {
       if (listItem.id != listItemId) return listItem;
       return ListItem(

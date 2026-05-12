@@ -17,10 +17,17 @@ class RecipeNotifier extends AsyncNotifier<List<Recipe>> {
     });
   }
 
-  Future<void> addIngredient(String recipeId, Item item, double quantity, String units) async {
+  Future<void> addIngredient(
+    String recipeId,
+    Item item,
+    double quantity,
+    String units,
+  ) async {
     state = const AsyncLoading<List<Recipe>>().copyWithPrevious(state);
     state = await AsyncValue.guard(() async {
-      await ref.read(recipeRepositoryProvider).addIngredient(recipeId, item, quantity, units);
+      await ref
+          .read(recipeRepositoryProvider)
+          .addIngredient(recipeId, item, quantity, units);
       return ref.read(recipeRepositoryProvider).getAllRecipes();
     });
   }

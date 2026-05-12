@@ -25,16 +25,16 @@ final shoppingRepositoryProvider = Provider<ShoppingRepository>((ref) {
 final activeShoppingListIdProvider = StateProvider<String>((ref) => '');
 
 final shoppingListProvider =
-AsyncNotifierProvider<ShoppingListNotifier, List<ListItem>>(
-  ShoppingListNotifier.new,
-);
+    AsyncNotifierProvider<ShoppingListNotifier, List<ListItem>>(
+      ShoppingListNotifier.new,
+    );
 
 final isReorderModeProvider = StateProvider<bool>((ref) => false);
 
 final allListsProvider =
-AsyncNotifierProvider<AllListsNotifier, List<db.ShoppingList>>(
-  AllListsNotifier.new,
-);
+    AsyncNotifierProvider<AllListsNotifier, List<db.ShoppingList>>(
+      AllListsNotifier.new,
+    );
 
 // Item providers
 final itemRepositoryProvider = Provider<ItemRepository>((ref) {

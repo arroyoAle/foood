@@ -13,7 +13,8 @@ class Items extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
   TextColumn get defaultUnits => text()();
-  TextColumn get category => text().withDefault(const Constant('Uncategorised'))();
+  TextColumn get category =>
+      text().withDefault(const Constant('Uncategorised'))();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -90,37 +91,34 @@ class ShoppingDao extends DatabaseAccessor<AppDatabase>
   ShoppingDao(super.db);
 
   Future<List<TypedResult>> getItemsWithDetails(String listId) {
-    final query = select(shoppingListItems).join([
-      innerJoin(
-        items,
-        items.id.equalsExp(shoppingListItems.itemId),
-      ),
-    ])
-      ..where(shoppingListItems.shoppingListId.equals(listId))
-      ..orderBy([
-        OrderingTerm.asc(shoppingListItems.ordering),
-        OrderingTerm.asc(items.category),
-        OrderingTerm.asc(items.name),
-      ]);
+    final query =
+        select(shoppingListItems).join([
+            innerJoin(items, items.id.equalsExp(shoppingListItems.itemId)),
+          ])
+          ..where(shoppingListItems.shoppingListId.equals(listId))
+          ..orderBy([
+            OrderingTerm.asc(shoppingListItems.ordering),
+            OrderingTerm.asc(items.category),
+            OrderingTerm.asc(items.name),
+          ]);
 
     return query.get();
   }
 
   Future<Item?> findItemByName(String name) {
     return (select(items)
-      ..where((i) => i.name.lower().equals(name.toLowerCase())))
+          ..where((i) => i.name.lower().equals(name.toLowerCase())))
         .getSingleOrNull();
   }
 
   Future<double> getPantryStock(String itemId) async {
-    final row = await (select(pantryItems)
-      ..where((p) => p.itemId.equals(itemId)))
-        .getSingleOrNull();
+    final row = await (select(
+      pantryItems,
+    )..where((p) => p.itemId.equals(itemId))).getSingleOrNull();
     return row?.quantity ?? 0;
   }
 
-  Future<void> insertItem(Insertable<Item> item) =>
-      into(items).insert(item);
+  Future<void> insertItem(Insertable<Item> item) => into(items).insert(item);
 
   Future<void> insertShoppingListItem(Insertable<ShoppingListItem> item) =>
       into(shoppingListItems).insert(item);
@@ -134,8 +132,9 @@ class ShoppingDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> updateSelected(String itemId, bool selected) =>
-  (update(shoppingListItems)..where((i) => i.id.equals(itemId)))
-      .write(ShoppingListItemsCompanion(selected: Value(selected)));
+      (update(shoppingListItems)..where((i) => i.id.equals(itemId))).write(
+        ShoppingListItemsCompanion(selected: Value(selected)),
+      );
 
   Future<void> updateShoppingListItem({
     required String id,
@@ -158,7 +157,9 @@ class ShoppingDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-  Future<void> updateAllOrderings(List<({String id, int ordering})> updates) async {
+  Future<void> updateAllOrderings(
+    List<({String id, int ordering})> updates,
+  ) async {
     await batch((batch) {
       for (final update in updates) {
         batch.update(
@@ -199,7 +200,6 @@ class ShoppingDao extends DatabaseAccessor<AppDatabase>
     await into(shoppingLists).insert(list);
     return ShoppingList(id: id, name: name, generatedAt: DateTime.now());
   }
-
 }
 
 @DriftAccessor(tables: [Recipes, RecipeIngredients, Instructions, Items])
@@ -211,8 +211,7 @@ class RecipeDao extends DatabaseAccessor<AppDatabase> with _$RecipeDaoMixin {
   Future<List<TypedResult>> getRecipeIngredients(String recipeId) {
     return (select(recipeIngredients).join([
       innerJoin(items, items.id.equalsExp(recipeIngredients.itemId)),
-    ])..where(recipeIngredients.recipeId.equals(recipeId)))
-        .get();
+    ])..where(recipeIngredients.recipeId.equals(recipeId))).get();
   }
 
   Future<List<Instruction>> getRecipeInstructions(String recipeId) {
@@ -222,10 +221,12 @@ class RecipeDao extends DatabaseAccessor<AppDatabase> with _$RecipeDaoMixin {
         .get();
   }
 
-  Future<void> insertRecipe(Insertable<Recipe> recipe) => into(recipes).insert(recipe);
+  Future<void> insertRecipe(Insertable<Recipe> recipe) =>
+      into(recipes).insert(recipe);
 
-  Future<void> insertRecipeIngredient(Insertable<RecipeIngredient> ingredient) =>
-      into(recipeIngredients).insert(ingredient);
+  Future<void> insertRecipeIngredient(
+    Insertable<RecipeIngredient> ingredient,
+  ) => into(recipeIngredients).insert(ingredient);
 
   Future<void> insertInstruction(Insertable<Instruction> instruction) =>
       into(instructions).insert(instruction);
@@ -242,7 +243,15 @@ class RecipeDao extends DatabaseAccessor<AppDatabase> with _$RecipeDaoMixin {
 // --- Database ---
 
 @DriftDatabase(
-  tables: [Items, PantryItems, ShoppingLists, ShoppingListItems, Recipes, RecipeIngredients, Instructions],
+  tables: [
+    Items,
+    PantryItems,
+    ShoppingLists,
+    ShoppingListItems,
+    Recipes,
+    RecipeIngredients,
+    Instructions,
+  ],
   daos: [ShoppingDao, RecipeDao],
 )
 class AppDatabase extends _$AppDatabase {

@@ -24,12 +24,7 @@ class Recipe {
 
   /// A factory constructor to create a new, empty recipe with a unique ID.
   factory Recipe.empty() {
-    return Recipe(
-      id: Uuid().v4(),
-      name: '',
-      instructions: [],
-      ingredients: [],
-    );
+    return Recipe(id: Uuid().v4(), name: '', instructions: [], ingredients: []);
   }
 
   factory Recipe.fromJson(Map<String, dynamic> json) => _$RecipeFromJson(json);

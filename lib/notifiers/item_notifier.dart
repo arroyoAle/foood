@@ -10,6 +10,8 @@ class ItemNotifier extends AsyncNotifier<List<Item>> {
 
   Future<void> refresh() async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() => ref.read(itemRepositoryProvider).getAllItems());
+    state = await AsyncValue.guard(
+      () => ref.read(itemRepositoryProvider).getAllItems(),
+    );
   }
 }

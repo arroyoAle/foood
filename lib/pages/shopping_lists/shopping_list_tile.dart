@@ -26,27 +26,29 @@ class ShoppingListTile extends ConsumerWidget {
           onLongPress: isReorderMode
               ? null
               : () => showDialog(
-                    context: context,
-                    builder: (_) => ItemDialog(listItem: listItem),
-                  ),
+                  context: context,
+                  builder: (_) => ItemDialog(listItem: listItem),
+                ),
           child: Row(
             children: [
               Expanded(
                 child: CheckboxListTile(
                   contentPadding: const EdgeInsets.fromLTRB(8, 0, 16, 0),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   value: listItem.selected,
                   onChanged: isReorderMode
                       ? null
                       : (_) => ref
-                          .read(shoppingListProvider.notifier)
-                          .toggleSelected(listItem),
+                            .read(shoppingListProvider.notifier)
+                            .toggleSelected(listItem),
                   title: Text(
                     listItem.item.name,
                     style: TextStyle(
-                      decoration:
-                          listItem.selected ? TextDecoration.lineThrough : null,
+                      decoration: listItem.selected
+                          ? TextDecoration.lineThrough
+                          : null,
                       color: listItem.selected ? Colors.grey : null,
                     ),
                   ),
