@@ -1,5 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:foood/models/item.dart'; // Reuse the existing Item model for ingredients
+import 'package:foood/models/item.dart';
 import 'package:uuid/uuid.dart';
 
 part 'recipe.g.dart';
@@ -10,10 +10,6 @@ class Recipe {
   String name;
   List<String> instructions;
   List<Item> ingredients;
-
-  // Optional fields you might want to add later:
-  // int? cookingTimeMinutes;
-  // String? category; // e.g., "Dinner", "Dessert"
 
   Recipe({
     required this.id,

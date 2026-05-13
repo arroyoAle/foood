@@ -39,4 +39,12 @@ class RecipeNotifier extends AsyncNotifier<List<Recipe>> {
       return ref.read(recipeRepositoryProvider).getAllRecipes();
     });
   }
+
+  Future<void> updateRecipeName(String recipeId, String name) async {
+    state = const AsyncLoading<List<Recipe>>().copyWithPrevious(state);
+    state = await AsyncValue.guard(() async {
+      await ref.read(recipeRepositoryProvider).updateRecipeName(recipeId, name);
+      return ref.read(recipeRepositoryProvider).getAllRecipes();
+    });
+  }
 }

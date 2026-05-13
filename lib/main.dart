@@ -45,7 +45,6 @@ class MyApp extends StatelessWidget {
           default:
             page = const MyHomePage();
         }
-        // return MaterialPageRoute(builder: (context) => page);
         return NoAnimationPageRoute(pageBuilder: (_, _, _) => page);
       },
     );
