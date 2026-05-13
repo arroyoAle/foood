@@ -160,10 +160,12 @@ class _RecipePageState extends ConsumerState<RecipePage>
                     decoration: InputDecoration(
                       labelText: 'Recipe Name',
                       border: const OutlineInputBorder(),
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.save),
-                        onPressed: saveName,
-                      ),
+                      suffixIcon: _nameController.text != recipe.name
+                          ? IconButton(
+                              icon: const Icon(Icons.save),
+                              onPressed: saveName,
+                            )
+                          : null,
                     ),
                     onFieldSubmitted: (_) => saveName(),
                   ),

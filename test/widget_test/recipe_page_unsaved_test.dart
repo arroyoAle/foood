@@ -135,4 +135,35 @@ void main() {
     )..where((t) => t.id.equals(recipeId))).getSingle();
     expect(recipe.name, 'Original Name');
   });
+
+  testWidgets('Save icon is only visible when name has been changed', (
+    WidgetTester tester,
+  ) async {
+    final recipeId = 'test-recipe';
+    await database
+        .into(database.recipes)
+        .insert(
+          db.RecipesCompanion.insert(id: recipeId, name: 'Original Name'),
+        );
+
+    await pumpRecipePage(tester, recipeId);
+    await tester.pumpAndSettle();
+
+    // Initially, save icon should NOT be visible
+    expect(find.byIcon(Icons.save), findsNothing);
+
+    // Edit the name
+    await tester.enterText(find.byType(TextFormField), 'Modified Name');
+    await tester.pump();
+
+    // Now, save icon SHOULD be visible
+    expect(find.byIcon(Icons.save), findsOneWidget);
+
+    // Change it back to original
+    await tester.enterText(find.byType(TextFormField), 'Original Name');
+    await tester.pump();
+
+    // Save icon should NOT be visible again
+    expect(find.byIcon(Icons.save), findsNothing);
+  });
 }
