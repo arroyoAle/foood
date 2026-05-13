@@ -6,8 +6,6 @@
 
 - [ ] Unit tests
 - [ ] Manual testing (Android)
-- [ ] Manual testing (iOS)
-- [ ] Manual testing (Web)
 
 ## Screenshots (optional)
 <!-- Add screenshots or screen recordings if applicable. -->
