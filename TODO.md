@@ -22,7 +22,7 @@
 - [x] Add drag and drop support to re-order items
 
 ### 4. Recipe Management
-- [ ] Save name changes
+- [x] Save name changes
 - [ ] Support editing ingredients and instructions
 - [ ] Support adding images to recipes.
 - [ ] Implement recipe tags (Vegetarian, Quick, Dinner, etc.).

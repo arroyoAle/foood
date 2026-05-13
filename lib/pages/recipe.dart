@@ -86,8 +86,8 @@ class _RecipePageState extends ConsumerState<RecipePage>
             child: const Text('Discard'),
           ),
           FilledButton(
-              onPressed: () => Navigator.pop(context, 'save'),
-              child: const Text('Save')
+            onPressed: () => Navigator.pop(context, 'save'),
+            child: const Text('Save'),
           ),
         ],
       ),

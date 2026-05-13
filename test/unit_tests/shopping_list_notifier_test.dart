@@ -33,27 +33,30 @@ void main() {
       final list = await database.shoppingDao.createList('Test List');
       container.read(activeShoppingListIdProvider.notifier).state = list.id;
 
-      await container.read(shoppingListProvider.notifier).addManualItem(
-        name: 'Milk',
-        quantity: 2.0,
-        units: 'L',
-        category: 'Dairy',
-      );
+      await container
+          .read(shoppingListProvider.notifier)
+          .addManualItem(
+            name: 'Milk',
+            quantity: 2.0,
+            units: 'L',
+            category: 'Dairy',
+          );
 
       final items = await container.read(shoppingListProvider.future);
       expect(items.any((i) => i.item.name == 'Milk'), isTrue);
-      expect(items.firstWhere((i) => i.item.name == 'Milk').quantityRequired, 2.0);
+      expect(
+        items.firstWhere((i) => i.item.name == 'Milk').quantityRequired,
+        2.0,
+      );
     });
 
     test('toggleSelected updates item selected status', () async {
       final list = await database.shoppingDao.createList('Test List');
       container.read(activeShoppingListIdProvider.notifier).state = list.id;
-      
-      await container.read(shoppingListProvider.notifier).addManualItem(
-        name: 'Milk',
-        quantity: 2.0,
-        units: 'L',
-      );
+
+      await container
+          .read(shoppingListProvider.notifier)
+          .addManualItem(name: 'Milk', quantity: 2.0, units: 'L');
 
       var items = await container.read(shoppingListProvider.future);
       final item = items.first;

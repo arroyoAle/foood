@@ -38,14 +38,16 @@ void main() {
     test('updateRecipeName updates name and refreshes state', () async {
       // Create an initial recipe
       await recipeRepository.createRecipe('Original Name');
-      
+
       // Initial state
       var recipes = await container.read(recipesProvider.future);
       expect(recipes.first.name, 'Original Name');
       final recipeId = recipes.first.id;
 
       // Update name via notifier
-      await container.read(recipesProvider.notifier).updateRecipeName(recipeId, 'New Name');
+      await container
+          .read(recipesProvider.notifier)
+          .updateRecipeName(recipeId, 'New Name');
 
       // Check state updated
       recipes = await container.read(recipesProvider.future);
@@ -58,17 +60,13 @@ void main() {
 
     test('addIngredient adds an ingredient and refreshes state', () async {
       final recipe = await recipeRepository.createRecipe('Recipe');
-      final item = await container.read(shoppingRepositoryProvider).findOrCreateItem(
-        name: 'Salt',
-        units: 'tsp',
-      );
+      final item = await container
+          .read(shoppingRepositoryProvider)
+          .findOrCreateItem(name: 'Salt', units: 'tsp');
 
-      await container.read(recipesProvider.notifier).addIngredient(
-        recipe.id,
-        item,
-        1.0,
-        'tsp',
-      );
+      await container
+          .read(recipesProvider.notifier)
+          .addIngredient(recipe.id, item, 1.0, 'tsp');
 
       final recipes = await container.read(recipesProvider.future);
       final updatedRecipe = recipes.firstWhere((r) => r.id == recipe.id);
@@ -78,10 +76,9 @@ void main() {
     test('addInstruction adds an instruction and refreshes state', () async {
       final recipe = await recipeRepository.createRecipe('Recipe');
 
-      await container.read(recipesProvider.notifier).addInstruction(
-        recipe.id,
-        'Mix well',
-      );
+      await container
+          .read(recipesProvider.notifier)
+          .addInstruction(recipe.id, 'Mix well');
 
       final recipes = await container.read(recipesProvider.future);
       final updatedRecipe = recipes.firstWhere((r) => r.id == recipe.id);

@@ -20,12 +20,8 @@ void main() {
   Future<void> pumpAllRecipesPage(WidgetTester tester) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          databaseProvider.overrideWithValue(database),
-        ],
-        child: const MaterialApp(
-          home: AllRecipesPage(),
-        ),
+        overrides: [databaseProvider.overrideWithValue(database)],
+        child: const MaterialApp(home: AllRecipesPage()),
       ),
     );
   }
@@ -33,9 +29,9 @@ void main() {
   testWidgets('Shows list of recipes and navigates to creation', (
     WidgetTester tester,
   ) async {
-    await database.into(database.recipes).insert(
-          db.RecipesCompanion.insert(id: 'r1', name: 'Amatriciana'),
-        );
+    await database
+        .into(database.recipes)
+        .insert(db.RecipesCompanion.insert(id: 'r1', name: 'Amatriciana'));
 
     await pumpAllRecipesPage(tester);
     await tester.pumpAndSettle();
@@ -47,7 +43,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('New Recipe'), findsOneWidget);
-    
+
     // Enter name and create
     await tester.enterText(find.byType(TextField), 'Pizza');
     await tester.tap(find.text('Create'));

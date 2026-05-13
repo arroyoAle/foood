@@ -24,56 +24,59 @@ void main() {
           databaseProvider.overrideWithValue(database),
           activeRecipeIdProvider.overrideWith((ref) => recipeId),
         ],
-        child: const MaterialApp(
-          home: RecipePage(),
-        ),
+        child: const MaterialApp(home: RecipePage()),
       ),
     );
   }
 
-  testWidgets('Shows confirmation dialog when navigating back with unsaved changes', (
-    WidgetTester tester,
-  ) async {
-    final recipeId = 'test-recipe';
-    await database.into(database.recipes).insert(
-          db.RecipesCompanion.insert(id: recipeId, name: 'Original Name'),
-        );
+  testWidgets(
+    'Shows confirmation dialog when navigating back with unsaved changes',
+    (WidgetTester tester) async {
+      final recipeId = 'test-recipe';
+      await database
+          .into(database.recipes)
+          .insert(
+            db.RecipesCompanion.insert(id: recipeId, name: 'Original Name'),
+          );
 
-    await pumpRecipePage(tester, recipeId);
-    await tester.pumpAndSettle();
+      await pumpRecipePage(tester, recipeId);
+      await tester.pumpAndSettle();
 
-    // Verify initial state
-    expect(find.text('Original Name'), findsOneWidget);
+      // Verify initial state
+      expect(find.text('Original Name'), findsOneWidget);
 
-    // Edit the name
-    await tester.enterText(find.byType(TextFormField), 'Modified Name');
-    await tester.pump(); // Trigger listener/setState
+      // Edit the name
+      await tester.enterText(find.byType(TextFormField), 'Modified Name');
+      await tester.pump(); // Trigger listener/setState
 
-    // Attempt to navigate back
-    final nav = Navigator.of(tester.element(find.byType(RecipePage)));
-    nav.maybePop();
-    
-    await tester.pumpAndSettle();
+      // Attempt to navigate back
+      final nav = Navigator.of(tester.element(find.byType(RecipePage)));
+      nav.maybePop();
 
-    // Verify dialog is shown
-    expect(find.text('Unsaved Changes'), findsOneWidget);
-    expect(find.text('Discard'), findsOneWidget);
-    expect(find.text('Save'), findsOneWidget);
-    expect(find.text('Cancel'), findsOneWidget);
+      await tester.pumpAndSettle();
 
-    // Tap Cancel and verify we stay on the page
-    await tester.tap(find.text('Cancel'));
-    await tester.pumpAndSettle();
-    expect(find.text('Unsaved Changes'), findsNothing);
-    expect(find.byType(RecipePage), findsOneWidget);
-    expect(find.text('Modified Name'), findsOneWidget);
-  });
+      // Verify dialog is shown
+      expect(find.text('Unsaved Changes'), findsOneWidget);
+      expect(find.text('Discard'), findsOneWidget);
+      expect(find.text('Save'), findsOneWidget);
+      expect(find.text('Cancel'), findsOneWidget);
+
+      // Tap Cancel and verify we stay on the page
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      expect(find.text('Unsaved Changes'), findsNothing);
+      expect(find.byType(RecipePage), findsOneWidget);
+      expect(find.text('Modified Name'), findsOneWidget);
+    },
+  );
 
   testWidgets('Saving from dialog updates name and closes page', (
     WidgetTester tester,
   ) async {
     final recipeId = 'test-recipe';
-    await database.into(database.recipes).insert(
+    await database
+        .into(database.recipes)
+        .insert(
           db.RecipesCompanion.insert(id: recipeId, name: 'Original Name'),
         );
 
@@ -95,9 +98,9 @@ void main() {
     // Verify page is closed (MaterialApp will be empty or show nothing if we don't have a background)
     // Actually, in this test setup, it might just pop the only page.
     // Let's check the database instead to verify save happened.
-    final recipe = await (database.select(database.recipes)
-          ..where((t) => t.id.equals(recipeId)))
-        .getSingle();
+    final recipe = await (database.select(
+      database.recipes,
+    )..where((t) => t.id.equals(recipeId))).getSingle();
     expect(recipe.name, 'Modified Name');
   });
 
@@ -105,7 +108,9 @@ void main() {
     WidgetTester tester,
   ) async {
     final recipeId = 'test-recipe';
-    await database.into(database.recipes).insert(
+    await database
+        .into(database.recipes)
+        .insert(
           db.RecipesCompanion.insert(id: recipeId, name: 'Original Name'),
         );
 
@@ -125,9 +130,9 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify database NOT updated
-    final recipe = await (database.select(database.recipes)
-          ..where((t) => t.id.equals(recipeId)))
-        .getSingle();
+    final recipe = await (database.select(
+      database.recipes,
+    )..where((t) => t.id.equals(recipeId))).getSingle();
     expect(recipe.name, 'Original Name');
   });
 }

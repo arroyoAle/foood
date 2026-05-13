@@ -13,9 +13,7 @@ void main() {
   setUp(() {
     database = db.AppDatabase(NativeDatabase.memory());
     container = ProviderContainer(
-      overrides: [
-        databaseProvider.overrideWithValue(database),
-      ],
+      overrides: [databaseProvider.overrideWithValue(database)],
     );
   });
 
