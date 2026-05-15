@@ -86,56 +86,91 @@ class GroupedList extends StatelessWidget {
       final categoryItems = grouped[category]!;
       categoryItems.sort((a, b) => a.ordering.compareTo(b.ordering));
 
-      return Consumer(
-        builder: (context, ref, child) {
-          return Card(
-            color: Theme.of(context).colorScheme.surface,
-            elevation: 0,
-            margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-            child: ExpansionTile(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              collapsedShape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              title: Text(
-                '$category (${categoryItems.length})',
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-              initiallyExpanded: true,
-              children: [
-                ReorderableListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: categoryItems.length,
-                  buildDefaultDragHandles: false, // We use custom handle
-                  itemBuilder: (context, index) {
-                    final item = categoryItems[index];
-                    return ShoppingListTile(
-                      key: ValueKey(item.id),
-                      listItem: item,
-                      isReorderMode: isReorderMode,
-                      index: index,
-                    );
-                  },
-                  onReorder: (oldIndex, newIndex) {
-                    ref
-                        .read(shoppingListProvider.notifier)
-                        .reorderItemsInCategory(
-                          categoryItems,
-                          oldIndex,
-                          newIndex,
-                        );
-                  },
-                ),
-              ],
-            ),
-          );
-        },
+      return _CategoryExpansionTile(
+        category: category,
+        categoryItems: categoryItems,
+        isReorderMode: isReorderMode,
       );
     }).toList();
+  }
+}
+
+class _CategoryExpansionTile extends StatefulWidget {
+  final String category;
+  final List<ListItem> categoryItems;
+  final bool isReorderMode;
+
+  const _CategoryExpansionTile({
+    required this.category,
+    required this.categoryItems,
+    required this.isReorderMode,
+  });
+
+  @override
+  State<_CategoryExpansionTile> createState() => _CategoryExpansionTileState();
+}
+
+class _CategoryExpansionTileState extends State<_CategoryExpansionTile> {
+  bool _isExpanded = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer(
+      builder: (context, ref, child) {
+        return Card(
+          color: Theme.of(context).colorScheme.surface,
+          elevation: 0,
+          margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          child: ExpansionTile(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            collapsedShape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            title: Text(
+              _isExpanded
+                  ? widget.category
+                  : '${widget.category} (${widget.categoryItems.length})',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            initiallyExpanded: true,
+            onExpansionChanged: (expanded) {
+              setState(() {
+                _isExpanded = expanded;
+              });
+            },
+            children: [
+              ReorderableListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: widget.categoryItems.length,
+                buildDefaultDragHandles: false, // We use custom handle
+                itemBuilder: (context, index) {
+                  final item = widget.categoryItems[index];
+                  return ShoppingListTile(
+                    key: ValueKey(item.id),
+                    listItem: item,
+                    isReorderMode: widget.isReorderMode,
+                    index: index,
+                  );
+                },
+                onReorder: (oldIndex, newIndex) {
+                  ref
+                      .read(shoppingListProvider.notifier)
+                      .reorderItemsInCategory(
+                        widget.categoryItems,
+                        oldIndex,
+                        newIndex,
+                      );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

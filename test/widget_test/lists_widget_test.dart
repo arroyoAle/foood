@@ -81,9 +81,11 @@ void main() {
         expect(find.text('Bananas'), findsOneWidget);
         expect(find.text('Milk'), findsOneWidget);
 
-        // Check category headings with counts
-        expect(find.text('Produce (2)'), findsOneWidget);
-        expect(find.text('Dairy (1)'), findsOneWidget);
+        // Check category headings (counts should be hidden when expanded)
+        expect(find.text('Produce'), findsOneWidget);
+        expect(find.text('Dairy'), findsOneWidget);
+        expect(find.text('Produce (2)'), findsNothing);
+        expect(find.text('Dairy (1)'), findsNothing);
 
         // Check section headers
         expect(find.text('To Buy'), findsOneWidget);
@@ -115,8 +117,9 @@ void main() {
       // After tapping, it should be selected
       expect(tester.widget<Checkbox>(checkbox).value, isTrue);
 
-      // And Produce (1) should still exist but under "In Cart"
-      expect(find.text('Produce (1)'), findsOneWidget);
+      // And Produce should still exist but under "In Cart" (count hidden when expanded)
+      expect(find.text('Produce'), findsOneWidget);
+      expect(find.text('Produce (1)'), findsNothing);
     });
 
     testWidgets('Floating toolbar contains jump buttons and reorder toggle', (
@@ -269,9 +272,11 @@ void main() {
       expect(find.text('Apples'), findsOneWidget);
       expect(find.text('Milk'), findsOneWidget);
 
-      // Verify Categories are present
-      expect(find.text('Produce (1)'), findsOneWidget);
-      expect(find.text('Dairy (1)'), findsOneWidget);
+      // Verify Categories are present (counts hidden when expanded)
+      expect(find.text('Produce'), findsOneWidget);
+      expect(find.text('Dairy'), findsOneWidget);
+      expect(find.text('Produce (1)'), findsNothing);
+      expect(find.text('Dairy (1)'), findsNothing);
     });
 
     testWidgets('Moving item from "To Buy" to "In Cart" when selected', (
@@ -348,14 +353,59 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.text('Produce (2)'),
+        find.text('Produce'),
         findsOneWidget,
       ); // Category header appears once
-      expect(find.text('Dairy (1)'), findsOneWidget);
+      expect(find.text('Dairy'), findsOneWidget);
+      expect(find.text('Produce (2)'), findsNothing);
+      expect(find.text('Dairy (1)'), findsNothing);
 
       expect(find.text('Apples'), findsOneWidget);
       expect(find.text('Bananas'), findsOneWidget);
       expect(find.text('Milk'), findsOneWidget);
+    });
+
+    testWidgets('Category count is only shown when collapsed', (
+      WidgetTester tester,
+    ) async {
+      final list = await database.shoppingDao.createList('Test List');
+      await repository.addManualItem(
+        shoppingListId: list.id,
+        name: 'Apples',
+        category: 'Produce',
+        quantity: 1.0,
+        units: 'kg',
+      );
+      await repository.addManualItem(
+        shoppingListId: list.id,
+        name: 'Bananas',
+        category: 'Produce',
+        quantity: 1.0,
+        units: 'kg',
+      );
+
+      await pumpShoppingListScreen(tester, list.id);
+      await tester.pumpAndSettle();
+
+      // Initially expanded: count hidden
+      expect(find.text('Produce'), findsOneWidget);
+      expect(find.text('Produce (2)'), findsNothing);
+
+      // Tap to collapse
+      await tester.tap(find.text('Produce'));
+      await tester.pumpAndSettle();
+
+      // Now collapsed: count shown
+      expect(find.text('Produce (2)'), findsOneWidget);
+      expect(find.text('Produce'), findsNothing);
+
+      // Tap to expand
+      await tester.tap(find.text('Produce (2)'));
+      await tester.pumpAndSettle();
+
+      // Expanded again: count hidden
+      expect(find.text('Produce'), findsOneWidget);
+      expect(find.text('Produce (2)'), findsNothing);
     });
   });
 
