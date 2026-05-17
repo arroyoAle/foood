@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:foood/models/item.dart';
 import 'package:uuid/uuid.dart';
+import 'recipe_ingredient.dart';
+import 'instruction.dart';
 
 part 'recipe.g.dart';
 
@@ -8,8 +9,8 @@ part 'recipe.g.dart';
 class Recipe {
   String id;
   String name;
-  List<String> instructions;
-  List<Item> ingredients;
+  List<Instruction> instructions;
+  List<RecipeIngredient> ingredients;
 
   Recipe({
     required this.id,

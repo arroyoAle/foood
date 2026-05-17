@@ -4,6 +4,8 @@ import 'package:foood/forms.dart';
 import 'package:foood/partials/top_bar.dart';
 import '../providers/providers.dart';
 import '../models/recipe.dart';
+import 'dialogs/ingredient_dialog.dart';
+import 'dialogs/instruction_dialog.dart';
 
 class RecipePage extends ConsumerStatefulWidget {
   const RecipePage({super.key});
@@ -56,14 +58,7 @@ class _RecipePageState extends ConsumerState<RecipePage>
     await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return const Dialog(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(15),
-              child: InstructionForm(),
-            ),
-          ),
-        );
+        return const InstructionDialog();
       },
     );
   }
@@ -210,13 +205,20 @@ class _RecipePageState extends ConsumerState<RecipePage>
           final ingredient = recipe.ingredients[index];
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            child: ListTile(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onLongPress: () => showDialog(
+                context: context,
+                builder: (_) => IngredientDialog(ingredient: ingredient),
               ),
-              title: Text(ingredient.name),
-              subtitle: Text(
-                '${ingredient.category} - ${ingredient.defaultUnits}',
+              child: ListTile(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                title: Text(ingredient.item.name),
+                subtitle: Text(
+                  '${ingredient.quantity} ${ingredient.units}',
+                ),
               ),
             ),
           );
@@ -245,12 +247,19 @@ class _RecipePageState extends ConsumerState<RecipePage>
           final instruction = recipe.instructions[index];
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            child: ListTile(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onLongPress: () => showDialog(
+                context: context,
+                builder: (_) => InstructionDialog(instruction: instruction),
               ),
-              leading: CircleAvatar(child: Text('${index + 1}')),
-              title: Text(instruction),
+              child: ListTile(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                leading: CircleAvatar(child: Text('${index + 1}')),
+                title: Text(instruction.text),
+              ),
             ),
           );
         } else {
