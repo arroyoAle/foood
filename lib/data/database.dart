@@ -238,6 +238,32 @@ class RecipeDao extends DatabaseAccessor<AppDatabase> with _$RecipeDaoMixin {
     final result = await query.getSingleOrNull();
     return (result?.read(instructions.ordering.max()) ?? 0) + 1;
   }
+
+  Future<void> updateIngredient({
+    required String id,
+    required String itemId,
+    required double quantity,
+    required String units,
+  }) {
+    return (update(recipeIngredients)..where((i) => i.id.equals(id))).write(
+      RecipeIngredientsCompanion(
+        itemId: Value(itemId),
+        quantity: Value(quantity),
+        units: Value(units),
+      ),
+    );
+  }
+
+  Future<void> updateInstruction({
+    required String id,
+    required String textContent,
+  }) {
+    return (update(instructions)..where((i) => i.id.equals(id))).write(
+      InstructionsCompanion(
+        textContent: Value(textContent),
+      ),
+    );
+  }
 }
 
 // --- Database ---
