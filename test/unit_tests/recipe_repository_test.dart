@@ -40,7 +40,7 @@ void main() {
 
       final recipes = await recipeRepository.getAllRecipes();
       expect(recipes.first.ingredients.length, 1);
-      expect(recipes.first.ingredients.first.name, 'Flour');
+      expect(recipes.first.ingredients.first.item.name, 'Flour');
     });
 
     test('addInstruction adds an instruction to a recipe', () async {
@@ -51,8 +51,8 @@ void main() {
 
       final recipes = await recipeRepository.getAllRecipes();
       expect(recipes.first.instructions.length, 2);
-      expect(recipes.first.instructions[0], 'Boil water');
-      expect(recipes.first.instructions[1], 'Add pasta');
+      expect(recipes.first.instructions[0].text, 'Boil water');
+      expect(recipes.first.instructions[1].text, 'Add pasta');
     });
 
     test('updateRecipeName updates the name', () async {

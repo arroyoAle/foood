@@ -70,7 +70,7 @@ void main() {
 
       final recipes = await container.read(recipesProvider.future);
       final updatedRecipe = recipes.firstWhere((r) => r.id == recipe.id);
-      expect(updatedRecipe.ingredients.any((i) => i.name == 'Salt'), isTrue);
+      expect(updatedRecipe.ingredients.any((i) => i.item.name == 'Salt'), isTrue);
     });
 
     test('addInstruction adds an instruction and refreshes state', () async {
@@ -82,7 +82,7 @@ void main() {
 
       final recipes = await container.read(recipesProvider.future);
       final updatedRecipe = recipes.firstWhere((r) => r.id == recipe.id);
-      expect(updatedRecipe.instructions.contains('Mix well'), isTrue);
+      expect(updatedRecipe.instructions.any((i) => i.text == 'Mix well'), isTrue);
     });
   });
 }

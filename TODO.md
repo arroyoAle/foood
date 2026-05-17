@@ -23,8 +23,11 @@
 
 ### 4. Recipe Management
 - [x] Save name changes
-- [ ] Support editing ingredients and instructions
+- [x] Support editing ingredients and instructions
+- [ ] Edit ingredient item
+- [ ] Remove ingredients and instructions
 - [ ] Support adding images to recipes.
+- [ ] Support adding images to instruction steps
 - [ ] Implement recipe tags (Vegetarian, Quick, Dinner, etc.).
 - [ ] Add search and filter functionality to `AllRecipesPage`.
 
