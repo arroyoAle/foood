@@ -216,9 +216,7 @@ class _RecipePageState extends ConsumerState<RecipePage>
                   borderRadius: BorderRadius.circular(12),
                 ),
                 title: Text(ingredient.item.name),
-                subtitle: Text(
-                  '${ingredient.quantity} ${ingredient.units}',
-                ),
+                subtitle: Text('${ingredient.quantity} ${ingredient.units}'),
               ),
             ),
           );

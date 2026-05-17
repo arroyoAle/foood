@@ -103,12 +103,14 @@ class RecipeRepository {
     double quantity,
     String units,
   ) async {
-    // We need the itemId to call the Dao method. 
+    // We need the itemId to call the Dao method.
     // Usually, we'd fetch the current ingredient or assume it doesn't change here.
     // If the requirement is just to edit quantity/units like shopping items.
-    
+
     // Let's check what RecipeIngredient row looks like.
-    final row = await (_db.select(_db.recipeIngredients)..where((t) => t.id.equals(ingredientId))).getSingle();
+    final row = await (_db.select(
+      _db.recipeIngredients,
+    )..where((t) => t.id.equals(ingredientId))).getSingle();
 
     await _db.recipeDao.updateIngredient(
       id: ingredientId,
@@ -119,9 +121,6 @@ class RecipeRepository {
   }
 
   Future<void> updateInstruction(String instructionId, String text) async {
-    await _db.recipeDao.updateInstruction(
-      id: instructionId,
-      textContent: text,
-    );
+    await _db.recipeDao.updateInstruction(id: instructionId, textContent: text);
   }
 }

@@ -259,9 +259,7 @@ class RecipeDao extends DatabaseAccessor<AppDatabase> with _$RecipeDaoMixin {
     required String textContent,
   }) {
     return (update(instructions)..where((i) => i.id.equals(id))).write(
-      InstructionsCompanion(
-        textContent: Value(textContent),
-      ),
+      InstructionsCompanion(textContent: Value(textContent)),
     );
   }
 }

@@ -52,7 +52,12 @@ class _IngredientDialogState extends ConsumerState<IngredientDialog> {
         units: _unitController.text,
       );
     } else {
-      await notifier.addIngredient(recipeId, item, quantity, _unitController.text);
+      await notifier.addIngredient(
+        recipeId,
+        item,
+        quantity,
+        _unitController.text,
+      );
     }
 
     if (mounted) {
@@ -87,13 +92,15 @@ class _IngredientDialogState extends ConsumerState<IngredientDialog> {
                       ),
                     )
                     .toList(),
-                onChanged: _isEditing ? null : (value) {
-                  setState(() {
-                    _selectedItemId = value;
-                    final item = items.firstWhere((i) => i.id == value);
-                    _unitController.text = item.defaultUnits;
-                  });
-                },
+                onChanged: _isEditing
+                    ? null
+                    : (value) {
+                        setState(() {
+                          _selectedItemId = value;
+                          final item = items.firstWhere((i) => i.id == value);
+                          _unitController.text = item.defaultUnits;
+                        });
+                      },
                 validator: (value) =>
                     value == null ? 'Please select an ingredient' : null,
               ),
