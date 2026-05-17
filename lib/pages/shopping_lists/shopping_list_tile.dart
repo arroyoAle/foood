@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foood/models/list_item.dart';
 import '../../providers/providers.dart';
-import 'dialogs/item_dialog.dart';
+import '../dialogs/item_dialog.dart';
 
 class ShoppingListTile extends ConsumerWidget {
   final ListItem listItem;
