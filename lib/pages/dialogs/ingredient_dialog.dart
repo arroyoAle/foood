@@ -48,6 +48,7 @@ class _IngredientDialogState extends ConsumerState<IngredientDialog> {
     if (_isEditing) {
       await notifier.updateIngredient(
         ingredientId: widget.ingredient!.id,
+        itemId: _selectedItemId!,
         quantity: quantity,
         units: _unitController.text,
       );
@@ -92,15 +93,13 @@ class _IngredientDialogState extends ConsumerState<IngredientDialog> {
                       ),
                     )
                     .toList(),
-                onChanged: _isEditing
-                    ? null
-                    : (value) {
-                        setState(() {
-                          _selectedItemId = value;
-                          final item = items.firstWhere((i) => i.id == value);
-                          _unitController.text = item.defaultUnits;
-                        });
-                      },
+                onChanged: (value) {
+                  setState(() {
+                    _selectedItemId = value;
+                    final item = items.firstWhere((i) => i.id == value);
+                    _unitController.text = item.defaultUnits;
+                  });
+                },
                 validator: (value) =>
                     value == null ? 'Please select an ingredient' : null,
               ),

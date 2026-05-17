@@ -24,7 +24,7 @@
 ### 4. Recipe Management
 - [x] Save name changes
 - [x] Support editing ingredients and instructions
-- [ ] Edit ingredient item
+- [x] Edit ingredient item
 - [ ] Remove ingredients and instructions
 - [ ] Support adding images to recipes.
 - [ ] Support adding images to instruction steps

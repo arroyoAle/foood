@@ -64,21 +64,32 @@ void main() {
     });
 
     group('Editing', () {
-      test('updateIngredient updates quantity and units', () async {
+      test('updateIngredient updates item, quantity and units', () async {
         final recipe = await recipeRepository.createRecipe('Pasta');
-        final item = await shoppingRepository.findOrCreateItem(
+        final item1 = await shoppingRepository.findOrCreateItem(
           name: 'Flour',
           units: 'g',
         );
-        await recipeRepository.addIngredient(recipe.id, item, 500.0, 'g');
+        final item2 = await shoppingRepository.findOrCreateItem(
+          name: 'Sugar',
+          units: 'g',
+        );
+        await recipeRepository.addIngredient(recipe.id, item1, 500.0, 'g');
 
         final initialRecipes = await recipeRepository.getAllRecipes();
         final ingredientId = initialRecipes.first.ingredients.first.id;
 
-        await recipeRepository.updateIngredient(ingredientId, 600.0, 'kg');
+        // Change from Flour to Sugar, and update qty/units
+        await recipeRepository.updateIngredient(
+          ingredientId,
+          item2.id,
+          600.0,
+          'kg',
+        );
 
         final updatedRecipes = await recipeRepository.getAllRecipes();
         final ingredient = updatedRecipes.first.ingredients.first;
+        expect(ingredient.item.name, 'Sugar');
         expect(ingredient.quantity, 600.0);
         expect(ingredient.units, 'kg');
       });

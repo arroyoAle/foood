@@ -50,6 +50,7 @@ class RecipeNotifier extends AsyncNotifier<List<Recipe>> {
 
   Future<void> updateIngredient({
     required String ingredientId,
+    required String itemId,
     required double quantity,
     required String units,
   }) async {
@@ -57,7 +58,7 @@ class RecipeNotifier extends AsyncNotifier<List<Recipe>> {
     state = await AsyncValue.guard(() async {
       await ref
           .read(recipeRepositoryProvider)
-          .updateIngredient(ingredientId, quantity, units);
+          .updateIngredient(ingredientId, itemId, quantity, units);
       return ref.read(recipeRepositoryProvider).getAllRecipes();
     });
   }

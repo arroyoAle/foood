@@ -94,10 +94,13 @@ void main() {
     group('Editing', () {
       test('updateIngredient refreshes state and updates details', () async {
         final recipe = await recipeRepository.createRecipe('Recipe');
-        final item = await container
+        final item1 = await container
             .read(shoppingRepositoryProvider)
             .findOrCreateItem(name: 'Salt', units: 'tsp');
-        await recipeRepository.addIngredient(recipe.id, item, 1.0, 'tsp');
+        final item2 = await container
+            .read(shoppingRepositoryProvider)
+            .findOrCreateItem(name: 'Pepper', units: 'tsp');
+        await recipeRepository.addIngredient(recipe.id, item1, 1.0, 'tsp');
 
         final initialRecipes = await container.read(recipesProvider.future);
         final ingredientId = initialRecipes.first.ingredients.first.id;
@@ -106,12 +109,14 @@ void main() {
             .read(recipesProvider.notifier)
             .updateIngredient(
               ingredientId: ingredientId,
+              itemId: item2.id,
               quantity: 2.0,
               units: 'tbsp',
             );
 
         final updatedRecipes = await container.read(recipesProvider.future);
         final ingredient = updatedRecipes.first.ingredients.first;
+        expect(ingredient.item.name, 'Pepper');
         expect(ingredient.quantity, 2.0);
         expect(ingredient.units, 'tbsp');
       });

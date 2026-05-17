@@ -357,5 +357,72 @@ void main() {
       )..where((t) => t.id.equals('inst-1'))).getSingle();
       expect(inst.textContent, 'Updated Step');
     });
+
+    testWidgets('Changing ingredient item updates UI', (
+      WidgetTester tester,
+    ) async {
+      final recipeId = 'test-recipe';
+      final itemId1 = 'item-1';
+      final itemId2 = 'item-2';
+      await database
+          .into(database.recipes)
+          .insert(
+            db.RecipesCompanion.insert(id: recipeId, name: 'Test Recipe'),
+          );
+      await database
+          .into(database.items)
+          .insert(
+            db.ItemsCompanion.insert(
+              id: itemId1,
+              name: 'Salt',
+              defaultUnits: 'tsp',
+            ),
+          );
+      await database
+          .into(database.items)
+          .insert(
+            db.ItemsCompanion.insert(
+              id: itemId2,
+              name: 'Pepper',
+              defaultUnits: 'tsp',
+            ),
+          );
+      await database
+          .into(database.recipeIngredients)
+          .insert(
+            db.RecipeIngredientsCompanion.insert(
+              id: 'ing-1',
+              recipeId: recipeId,
+              itemId: itemId1,
+              quantity: 1.0,
+              units: 'tsp',
+            ),
+          );
+
+      await pumpRecipePage(tester, recipeId);
+      await tester.pumpAndSettle();
+
+      await tester.longPress(find.text('Salt'));
+      await tester.pumpAndSettle();
+
+      // Change item in dropdown
+      await tester.tap(find.byType(DropdownButtonFormField<String>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Pepper').last);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      // Verify UI is updated to show Pepper
+      expect(find.text('Pepper'), findsOneWidget);
+      expect(find.text('Salt'), findsNothing);
+
+      // Verify database updated
+      final ing = await (database.select(
+        database.recipeIngredients,
+      )..where((t) => t.id.equals('ing-1'))).getSingle();
+      expect(ing.itemId, itemId2);
+    });
   });
 }
