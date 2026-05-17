@@ -62,5 +62,45 @@ void main() {
       final recipes = await recipeRepository.getAllRecipes();
       expect(recipes.first.name, 'Spaghetti');
     });
+
+    group('Editing', () {
+      test('updateIngredient updates quantity and units', () async {
+        final recipe = await recipeRepository.createRecipe('Pasta');
+        final item = await shoppingRepository.findOrCreateItem(
+          name: 'Flour',
+          units: 'g',
+        );
+        await recipeRepository.addIngredient(recipe.id, item, 500.0, 'g');
+
+        final initialRecipes = await recipeRepository.getAllRecipes();
+        final ingredientId = initialRecipes.first.ingredients.first.id;
+
+        await recipeRepository.updateIngredient(ingredientId, 600.0, 'kg');
+
+        final updatedRecipes = await recipeRepository.getAllRecipes();
+        final ingredient = updatedRecipes.first.ingredients.first;
+        expect(ingredient.quantity, 600.0);
+        expect(ingredient.units, 'kg');
+      });
+
+      test('updateInstruction updates text content', () async {
+        final recipe = await recipeRepository.createRecipe('Pasta');
+        await recipeRepository.addInstruction(recipe.id, 'Boil water');
+
+        final initialRecipes = await recipeRepository.getAllRecipes();
+        final instructionId = initialRecipes.first.instructions.first.id;
+
+        await recipeRepository.updateInstruction(
+          instructionId,
+          'Boil salty water',
+        );
+
+        final updatedRecipes = await recipeRepository.getAllRecipes();
+        expect(
+          updatedRecipes.first.instructions.first.text,
+          'Boil salty water',
+        );
+      });
+    });
   });
 }
