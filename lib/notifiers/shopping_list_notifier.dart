@@ -3,10 +3,25 @@ import '../models/list_item.dart';
 import '../providers/providers.dart';
 
 class ShoppingListNotifier extends AsyncNotifier<List<ListItem>> {
+  final List<String> _undoStack = [];
+  final List<String> _redoStack = [];
+
   @override
   Future<List<ListItem>> build() async {
     final listId = ref.watch(activeShoppingListIdProvider);
+
+    // Clear stacks when entering a new list (active ID changed)
+    _undoStack.clear();
+    _redoStack.clear();
+    // Ensure stack providers are updated immediately
+    Future.microtask(() => _updateStackProviders());
+
     return ref.read(shoppingRepositoryProvider).getList(listId);
+  }
+
+  void _updateStackProviders() {
+    ref.read(shoppingListUndoProvider.notifier).state = _undoStack.isNotEmpty;
+    ref.read(shoppingListRedoProvider.notifier).state = _redoStack.isNotEmpty;
   }
 
   Future<void> addManualItem({
@@ -31,8 +46,18 @@ class ShoppingListNotifier extends AsyncNotifier<List<ListItem>> {
     });
   }
 
-  Future<void> toggleSelected(ListItem listItem) async {
+  Future<void> toggleSelected(
+    ListItem listItem, {
+    bool isUndo = false,
+    bool isRedo = false,
+  }) async {
     final repo = ref.read(shoppingRepositoryProvider);
+
+    if (!isUndo && !isRedo) {
+      _undoStack.add(listItem.id);
+      _redoStack.clear();
+      _updateStackProviders();
+    }
 
     if (state.value != null) {
       state = AsyncData(
@@ -41,6 +66,30 @@ class ShoppingListNotifier extends AsyncNotifier<List<ListItem>> {
     }
 
     await repo.updateSelected(listItem.id, !listItem.selected);
+  }
+
+  Future<void> undoLastToggle() async {
+    if (_undoStack.isEmpty) return;
+    final itemId = _undoStack.removeLast();
+    _redoStack.add(itemId);
+    _updateStackProviders();
+
+    if (state.value != null) {
+      final item = state.value!.firstWhere((i) => i.id == itemId);
+      await toggleSelected(item, isUndo: true);
+    }
+  }
+
+  Future<void> redoLastToggle() async {
+    if (_redoStack.isEmpty) return;
+    final itemId = _redoStack.removeLast();
+    _undoStack.add(itemId);
+    _updateStackProviders();
+
+    if (state.value != null) {
+      final item = state.value!.firstWhere((i) => i.id == itemId);
+      await toggleSelected(item, isRedo: true);
+    }
   }
 
   Future<void> reorderItem(ListItem item, int offset) async {

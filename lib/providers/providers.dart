@@ -31,6 +31,9 @@ final shoppingListProvider =
 
 final isReorderModeProvider = StateProvider<bool>((ref) => false);
 
+final shoppingListUndoProvider = StateProvider<bool>((ref) => false);
+final shoppingListRedoProvider = StateProvider<bool>((ref) => false);
+
 final allListsProvider =
     AsyncNotifierProvider<AllListsNotifier, List<db.ShoppingList>>(
       AllListsNotifier.new,

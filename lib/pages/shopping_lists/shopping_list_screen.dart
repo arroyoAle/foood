@@ -40,6 +40,8 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
   Widget build(BuildContext context) {
     final listAsync = ref.watch(filteredShoppingListProvider);
     final isReorderMode = ref.watch(isReorderModeProvider);
+    final canUndo = ref.watch(shoppingListUndoProvider);
+    final canRedo = ref.watch(shoppingListRedoProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -58,6 +60,20 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
             : const Text('Shopping List'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.undo),
+            onPressed: canUndo
+                ? () => ref.read(shoppingListProvider.notifier).undoLastToggle()
+                : null,
+            tooltip: 'Undo',
+          ),
+          IconButton(
+            icon: const Icon(Icons.redo),
+            onPressed: canRedo
+                ? () => ref.read(shoppingListProvider.notifier).redoLastToggle()
+                : null,
+            tooltip: 'Redo',
+          ),
           IconButton(
             icon: Icon(_isSearching ? Icons.close : Icons.search),
             onPressed: () {
