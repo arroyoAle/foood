@@ -5,7 +5,7 @@ A Flutter application designed to simplify grocery shopping, meal planning, and 
 ## Features
 
 - **Meal Planning**: Plan your weekly meals with ease.
-- **Recipe Management**: Store and organize your favorite recipes, including ingredients and instructions.
+- **Recipe Management**: Store and organise your favorite recipes, including ingredients and instructions.
 - **Shopping Lists**: Automatically generate or manually create shopping lists to keep your pantry stocked.
 - **Spin Wheel**: Use the interactive fortune wheel to help decide what to eat when you're feeling indecisive.
 - **Persistent Storage**: All your data is saved locally using SQLite for offline access.

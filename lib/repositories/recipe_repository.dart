@@ -3,6 +3,8 @@ import 'package:uuid/uuid.dart';
 import '../data/database.dart' as db;
 import '../models/recipe.dart';
 import '../models/item.dart';
+import '../models/recipe_ingredient.dart';
+import '../models/instruction.dart';
 
 class RecipeRepository {
   final db.AppDatabase _db;
@@ -27,15 +29,24 @@ class RecipeRepository {
 
     final ingredients = ingredientRows.map((result) {
       final item = result.readTable(_db.items);
-      return Item(
-        id: item.id,
-        name: item.name,
-        defaultUnits: item.defaultUnits,
-        category: item.category,
+      final recipeIngredient = result.readTable(_db.recipeIngredients);
+      return RecipeIngredient(
+        id: recipeIngredient.id,
+        itemId: item.id,
+        item: Item(
+          id: item.id,
+          name: item.name,
+          defaultUnits: item.defaultUnits,
+          category: item.category,
+        ),
+        quantity: recipeIngredient.quantity,
+        units: recipeIngredient.units,
       );
     }).toList();
 
-    final instructions = instructionRows.map((i) => i.textContent).toList();
+    final instructions = instructionRows
+        .map((i) => Instruction(id: i.id, text: i.textContent))
+        .toList();
 
     return Recipe(
       id: row.id,
@@ -85,5 +96,23 @@ class RecipeRepository {
     await (_db.update(_db.recipes)..where((t) => t.id.equals(recipeId))).write(
       db.RecipesCompanion(name: Value(name)),
     );
+  }
+
+  Future<void> updateIngredient(
+    String ingredientId,
+    String itemId,
+    double quantity,
+    String units,
+  ) async {
+    await _db.recipeDao.updateIngredient(
+      id: ingredientId,
+      itemId: itemId,
+      quantity: quantity,
+      units: units,
+    );
+  }
+
+  Future<void> updateInstruction(String instructionId, String text) async {
+    await _db.recipeDao.updateInstruction(id: instructionId, textContent: text);
   }
 }

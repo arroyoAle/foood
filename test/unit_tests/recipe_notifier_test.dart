@@ -70,7 +70,10 @@ void main() {
 
       final recipes = await container.read(recipesProvider.future);
       final updatedRecipe = recipes.firstWhere((r) => r.id == recipe.id);
-      expect(updatedRecipe.ingredients.any((i) => i.name == 'Salt'), isTrue);
+      expect(
+        updatedRecipe.ingredients.any((i) => i.item.name == 'Salt'),
+        isTrue,
+      );
     });
 
     test('addInstruction adds an instruction and refreshes state', () async {
@@ -82,7 +85,59 @@ void main() {
 
       final recipes = await container.read(recipesProvider.future);
       final updatedRecipe = recipes.firstWhere((r) => r.id == recipe.id);
-      expect(updatedRecipe.instructions.contains('Mix well'), isTrue);
+      expect(
+        updatedRecipe.instructions.any((i) => i.text == 'Mix well'),
+        isTrue,
+      );
+    });
+
+    group('Editing', () {
+      test('updateIngredient refreshes state and updates details', () async {
+        final recipe = await recipeRepository.createRecipe('Recipe');
+        final item1 = await container
+            .read(shoppingRepositoryProvider)
+            .findOrCreateItem(name: 'Salt', units: 'tsp');
+        final item2 = await container
+            .read(shoppingRepositoryProvider)
+            .findOrCreateItem(name: 'Pepper', units: 'tsp');
+        await recipeRepository.addIngredient(recipe.id, item1, 1.0, 'tsp');
+
+        final initialRecipes = await container.read(recipesProvider.future);
+        final ingredientId = initialRecipes.first.ingredients.first.id;
+
+        await container
+            .read(recipesProvider.notifier)
+            .updateIngredient(
+              ingredientId: ingredientId,
+              itemId: item2.id,
+              quantity: 2.0,
+              units: 'tbsp',
+            );
+
+        final updatedRecipes = await container.read(recipesProvider.future);
+        final ingredient = updatedRecipes.first.ingredients.first;
+        expect(ingredient.item.name, 'Pepper');
+        expect(ingredient.quantity, 2.0);
+        expect(ingredient.units, 'tbsp');
+      });
+
+      test('updateInstruction refreshes state and updates text', () async {
+        final recipe = await recipeRepository.createRecipe('Recipe');
+        await recipeRepository.addInstruction(recipe.id, 'Mix well');
+
+        final initialRecipes = await container.read(recipesProvider.future);
+        final instructionId = initialRecipes.first.instructions.first.id;
+
+        await container
+            .read(recipesProvider.notifier)
+            .updateInstruction(
+              instructionId: instructionId,
+              text: 'Mix very well',
+            );
+
+        final updatedRecipes = await container.read(recipesProvider.future);
+        expect(updatedRecipes.first.instructions.first.text, 'Mix very well');
+      });
     });
   });
 }

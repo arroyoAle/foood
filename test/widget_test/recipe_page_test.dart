@@ -166,4 +166,263 @@ void main() {
     // Save icon should NOT be visible again
     expect(find.byIcon(Icons.save), findsNothing);
   });
+
+  group('Editing Ingredients and Instructions', () {
+    testWidgets(
+      'Long-pressing an ingredient opens IngredientDialog in edit mode',
+      (WidgetTester tester) async {
+        final recipeId = 'test-recipe';
+        final itemId = 'test-item';
+        await database
+            .into(database.recipes)
+            .insert(
+              db.RecipesCompanion.insert(id: recipeId, name: 'Test Recipe'),
+            );
+        await database
+            .into(database.items)
+            .insert(
+              db.ItemsCompanion.insert(
+                id: itemId,
+                name: 'Salt',
+                defaultUnits: 'tsp',
+              ),
+            );
+        await database
+            .into(database.recipeIngredients)
+            .insert(
+              db.RecipeIngredientsCompanion.insert(
+                id: 'ing-1',
+                recipeId: recipeId,
+                itemId: itemId,
+                quantity: 1.0,
+                units: 'tsp',
+              ),
+            );
+
+        await pumpRecipePage(tester, recipeId);
+        await tester.pumpAndSettle();
+
+        // Find the ingredient tile and long press it
+        await tester.longPress(find.text('Salt'));
+        await tester.pumpAndSettle();
+
+        // Verify dialog is shown
+        expect(find.text('Edit Ingredient'), findsOneWidget);
+        expect(find.text('1.0'), findsOneWidget); // Quantity
+        expect(find.text('tsp'), findsOneWidget); // Units
+      },
+    );
+
+    testWidgets(
+      'Long-pressing an instruction opens InstructionDialog in edit mode',
+      (WidgetTester tester) async {
+        final recipeId = 'test-recipe';
+        await database
+            .into(database.recipes)
+            .insert(
+              db.RecipesCompanion.insert(id: recipeId, name: 'Test Recipe'),
+            );
+        await database
+            .into(database.instructions)
+            .insert(
+              db.InstructionsCompanion.insert(
+                id: 'inst-1',
+                recipeId: recipeId,
+                textContent: 'Initial Step',
+                ordering: 1,
+              ),
+            );
+
+        await pumpRecipePage(tester, recipeId);
+        await tester.pumpAndSettle();
+
+        // Switch to instructions tab
+        await tester.tap(find.text('Instructions'));
+        await tester.pumpAndSettle();
+
+        // Find the instruction tile and long press it
+        await tester.longPress(find.text('Initial Step'));
+        await tester.pumpAndSettle();
+
+        // Verify dialog is shown
+        expect(find.text('Edit Instruction'), findsOneWidget);
+        expect(
+          find.text('Initial Step'),
+          findsNWidgets(2),
+        ); // One in list, one in dialog
+      },
+    );
+
+    testWidgets('Saving changes from IngredientDialog updates UI', (
+      WidgetTester tester,
+    ) async {
+      final recipeId = 'test-recipe';
+      final itemId = 'test-item';
+      await database
+          .into(database.recipes)
+          .insert(
+            db.RecipesCompanion.insert(id: recipeId, name: 'Test Recipe'),
+          );
+      await database
+          .into(database.items)
+          .insert(
+            db.ItemsCompanion.insert(
+              id: itemId,
+              name: 'Salt',
+              defaultUnits: 'tsp',
+            ),
+          );
+      await database
+          .into(database.recipeIngredients)
+          .insert(
+            db.RecipeIngredientsCompanion.insert(
+              id: 'ing-1',
+              recipeId: recipeId,
+              itemId: itemId,
+              quantity: 1.0,
+              units: 'tsp',
+            ),
+          );
+
+      await pumpRecipePage(tester, recipeId);
+      await tester.pumpAndSettle();
+
+      await tester.longPress(find.text('Salt'));
+      await tester.pumpAndSettle();
+
+      // Edit quantity and unit
+      await tester.enterText(find.widgetWithText(TextFormField, 'Qty'), '2.0');
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Unit'),
+        'tbsp',
+      );
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      // Verify UI is updated
+      expect(find.text('2.0 tbsp'), findsOneWidget);
+
+      // Verify database updated
+      final ing = await (database.select(
+        database.recipeIngredients,
+      )..where((t) => t.id.equals('ing-1'))).getSingle();
+      expect(ing.quantity, 2.0);
+      expect(ing.units, 'tbsp');
+    });
+
+    testWidgets('Saving changes from InstructionDialog updates UI', (
+      WidgetTester tester,
+    ) async {
+      final recipeId = 'test-recipe';
+      await database
+          .into(database.recipes)
+          .insert(
+            db.RecipesCompanion.insert(id: recipeId, name: 'Test Recipe'),
+          );
+      await database
+          .into(database.instructions)
+          .insert(
+            db.InstructionsCompanion.insert(
+              id: 'inst-1',
+              recipeId: recipeId,
+              textContent: 'Initial Step',
+              ordering: 1,
+            ),
+          );
+
+      await pumpRecipePage(tester, recipeId);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Instructions'));
+      await tester.pumpAndSettle();
+
+      await tester.longPress(find.text('Initial Step'));
+      await tester.pumpAndSettle();
+
+      // Edit text
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Instruction'),
+        'Updated Step',
+      );
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      // Verify UI is updated
+      expect(find.text('Updated Step'), findsOneWidget);
+      expect(find.text('Initial Step'), findsNothing);
+
+      // Verify database updated
+      final inst = await (database.select(
+        database.instructions,
+      )..where((t) => t.id.equals('inst-1'))).getSingle();
+      expect(inst.textContent, 'Updated Step');
+    });
+
+    testWidgets('Changing ingredient item updates UI', (
+      WidgetTester tester,
+    ) async {
+      final recipeId = 'test-recipe';
+      final itemId1 = 'item-1';
+      final itemId2 = 'item-2';
+      await database
+          .into(database.recipes)
+          .insert(
+            db.RecipesCompanion.insert(id: recipeId, name: 'Test Recipe'),
+          );
+      await database
+          .into(database.items)
+          .insert(
+            db.ItemsCompanion.insert(
+              id: itemId1,
+              name: 'Salt',
+              defaultUnits: 'tsp',
+            ),
+          );
+      await database
+          .into(database.items)
+          .insert(
+            db.ItemsCompanion.insert(
+              id: itemId2,
+              name: 'Pepper',
+              defaultUnits: 'tsp',
+            ),
+          );
+      await database
+          .into(database.recipeIngredients)
+          .insert(
+            db.RecipeIngredientsCompanion.insert(
+              id: 'ing-1',
+              recipeId: recipeId,
+              itemId: itemId1,
+              quantity: 1.0,
+              units: 'tsp',
+            ),
+          );
+
+      await pumpRecipePage(tester, recipeId);
+      await tester.pumpAndSettle();
+
+      await tester.longPress(find.text('Salt'));
+      await tester.pumpAndSettle();
+
+      // Change item in dropdown
+      await tester.tap(find.byType(DropdownButtonFormField<String>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Pepper').last);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      // Verify UI is updated to show Pepper
+      expect(find.text('Pepper'), findsOneWidget);
+      expect(find.text('Salt'), findsNothing);
+
+      // Verify database updated
+      final ing = await (database.select(
+        database.recipeIngredients,
+      )..where((t) => t.id.equals('ing-1'))).getSingle();
+      expect(ing.itemId, itemId2);
+    });
+  });
 }

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foood/data/database.dart' as db;
-import 'package:foood/pages/shopping_lists/dialogs/item_dialog.dart';
+import 'package:foood/pages/dialogs/item_dialog.dart';
 import 'package:foood/pages/shopping_lists/shopping_list_screen.dart';
 import 'package:foood/providers/providers.dart';
 import 'package:foood/repositories/shopping_list_repository.dart';

@@ -40,7 +40,7 @@ void main() {
 
       final recipes = await recipeRepository.getAllRecipes();
       expect(recipes.first.ingredients.length, 1);
-      expect(recipes.first.ingredients.first.name, 'Flour');
+      expect(recipes.first.ingredients.first.item.name, 'Flour');
     });
 
     test('addInstruction adds an instruction to a recipe', () async {
@@ -51,8 +51,8 @@ void main() {
 
       final recipes = await recipeRepository.getAllRecipes();
       expect(recipes.first.instructions.length, 2);
-      expect(recipes.first.instructions[0], 'Boil water');
-      expect(recipes.first.instructions[1], 'Add pasta');
+      expect(recipes.first.instructions[0].text, 'Boil water');
+      expect(recipes.first.instructions[1].text, 'Add pasta');
     });
 
     test('updateRecipeName updates the name', () async {
@@ -61,6 +61,57 @@ void main() {
 
       final recipes = await recipeRepository.getAllRecipes();
       expect(recipes.first.name, 'Spaghetti');
+    });
+
+    group('Editing', () {
+      test('updateIngredient updates item, quantity and units', () async {
+        final recipe = await recipeRepository.createRecipe('Pasta');
+        final item1 = await shoppingRepository.findOrCreateItem(
+          name: 'Flour',
+          units: 'g',
+        );
+        final item2 = await shoppingRepository.findOrCreateItem(
+          name: 'Sugar',
+          units: 'g',
+        );
+        await recipeRepository.addIngredient(recipe.id, item1, 500.0, 'g');
+
+        final initialRecipes = await recipeRepository.getAllRecipes();
+        final ingredientId = initialRecipes.first.ingredients.first.id;
+
+        // Change from Flour to Sugar, and update qty/units
+        await recipeRepository.updateIngredient(
+          ingredientId,
+          item2.id,
+          600.0,
+          'kg',
+        );
+
+        final updatedRecipes = await recipeRepository.getAllRecipes();
+        final ingredient = updatedRecipes.first.ingredients.first;
+        expect(ingredient.item.name, 'Sugar');
+        expect(ingredient.quantity, 600.0);
+        expect(ingredient.units, 'kg');
+      });
+
+      test('updateInstruction updates text content', () async {
+        final recipe = await recipeRepository.createRecipe('Pasta');
+        await recipeRepository.addInstruction(recipe.id, 'Boil water');
+
+        final initialRecipes = await recipeRepository.getAllRecipes();
+        final instructionId = initialRecipes.first.instructions.first.id;
+
+        await recipeRepository.updateInstruction(
+          instructionId,
+          'Boil salty water',
+        );
+
+        final updatedRecipes = await recipeRepository.getAllRecipes();
+        expect(
+          updatedRecipes.first.instructions.first.text,
+          'Boil salty water',
+        );
+      });
     });
   });
 }
