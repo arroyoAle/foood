@@ -20,6 +20,7 @@
 - [x] Allow collapsing of categories
 - [ ] Support adding images to items for more clarity
 - [x] Add drag and drop support to re-order items
+- [x] Undo and redo selection
 
 ### 4. Recipe Management
 - [x] Save name changes
@@ -82,3 +83,22 @@
 - [x] Create recipes
 - [x] Add ingredients
 - [x] Add instructions
+
+
+
+gpg:OpenPGP:/opt/homebrew/Cellar/gnupg/2.5.19/bin/gpg
+gpgsm:S/MIME:/opt/homebrew/Cellar/gnupg/2.5.19/bin/gpgsm
+keyboxd:Public Keys:/opt/homebrew/Cellar/gnupg/2.5.19/libexec/keyboxd
+gpg-agent:Private Keys:/opt/homebrew/Cellar/gnupg/2.5.19/bin/gpg-agent
+scdaemon:Smartcards:/opt/homebrew/Cellar/gnupg/2.5.19/libexec/scdaemon
+dirmngr:Network:/opt/homebrew/Cellar/gnupg/2.5.19/bin/dirmngr
+pinentry:Passphrase Entry:/opt/homebrew/opt/pinentry/bin/
+
+
+pg:OpenGPG:/usr/local/MacGPG2/bin/gpg
+gpg-agent:Private Keys:/usr/local/MacGPG2/bin/gpg-agent
+scdaemon:Smartcards:/usr/local/MacGPG2/libexec/scdaemon
+gpgsm:S/MIME:/usr/local/MacGPG2/bin/gpgsm
+dirmngr:Network:/usr/local/MacGPG2/bin/dirmngr
+pinentry:Passphrase Entry:/usr/local/bin/pinentry
+
