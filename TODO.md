@@ -26,6 +26,7 @@
 - [x] Save name changes
 - [x] Support editing ingredients and instructions
 - [x] Edit ingredient item
+- [ ] Undo changes
 - [ ] Remove ingredients and instructions
 - [ ] Support adding images to recipes.
 - [ ] Support adding images to instruction steps
@@ -62,6 +63,7 @@
 - [ ] Refine `Items` table to handle unit normalisation (e.g., g vs kg, ml vs l).
 - [ ] Implement database migrations for new schema changes.
 - [ ] Add unit tests for Repositories and DAOs.
+- [ ] Update Riverpods use to stop using legacy StateProvider
 
 ### 2. UI/UX
 - [ ] Implement Light/Dark mode support.
