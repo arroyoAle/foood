@@ -85,3 +85,6 @@
 - [x] Create recipes
 - [x] Add ingredients
 - [x] Add instructions
+
+## Bugs
+- [ ] Search stays searched after leaving recipe
