@@ -83,6 +83,34 @@ class Instructions extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+class MealPlans extends Table {
+  TextColumn get id => text()();
+  DateTimeColumn get weekStartDate => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+class MealPlanEntries extends Table {
+  TextColumn get id => text()();
+  TextColumn get mealPlanId => text().references(MealPlans, #id)();
+  DateTimeColumn get date => dateTime()();
+  TextColumn get mealType => text()(); // breakfast, lunch, dinner, snack
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+class MealPlanEntryRecipes extends Table {
+  TextColumn get id => text()();
+  TextColumn get mealPlanEntryId => text().references(MealPlanEntries, #id)();
+  TextColumn get recipeId => text().references(Recipes, #id)();
+  RealColumn get servings => real()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 // --- DAO ---
 
 @DriftAccessor(tables: [ShoppingListItems, Items, PantryItems])
@@ -264,6 +292,49 @@ class RecipeDao extends DatabaseAccessor<AppDatabase> with _$RecipeDaoMixin {
   }
 }
 
+@DriftAccessor(tables: [MealPlans, MealPlanEntries, MealPlanEntryRecipes, Recipes])
+class MealPlanDao extends DatabaseAccessor<AppDatabase>
+    with _$MealPlanDaoMixin {
+  MealPlanDao(super.db);
+
+  Future<MealPlan?> getMealPlanForWeek(DateTime weekStartDate) {
+    return (select(mealPlans)
+          ..where((t) => t.weekStartDate.equals(weekStartDate)))
+        .getSingleOrNull();
+  }
+
+  Future<List<MealPlanEntry>> getEntriesForMealPlan(String mealPlanId) {
+    return (select(mealPlanEntries)
+          ..where((t) => t.mealPlanId.equals(mealPlanId))
+          ..orderBy([(t) => OrderingTerm.asc(t.date)]))
+        .get();
+  }
+
+  Future<List<TypedResult>> getRecipesForEntry(String entryId) {
+    return (select(mealPlanEntryRecipes).join([
+      innerJoin(recipes, recipes.id.equalsExp(mealPlanEntryRecipes.recipeId)),
+    ])..where(mealPlanEntryRecipes.mealPlanEntryId.equals(entryId))).get();
+  }
+
+  Future<void> insertMealPlan(Insertable<MealPlan> mealPlan) =>
+      into(mealPlans).insert(mealPlan);
+
+  Future<void> insertMealPlanEntry(Insertable<MealPlanEntry> entry) =>
+      into(mealPlanEntries).insert(entry);
+
+  Future<void> insertMealPlanEntryRecipe(Insertable<MealPlanEntryRecipe> entryRecipe) =>
+      into(mealPlanEntryRecipes).insert(entryRecipe);
+
+  Future<void> deleteMealPlanEntry(String id) =>
+      (delete(mealPlanEntries)..where((t) => t.id.equals(id))).go();
+
+  Future<void> deleteMealPlanEntryRecipe(String id) =>
+      (delete(mealPlanEntryRecipes)..where((t) => t.id.equals(id))).go();
+
+  Future<void> updateMealPlanEntryRecipe(Insertable<MealPlanEntryRecipe> entryRecipe) =>
+      update(mealPlanEntryRecipes).replace(entryRecipe);
+}
+
 // --- Database ---
 
 @DriftDatabase(
@@ -275,14 +346,31 @@ class RecipeDao extends DatabaseAccessor<AppDatabase> with _$RecipeDaoMixin {
     Recipes,
     RecipeIngredients,
     Instructions,
+    MealPlans,
+    MealPlanEntries,
+    MealPlanEntryRecipes,
   ],
-  daos: [ShoppingDao, RecipeDao],
+  daos: [ShoppingDao, RecipeDao, MealPlanDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (m) async {
+          await m.createAll();
+        },
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            await m.createTable(mealPlans);
+            await m.createTable(mealPlanEntries);
+            await m.createTable(mealPlanEntryRecipes);
+          }
+        },
+      );
 }
 
 LazyDatabase _openConnection() {
