@@ -34,7 +34,7 @@ void main() {
 
     test('addRecipeToMeal adds a recipe and creates entry', () async {
       final recipe = await recipeRepository.createRecipe('Pasta');
-      
+
       await mealPlanRepository.addRecipeToMeal(
         weekStartDate: monday,
         date: monday,
@@ -61,12 +61,16 @@ void main() {
         servings: 2,
       );
 
-      final initialEntries = await mealPlanRepository.getMealPlanForWeek(monday);
+      final initialEntries = await mealPlanRepository.getMealPlanForWeek(
+        monday,
+      );
       final entryRecipeId = initialEntries.first.recipes.first.id;
 
       await mealPlanRepository.updateServings(entryRecipeId, 4);
 
-      final updatedEntries = await mealPlanRepository.getMealPlanForWeek(monday);
+      final updatedEntries = await mealPlanRepository.getMealPlanForWeek(
+        monday,
+      );
       expect(updatedEntries.first.recipes.first.servings, 4);
     });
 
@@ -80,12 +84,16 @@ void main() {
         servings: 2,
       );
 
-      final initialEntries = await mealPlanRepository.getMealPlanForWeek(monday);
+      final initialEntries = await mealPlanRepository.getMealPlanForWeek(
+        monday,
+      );
       final entryRecipeId = initialEntries.first.recipes.first.id;
 
       await mealPlanRepository.removeRecipeFromMeal(entryRecipeId);
 
-      final updatedEntries = await mealPlanRepository.getMealPlanForWeek(monday);
+      final updatedEntries = await mealPlanRepository.getMealPlanForWeek(
+        monday,
+      );
       expect(updatedEntries.first.recipes, isEmpty);
     });
 
@@ -111,8 +119,14 @@ void main() {
       final entries = await mealPlanRepository.getMealPlanForWeek(monday);
       expect(entries.length, 1);
       expect(entries.first.recipes.length, 2);
-      expect(entries.first.recipes.any((r) => r.recipe.name == 'Steak'), isTrue);
-      expect(entries.first.recipes.any((r) => r.recipe.name == 'Salad'), isTrue);
+      expect(
+        entries.first.recipes.any((r) => r.recipe.name == 'Steak'),
+        isTrue,
+      );
+      expect(
+        entries.first.recipes.any((r) => r.recipe.name == 'Salad'),
+        isTrue,
+      );
     });
   });
 }

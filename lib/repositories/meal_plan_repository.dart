@@ -72,10 +72,12 @@ class MealPlanRepository {
 
     var mealPlan = await _db.mealPlanDao.getMealPlanForWeek(utcWeekStart);
     if (mealPlan == null) {
-      await _db.into(_db.mealPlans).insert(
-        db.MealPlansCompanion.insert(weekStartDate: utcWeekStart),
-        mode: InsertMode.insertOrIgnore,
-      );
+      await _db
+          .into(_db.mealPlans)
+          .insert(
+            db.MealPlansCompanion.insert(weekStartDate: utcWeekStart),
+            mode: InsertMode.insertOrIgnore,
+          );
       mealPlan = await _db.mealPlanDao.getMealPlanForWeek(utcWeekStart);
     }
 

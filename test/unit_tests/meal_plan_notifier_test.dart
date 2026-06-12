@@ -42,13 +42,15 @@ void main() {
 
     test('addRecipeToMeal updates state', () async {
       final recipe = await recipeRepository.createRecipe('Pasta');
-      
-      await container.read(mealPlanProvider.notifier).addRecipeToMeal(
-        date: monday,
-        mealType: 'Dinner',
-        recipeId: recipe.id,
-        servings: 2,
-      );
+
+      await container
+          .read(mealPlanProvider.notifier)
+          .addRecipeToMeal(
+            date: monday,
+            mealType: 'Dinner',
+            recipeId: recipe.id,
+            servings: 2,
+          );
 
       final state = await container.read(mealPlanProvider.future);
       expect(state.length, 1);
@@ -57,17 +59,21 @@ void main() {
 
     test('updateServings refreshes state', () async {
       final recipe = await recipeRepository.createRecipe('Pasta');
-      await container.read(mealPlanProvider.notifier).addRecipeToMeal(
-        date: monday,
-        mealType: 'Dinner',
-        recipeId: recipe.id,
-        servings: 2,
-      );
+      await container
+          .read(mealPlanProvider.notifier)
+          .addRecipeToMeal(
+            date: monday,
+            mealType: 'Dinner',
+            recipeId: recipe.id,
+            servings: 2,
+          );
 
       final initialState = await container.read(mealPlanProvider.future);
       final entryRecipeId = initialState.first.recipes.first.id;
 
-      await container.read(mealPlanProvider.notifier).updateServings(entryRecipeId, 5);
+      await container
+          .read(mealPlanProvider.notifier)
+          .updateServings(entryRecipeId, 5);
 
       final updatedState = await container.read(mealPlanProvider.future);
       expect(updatedState.first.recipes.first.servings, 5);
@@ -75,17 +81,21 @@ void main() {
 
     test('removeRecipeFromMeal refreshes state', () async {
       final recipe = await recipeRepository.createRecipe('Pasta');
-      await container.read(mealPlanProvider.notifier).addRecipeToMeal(
-        date: monday,
-        mealType: 'Dinner',
-        recipeId: recipe.id,
-        servings: 2,
-      );
+      await container
+          .read(mealPlanProvider.notifier)
+          .addRecipeToMeal(
+            date: monday,
+            mealType: 'Dinner',
+            recipeId: recipe.id,
+            servings: 2,
+          );
 
       final initialState = await container.read(mealPlanProvider.future);
       final entryRecipeId = initialState.first.recipes.first.id;
 
-      await container.read(mealPlanProvider.notifier).removeRecipeFromMeal(entryRecipeId);
+      await container
+          .read(mealPlanProvider.notifier)
+          .removeRecipeFromMeal(entryRecipeId);
 
       final updatedState = await container.read(mealPlanProvider.future);
       expect(updatedState.first.recipes, isEmpty);
@@ -93,11 +103,13 @@ void main() {
 
     test('changing selectedWeek updates mealPlanProvider', () async {
       final recipe = await recipeRepository.createRecipe('Monday Meal');
-      await container.read(mealPlanProvider.notifier).addRecipeToMeal(
-        date: monday,
-        mealType: 'Dinner',
-        recipeId: recipe.id,
-      );
+      await container
+          .read(mealPlanProvider.notifier)
+          .addRecipeToMeal(
+            date: monday,
+            mealType: 'Dinner',
+            recipeId: recipe.id,
+          );
 
       // Verify current week has the meal
       expect((await container.read(mealPlanProvider.future)).length, 1);

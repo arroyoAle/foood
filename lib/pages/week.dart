@@ -226,7 +226,9 @@ class _RecipeItem extends ConsumerWidget {
     return ListTile(
       contentPadding: EdgeInsets.zero,
       title: Text(recipe.recipe.name),
-      subtitle: Text('${recipe.servings} serving${recipe.servings == 1 ? "" : "s"}'),
+      subtitle: Text(
+        '${recipe.servings} serving${recipe.servings == 1 ? "" : "s"}',
+      ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
