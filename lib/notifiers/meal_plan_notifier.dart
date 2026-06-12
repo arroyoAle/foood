@@ -15,7 +15,7 @@ class MealPlanNotifier extends AsyncNotifier<List<MealPlanEntryModel>> {
     required DateTime date,
     required String mealType,
     required String recipeId,
-    double servings = 1.0,
+    int servings = 1,
   }) async {
     state = const AsyncLoading<List<MealPlanEntryModel>>().copyWithPrevious(
       state,
@@ -52,7 +52,7 @@ class MealPlanNotifier extends AsyncNotifier<List<MealPlanEntryModel>> {
     });
   }
 
-  Future<void> updateServings(String entryRecipeId, double servings) async {
+  Future<void> updateServings(String entryRecipeId, int servings) async {
     state = const AsyncLoading<List<MealPlanEntryModel>>().copyWithPrevious(
       state,
     );

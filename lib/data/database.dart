@@ -105,7 +105,7 @@ class MealPlanEntryRecipes extends Table {
   TextColumn get id => text()();
   TextColumn get mealPlanEntryId => text().references(MealPlanEntries, #id)();
   TextColumn get recipeId => text().references(Recipes, #id)();
-  RealColumn get servings => real()();
+  IntColumn get servings => integer()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -336,7 +336,7 @@ class MealPlanDao extends DatabaseAccessor<AppDatabase>
 
   Future<void> updateMealPlanEntryRecipe({
     required String id,
-    required double servings,
+    required int servings,
   }) {
     return (update(mealPlanEntryRecipes)..where((t) => t.id.equals(id))).write(
       MealPlanEntryRecipesCompanion(servings: Value(servings)),
@@ -365,7 +365,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -376,6 +376,10 @@ class AppDatabase extends _$AppDatabase {
       if (from < 2) {
         await m.createTable(mealPlans);
         await m.createTable(mealPlanEntries);
+        await m.createTable(mealPlanEntryRecipes);
+      }
+      if (from < 3) {
+        await m.drop(mealPlanEntryRecipes);
         await m.createTable(mealPlanEntryRecipes);
       }
     },

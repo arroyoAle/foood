@@ -7,7 +7,7 @@ part 'meal_plan.g.dart';
 class MealPlanEntryRecipeModel {
   final String id;
   final Recipe recipe;
-  final double servings;
+  final int servings;
 
   MealPlanEntryRecipeModel({
     required this.id,

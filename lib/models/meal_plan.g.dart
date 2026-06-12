@@ -11,7 +11,7 @@ MealPlanEntryRecipeModel _$MealPlanEntryRecipeModelFromJson(
 ) => MealPlanEntryRecipeModel(
   id: json['id'] as String,
   recipe: Recipe.fromJson(json['recipe'] as Map<String, dynamic>),
-  servings: (json['servings'] as num).toDouble(),
+  servings: (json['servings'] as num).toInt(),
 );
 
 Map<String, dynamic> _$MealPlanEntryRecipeModelToJson(

@@ -226,17 +226,17 @@ class _RecipeItem extends ConsumerWidget {
     return ListTile(
       contentPadding: EdgeInsets.zero,
       title: Text(recipe.recipe.name),
-      subtitle: Text('${recipe.servings.toStringAsFixed(1)} servings'),
+      subtitle: Text('${recipe.servings} serving${recipe.servings == 1 ? "" : "s"}'),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
             icon: const Icon(Icons.remove_circle_outline, size: 20),
             onPressed: () {
-              if (recipe.servings > 1.0) {
+              if (recipe.servings > 1) {
                 ref
                     .read(mealPlanProvider.notifier)
-                    .updateServings(recipe.id, recipe.servings - 1.0);
+                    .updateServings(recipe.id, recipe.servings - 1);
               }
             },
           ),
@@ -245,7 +245,7 @@ class _RecipeItem extends ConsumerWidget {
             onPressed: () {
               ref
                   .read(mealPlanProvider.notifier)
-                  .updateServings(recipe.id, recipe.servings + 1.0);
+                  .updateServings(recipe.id, recipe.servings + 1);
             },
           ),
           IconButton(

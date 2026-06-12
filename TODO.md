@@ -13,6 +13,7 @@
 - [ ] Create `MealPlanRepository` and Riverpod notifiers.
 - [ ] Develop `WeekPage` for weekly meal scheduling.
 - [ ] Support scaling recipe portions in meal plan entries.
+- [ ] Delete weeks from more than 3? months ago
 
 ### 3. Shopping List Enhancements
 - [x] Add search functionality

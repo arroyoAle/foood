@@ -65,7 +65,7 @@ class MealPlanRepository {
     required DateTime date,
     required String mealType,
     required String recipeId,
-    required double servings,
+    required int servings,
   }) async {
     // 1. Get or create MealPlan for this week
     var mealPlan = await _db.mealPlanDao.getMealPlanForWeek(weekStartDate);
@@ -115,7 +115,7 @@ class MealPlanRepository {
     await _db.mealPlanDao.deleteMealPlanEntryRecipe(entryRecipeId);
   }
 
-  Future<void> updateServings(String entryRecipeId, double servings) async {
+  Future<void> updateServings(String entryRecipeId, int servings) async {
     await _db.mealPlanDao.updateMealPlanEntryRecipe(
       id: entryRecipeId,
       servings: servings,

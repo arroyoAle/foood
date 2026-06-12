@@ -3008,11 +3008,11 @@ class $MealPlanEntryRecipesTable extends MealPlanEntryRecipes
     'servings',
   );
   @override
-  late final GeneratedColumn<double> servings = GeneratedColumn<double>(
+  late final GeneratedColumn<int> servings = GeneratedColumn<int>(
     'servings',
     aliasedName,
     false,
-    type: DriftSqlType.double,
+    type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
   @override
@@ -3088,7 +3088,7 @@ class $MealPlanEntryRecipesTable extends MealPlanEntryRecipes
         data['${effectivePrefix}recipe_id'],
       )!,
       servings: attachedDatabase.typeMapping.read(
-        DriftSqlType.double,
+        DriftSqlType.int,
         data['${effectivePrefix}servings'],
       )!,
     );
@@ -3105,7 +3105,7 @@ class MealPlanEntryRecipe extends DataClass
   final String id;
   final String mealPlanEntryId;
   final String recipeId;
-  final double servings;
+  final int servings;
   const MealPlanEntryRecipe({
     required this.id,
     required this.mealPlanEntryId,
@@ -3118,7 +3118,7 @@ class MealPlanEntryRecipe extends DataClass
     map['id'] = Variable<String>(id);
     map['meal_plan_entry_id'] = Variable<String>(mealPlanEntryId);
     map['recipe_id'] = Variable<String>(recipeId);
-    map['servings'] = Variable<double>(servings);
+    map['servings'] = Variable<int>(servings);
     return map;
   }
 
@@ -3140,7 +3140,7 @@ class MealPlanEntryRecipe extends DataClass
       id: serializer.fromJson<String>(json['id']),
       mealPlanEntryId: serializer.fromJson<String>(json['mealPlanEntryId']),
       recipeId: serializer.fromJson<String>(json['recipeId']),
-      servings: serializer.fromJson<double>(json['servings']),
+      servings: serializer.fromJson<int>(json['servings']),
     );
   }
   @override
@@ -3150,7 +3150,7 @@ class MealPlanEntryRecipe extends DataClass
       'id': serializer.toJson<String>(id),
       'mealPlanEntryId': serializer.toJson<String>(mealPlanEntryId),
       'recipeId': serializer.toJson<String>(recipeId),
-      'servings': serializer.toJson<double>(servings),
+      'servings': serializer.toJson<int>(servings),
     };
   }
 
@@ -3158,7 +3158,7 @@ class MealPlanEntryRecipe extends DataClass
     String? id,
     String? mealPlanEntryId,
     String? recipeId,
-    double? servings,
+    int? servings,
   }) => MealPlanEntryRecipe(
     id: id ?? this.id,
     mealPlanEntryId: mealPlanEntryId ?? this.mealPlanEntryId,
@@ -3204,7 +3204,7 @@ class MealPlanEntryRecipesCompanion
   final Value<String> id;
   final Value<String> mealPlanEntryId;
   final Value<String> recipeId;
-  final Value<double> servings;
+  final Value<int> servings;
   final Value<int> rowid;
   const MealPlanEntryRecipesCompanion({
     this.id = const Value.absent(),
@@ -3217,7 +3217,7 @@ class MealPlanEntryRecipesCompanion
     required String id,
     required String mealPlanEntryId,
     required String recipeId,
-    required double servings,
+    required int servings,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        mealPlanEntryId = Value(mealPlanEntryId),
@@ -3227,7 +3227,7 @@ class MealPlanEntryRecipesCompanion
     Expression<String>? id,
     Expression<String>? mealPlanEntryId,
     Expression<String>? recipeId,
-    Expression<double>? servings,
+    Expression<int>? servings,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -3243,7 +3243,7 @@ class MealPlanEntryRecipesCompanion
     Value<String>? id,
     Value<String>? mealPlanEntryId,
     Value<String>? recipeId,
-    Value<double>? servings,
+    Value<int>? servings,
     Value<int>? rowid,
   }) {
     return MealPlanEntryRecipesCompanion(
@@ -3268,7 +3268,7 @@ class MealPlanEntryRecipesCompanion
       map['recipe_id'] = Variable<String>(recipeId.value);
     }
     if (servings.present) {
-      map['servings'] = Variable<double>(servings.value);
+      map['servings'] = Variable<int>(servings.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -6762,7 +6762,7 @@ typedef $$MealPlanEntryRecipesTableCreateCompanionBuilder =
       required String id,
       required String mealPlanEntryId,
       required String recipeId,
-      required double servings,
+      required int servings,
       Value<int> rowid,
     });
 typedef $$MealPlanEntryRecipesTableUpdateCompanionBuilder =
@@ -6770,7 +6770,7 @@ typedef $$MealPlanEntryRecipesTableUpdateCompanionBuilder =
       Value<String> id,
       Value<String> mealPlanEntryId,
       Value<String> recipeId,
-      Value<double> servings,
+      Value<int> servings,
       Value<int> rowid,
     });
 
@@ -6843,7 +6843,7 @@ class $$MealPlanEntryRecipesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<double> get servings => $composableBuilder(
+  ColumnFilters<int> get servings => $composableBuilder(
     column: $table.servings,
     builder: (column) => ColumnFilters(column),
   );
@@ -6909,7 +6909,7 @@ class $$MealPlanEntryRecipesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<double> get servings => $composableBuilder(
+  ColumnOrderings<int> get servings => $composableBuilder(
     column: $table.servings,
     builder: (column) => ColumnOrderings(column),
   );
@@ -6973,7 +6973,7 @@ class $$MealPlanEntryRecipesTableAnnotationComposer
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<double> get servings =>
+  GeneratedColumn<int> get servings =>
       $composableBuilder(column: $table.servings, builder: (column) => column);
 
   $$MealPlanEntriesTableAnnotationComposer get mealPlanEntryId {
@@ -7062,7 +7062,7 @@ class $$MealPlanEntryRecipesTableTableManager
                 Value<String> id = const Value.absent(),
                 Value<String> mealPlanEntryId = const Value.absent(),
                 Value<String> recipeId = const Value.absent(),
-                Value<double> servings = const Value.absent(),
+                Value<int> servings = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => MealPlanEntryRecipesCompanion(
                 id: id,
@@ -7076,7 +7076,7 @@ class $$MealPlanEntryRecipesTableTableManager
                 required String id,
                 required String mealPlanEntryId,
                 required String recipeId,
-                required double servings,
+                required int servings,
                 Value<int> rowid = const Value.absent(),
               }) => MealPlanEntryRecipesCompanion.insert(
                 id: id,
