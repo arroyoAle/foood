@@ -84,16 +84,16 @@ class Instructions extends Table {
 }
 
 class MealPlans extends Table {
-  TextColumn get id => text()();
   DateTimeColumn get weekStartDate => dateTime()();
 
   @override
-  Set<Column> get primaryKey => {id};
+  Set<Column> get primaryKey => {weekStartDate};
 }
 
 class MealPlanEntries extends Table {
   TextColumn get id => text()();
-  TextColumn get mealPlanId => text().references(MealPlans, #id)();
+  DateTimeColumn get weekStartDate =>
+      dateTime().references(MealPlans, #weekStartDate)();
   DateTimeColumn get date => dateTime()();
   TextColumn get mealType => text()(); // breakfast, lunch, dinner, snack
 
@@ -300,14 +300,14 @@ class MealPlanDao extends DatabaseAccessor<AppDatabase>
   MealPlanDao(super.db);
 
   Future<MealPlan?> getMealPlanForWeek(DateTime weekStartDate) {
-    return (select(
-      mealPlans,
-    )..where((t) => t.weekStartDate.equals(weekStartDate))).getSingleOrNull();
+    return (select(mealPlans)
+          ..where((t) => t.weekStartDate.equals(weekStartDate.toUtc())))
+        .getSingleOrNull();
   }
 
-  Future<List<MealPlanEntry>> getEntriesForMealPlan(String mealPlanId) {
+  Future<List<MealPlanEntry>> getEntriesForMealPlan(DateTime weekStartDate) {
     return (select(mealPlanEntries)
-          ..where((t) => t.mealPlanId.equals(mealPlanId))
+          ..where((t) => t.weekStartDate.equals(weekStartDate.toUtc()))
           ..orderBy([(t) => OrderingTerm.asc(t.date)]))
         .get();
   }
@@ -365,7 +365,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -381,6 +381,19 @@ class AppDatabase extends _$AppDatabase {
       if (from < 3) {
         await m.drop(mealPlanEntryRecipes);
         await m.createTable(mealPlanEntryRecipes);
+      }
+      if (from < 4) {
+        await m.drop(mealPlans);
+        await m.createTable(mealPlans);
+      }
+      if (from < 5) {
+        await m.drop(mealPlanEntries);
+        await m.drop(mealPlans);
+        await m.createTable(mealPlans);
+        await m.createTable(mealPlanEntries);
+      }
+      if (from < 6) {
+        // No schema changes in v6, just logic fixes in DAO
       }
     },
   );

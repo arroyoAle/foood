@@ -2433,15 +2433,6 @@ class $MealPlansTable extends MealPlans
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $MealPlansTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<String> id = GeneratedColumn<String>(
-    'id',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
   static const VerificationMeta _weekStartDateMeta = const VerificationMeta(
     'weekStartDate',
   );
@@ -2455,7 +2446,7 @@ class $MealPlansTable extends MealPlans
         requiredDuringInsert: true,
       );
   @override
-  List<GeneratedColumn> get $columns => [id, weekStartDate];
+  List<GeneratedColumn> get $columns => [weekStartDate];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -2468,11 +2459,6 @@ class $MealPlansTable extends MealPlans
   }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
-    }
     if (data.containsKey('week_start_date')) {
       context.handle(
         _weekStartDateMeta,
@@ -2488,15 +2474,11 @@ class $MealPlansTable extends MealPlans
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {id};
+  Set<GeneratedColumn> get $primaryKey => {weekStartDate};
   @override
   MealPlan map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return MealPlan(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}id'],
-      )!,
       weekStartDate: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}week_start_date'],
@@ -2511,22 +2493,17 @@ class $MealPlansTable extends MealPlans
 }
 
 class MealPlan extends DataClass implements Insertable<MealPlan> {
-  final String id;
   final DateTime weekStartDate;
-  const MealPlan({required this.id, required this.weekStartDate});
+  const MealPlan({required this.weekStartDate});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<String>(id);
     map['week_start_date'] = Variable<DateTime>(weekStartDate);
     return map;
   }
 
   MealPlansCompanion toCompanion(bool nullToAbsent) {
-    return MealPlansCompanion(
-      id: Value(id),
-      weekStartDate: Value(weekStartDate),
-    );
+    return MealPlansCompanion(weekStartDate: Value(weekStartDate));
   }
 
   factory MealPlan.fromJson(
@@ -2535,7 +2512,6 @@ class MealPlan extends DataClass implements Insertable<MealPlan> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return MealPlan(
-      id: serializer.fromJson<String>(json['id']),
       weekStartDate: serializer.fromJson<DateTime>(json['weekStartDate']),
     );
   }
@@ -2543,18 +2519,14 @@ class MealPlan extends DataClass implements Insertable<MealPlan> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<String>(id),
       'weekStartDate': serializer.toJson<DateTime>(weekStartDate),
     };
   }
 
-  MealPlan copyWith({String? id, DateTime? weekStartDate}) => MealPlan(
-    id: id ?? this.id,
-    weekStartDate: weekStartDate ?? this.weekStartDate,
-  );
+  MealPlan copyWith({DateTime? weekStartDate}) =>
+      MealPlan(weekStartDate: weekStartDate ?? this.weekStartDate);
   MealPlan copyWithCompanion(MealPlansCompanion data) {
     return MealPlan(
-      id: data.id.present ? data.id.value : this.id,
       weekStartDate: data.weekStartDate.present
           ? data.weekStartDate.value
           : this.weekStartDate,
@@ -2564,56 +2536,45 @@ class MealPlan extends DataClass implements Insertable<MealPlan> {
   @override
   String toString() {
     return (StringBuffer('MealPlan(')
-          ..write('id: $id, ')
           ..write('weekStartDate: $weekStartDate')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, weekStartDate);
+  int get hashCode => weekStartDate.hashCode;
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is MealPlan &&
-          other.id == this.id &&
-          other.weekStartDate == this.weekStartDate);
+      (other is MealPlan && other.weekStartDate == this.weekStartDate);
 }
 
 class MealPlansCompanion extends UpdateCompanion<MealPlan> {
-  final Value<String> id;
   final Value<DateTime> weekStartDate;
   final Value<int> rowid;
   const MealPlansCompanion({
-    this.id = const Value.absent(),
     this.weekStartDate = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   MealPlansCompanion.insert({
-    required String id,
     required DateTime weekStartDate,
     this.rowid = const Value.absent(),
-  }) : id = Value(id),
-       weekStartDate = Value(weekStartDate);
+  }) : weekStartDate = Value(weekStartDate);
   static Insertable<MealPlan> custom({
-    Expression<String>? id,
     Expression<DateTime>? weekStartDate,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
-      if (id != null) 'id': id,
       if (weekStartDate != null) 'week_start_date': weekStartDate,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
   MealPlansCompanion copyWith({
-    Value<String>? id,
     Value<DateTime>? weekStartDate,
     Value<int>? rowid,
   }) {
     return MealPlansCompanion(
-      id: id ?? this.id,
       weekStartDate: weekStartDate ?? this.weekStartDate,
       rowid: rowid ?? this.rowid,
     );
@@ -2622,9 +2583,6 @@ class MealPlansCompanion extends UpdateCompanion<MealPlan> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<String>(id.value);
-    }
     if (weekStartDate.present) {
       map['week_start_date'] = Variable<DateTime>(weekStartDate.value);
     }
@@ -2637,7 +2595,6 @@ class MealPlansCompanion extends UpdateCompanion<MealPlan> {
   @override
   String toString() {
     return (StringBuffer('MealPlansCompanion(')
-          ..write('id: $id, ')
           ..write('weekStartDate: $weekStartDate, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -2660,20 +2617,21 @@ class $MealPlanEntriesTable extends MealPlanEntries
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _mealPlanIdMeta = const VerificationMeta(
-    'mealPlanId',
+  static const VerificationMeta _weekStartDateMeta = const VerificationMeta(
+    'weekStartDate',
   );
   @override
-  late final GeneratedColumn<String> mealPlanId = GeneratedColumn<String>(
-    'meal_plan_id',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES meal_plans (id)',
-    ),
-  );
+  late final GeneratedColumn<DateTime> weekStartDate =
+      GeneratedColumn<DateTime>(
+        'week_start_date',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: true,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES meal_plans (week_start_date)',
+        ),
+      );
   static const VerificationMeta _dateMeta = const VerificationMeta('date');
   @override
   late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
@@ -2695,7 +2653,7 @@ class $MealPlanEntriesTable extends MealPlanEntries
     requiredDuringInsert: true,
   );
   @override
-  List<GeneratedColumn> get $columns => [id, mealPlanId, date, mealType];
+  List<GeneratedColumn> get $columns => [id, weekStartDate, date, mealType];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -2713,16 +2671,16 @@ class $MealPlanEntriesTable extends MealPlanEntries
     } else if (isInserting) {
       context.missing(_idMeta);
     }
-    if (data.containsKey('meal_plan_id')) {
+    if (data.containsKey('week_start_date')) {
       context.handle(
-        _mealPlanIdMeta,
-        mealPlanId.isAcceptableOrUnknown(
-          data['meal_plan_id']!,
-          _mealPlanIdMeta,
+        _weekStartDateMeta,
+        weekStartDate.isAcceptableOrUnknown(
+          data['week_start_date']!,
+          _weekStartDateMeta,
         ),
       );
     } else if (isInserting) {
-      context.missing(_mealPlanIdMeta);
+      context.missing(_weekStartDateMeta);
     }
     if (data.containsKey('date')) {
       context.handle(
@@ -2753,9 +2711,9 @@ class $MealPlanEntriesTable extends MealPlanEntries
         DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
-      mealPlanId: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}meal_plan_id'],
+      weekStartDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}week_start_date'],
       )!,
       date: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
@@ -2776,12 +2734,12 @@ class $MealPlanEntriesTable extends MealPlanEntries
 
 class MealPlanEntry extends DataClass implements Insertable<MealPlanEntry> {
   final String id;
-  final String mealPlanId;
+  final DateTime weekStartDate;
   final DateTime date;
   final String mealType;
   const MealPlanEntry({
     required this.id,
-    required this.mealPlanId,
+    required this.weekStartDate,
     required this.date,
     required this.mealType,
   });
@@ -2789,7 +2747,7 @@ class MealPlanEntry extends DataClass implements Insertable<MealPlanEntry> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
-    map['meal_plan_id'] = Variable<String>(mealPlanId);
+    map['week_start_date'] = Variable<DateTime>(weekStartDate);
     map['date'] = Variable<DateTime>(date);
     map['meal_type'] = Variable<String>(mealType);
     return map;
@@ -2798,7 +2756,7 @@ class MealPlanEntry extends DataClass implements Insertable<MealPlanEntry> {
   MealPlanEntriesCompanion toCompanion(bool nullToAbsent) {
     return MealPlanEntriesCompanion(
       id: Value(id),
-      mealPlanId: Value(mealPlanId),
+      weekStartDate: Value(weekStartDate),
       date: Value(date),
       mealType: Value(mealType),
     );
@@ -2811,7 +2769,7 @@ class MealPlanEntry extends DataClass implements Insertable<MealPlanEntry> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return MealPlanEntry(
       id: serializer.fromJson<String>(json['id']),
-      mealPlanId: serializer.fromJson<String>(json['mealPlanId']),
+      weekStartDate: serializer.fromJson<DateTime>(json['weekStartDate']),
       date: serializer.fromJson<DateTime>(json['date']),
       mealType: serializer.fromJson<String>(json['mealType']),
     );
@@ -2821,7 +2779,7 @@ class MealPlanEntry extends DataClass implements Insertable<MealPlanEntry> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
-      'mealPlanId': serializer.toJson<String>(mealPlanId),
+      'weekStartDate': serializer.toJson<DateTime>(weekStartDate),
       'date': serializer.toJson<DateTime>(date),
       'mealType': serializer.toJson<String>(mealType),
     };
@@ -2829,21 +2787,21 @@ class MealPlanEntry extends DataClass implements Insertable<MealPlanEntry> {
 
   MealPlanEntry copyWith({
     String? id,
-    String? mealPlanId,
+    DateTime? weekStartDate,
     DateTime? date,
     String? mealType,
   }) => MealPlanEntry(
     id: id ?? this.id,
-    mealPlanId: mealPlanId ?? this.mealPlanId,
+    weekStartDate: weekStartDate ?? this.weekStartDate,
     date: date ?? this.date,
     mealType: mealType ?? this.mealType,
   );
   MealPlanEntry copyWithCompanion(MealPlanEntriesCompanion data) {
     return MealPlanEntry(
       id: data.id.present ? data.id.value : this.id,
-      mealPlanId: data.mealPlanId.present
-          ? data.mealPlanId.value
-          : this.mealPlanId,
+      weekStartDate: data.weekStartDate.present
+          ? data.weekStartDate.value
+          : this.weekStartDate,
       date: data.date.present ? data.date.value : this.date,
       mealType: data.mealType.present ? data.mealType.value : this.mealType,
     );
@@ -2853,7 +2811,7 @@ class MealPlanEntry extends DataClass implements Insertable<MealPlanEntry> {
   String toString() {
     return (StringBuffer('MealPlanEntry(')
           ..write('id: $id, ')
-          ..write('mealPlanId: $mealPlanId, ')
+          ..write('weekStartDate: $weekStartDate, ')
           ..write('date: $date, ')
           ..write('mealType: $mealType')
           ..write(')'))
@@ -2861,50 +2819,50 @@ class MealPlanEntry extends DataClass implements Insertable<MealPlanEntry> {
   }
 
   @override
-  int get hashCode => Object.hash(id, mealPlanId, date, mealType);
+  int get hashCode => Object.hash(id, weekStartDate, date, mealType);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is MealPlanEntry &&
           other.id == this.id &&
-          other.mealPlanId == this.mealPlanId &&
+          other.weekStartDate == this.weekStartDate &&
           other.date == this.date &&
           other.mealType == this.mealType);
 }
 
 class MealPlanEntriesCompanion extends UpdateCompanion<MealPlanEntry> {
   final Value<String> id;
-  final Value<String> mealPlanId;
+  final Value<DateTime> weekStartDate;
   final Value<DateTime> date;
   final Value<String> mealType;
   final Value<int> rowid;
   const MealPlanEntriesCompanion({
     this.id = const Value.absent(),
-    this.mealPlanId = const Value.absent(),
+    this.weekStartDate = const Value.absent(),
     this.date = const Value.absent(),
     this.mealType = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   MealPlanEntriesCompanion.insert({
     required String id,
-    required String mealPlanId,
+    required DateTime weekStartDate,
     required DateTime date,
     required String mealType,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
-       mealPlanId = Value(mealPlanId),
+       weekStartDate = Value(weekStartDate),
        date = Value(date),
        mealType = Value(mealType);
   static Insertable<MealPlanEntry> custom({
     Expression<String>? id,
-    Expression<String>? mealPlanId,
+    Expression<DateTime>? weekStartDate,
     Expression<DateTime>? date,
     Expression<String>? mealType,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (mealPlanId != null) 'meal_plan_id': mealPlanId,
+      if (weekStartDate != null) 'week_start_date': weekStartDate,
       if (date != null) 'date': date,
       if (mealType != null) 'meal_type': mealType,
       if (rowid != null) 'rowid': rowid,
@@ -2913,14 +2871,14 @@ class MealPlanEntriesCompanion extends UpdateCompanion<MealPlanEntry> {
 
   MealPlanEntriesCompanion copyWith({
     Value<String>? id,
-    Value<String>? mealPlanId,
+    Value<DateTime>? weekStartDate,
     Value<DateTime>? date,
     Value<String>? mealType,
     Value<int>? rowid,
   }) {
     return MealPlanEntriesCompanion(
       id: id ?? this.id,
-      mealPlanId: mealPlanId ?? this.mealPlanId,
+      weekStartDate: weekStartDate ?? this.weekStartDate,
       date: date ?? this.date,
       mealType: mealType ?? this.mealType,
       rowid: rowid ?? this.rowid,
@@ -2933,8 +2891,8 @@ class MealPlanEntriesCompanion extends UpdateCompanion<MealPlanEntry> {
     if (id.present) {
       map['id'] = Variable<String>(id.value);
     }
-    if (mealPlanId.present) {
-      map['meal_plan_id'] = Variable<String>(mealPlanId.value);
+    if (weekStartDate.present) {
+      map['week_start_date'] = Variable<DateTime>(weekStartDate.value);
     }
     if (date.present) {
       map['date'] = Variable<DateTime>(date.value);
@@ -2952,7 +2910,7 @@ class MealPlanEntriesCompanion extends UpdateCompanion<MealPlanEntry> {
   String toString() {
     return (StringBuffer('MealPlanEntriesCompanion(')
           ..write('id: $id, ')
-          ..write('mealPlanId: $mealPlanId, ')
+          ..write('weekStartDate: $weekStartDate, ')
           ..write('date: $date, ')
           ..write('mealType: $mealType, ')
           ..write('rowid: $rowid')
@@ -6087,13 +6045,11 @@ typedef $$InstructionsTableProcessedTableManager =
     >;
 typedef $$MealPlansTableCreateCompanionBuilder =
     MealPlansCompanion Function({
-      required String id,
       required DateTime weekStartDate,
       Value<int> rowid,
     });
 typedef $$MealPlansTableUpdateCompanionBuilder =
     MealPlansCompanion Function({
-      Value<String> id,
       Value<DateTime> weekStartDate,
       Value<int> rowid,
     });
@@ -6106,16 +6062,18 @@ final class $$MealPlansTableReferences
   _mealPlanEntriesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.mealPlanEntries,
     aliasName: $_aliasNameGenerator(
-      db.mealPlans.id,
-      db.mealPlanEntries.mealPlanId,
+      db.mealPlans.weekStartDate,
+      db.mealPlanEntries.weekStartDate,
     ),
   );
 
   $$MealPlanEntriesTableProcessedTableManager get mealPlanEntriesRefs {
-    final manager = $$MealPlanEntriesTableTableManager(
-      $_db,
-      $_db.mealPlanEntries,
-    ).filter((f) => f.mealPlanId.id.sqlEquals($_itemColumn<String>('id')!));
+    final manager =
+        $$MealPlanEntriesTableTableManager($_db, $_db.mealPlanEntries).filter(
+          (f) => f.weekStartDate.weekStartDate.sqlEquals(
+            $_itemColumn<DateTime>('week_start_date')!,
+          ),
+        );
 
     final cache = $_typedResult.readTableOrNull(
       _mealPlanEntriesRefsTable($_db),
@@ -6135,11 +6093,6 @@ class $$MealPlansTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
   ColumnFilters<DateTime> get weekStartDate => $composableBuilder(
     column: $table.weekStartDate,
     builder: (column) => ColumnFilters(column),
@@ -6150,9 +6103,9 @@ class $$MealPlansTableFilterComposer
   ) {
     final $$MealPlanEntriesTableFilterComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.id,
+      getCurrentColumn: (t) => t.weekStartDate,
       referencedTable: $db.mealPlanEntries,
-      getReferencedColumn: (t) => t.mealPlanId,
+      getReferencedColumn: (t) => t.weekStartDate,
       builder:
           (
             joinBuilder, {
@@ -6180,11 +6133,6 @@ class $$MealPlansTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<DateTime> get weekStartDate => $composableBuilder(
     column: $table.weekStartDate,
     builder: (column) => ColumnOrderings(column),
@@ -6200,9 +6148,6 @@ class $$MealPlansTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
   GeneratedColumn<DateTime> get weekStartDate => $composableBuilder(
     column: $table.weekStartDate,
     builder: (column) => column,
@@ -6213,9 +6158,9 @@ class $$MealPlansTableAnnotationComposer
   ) {
     final $$MealPlanEntriesTableAnnotationComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.id,
+      getCurrentColumn: (t) => t.weekStartDate,
       referencedTable: $db.mealPlanEntries,
-      getReferencedColumn: (t) => t.mealPlanId,
+      getReferencedColumn: (t) => t.weekStartDate,
       builder:
           (
             joinBuilder, {
@@ -6262,21 +6207,17 @@ class $$MealPlansTableTableManager
               $$MealPlansTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<String> id = const Value.absent(),
                 Value<DateTime> weekStartDate = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => MealPlansCompanion(
-                id: id,
                 weekStartDate: weekStartDate,
                 rowid: rowid,
               ),
           createCompanionCallback:
               ({
-                required String id,
                 required DateTime weekStartDate,
                 Value<int> rowid = const Value.absent(),
               }) => MealPlansCompanion.insert(
-                id: id,
                 weekStartDate: weekStartDate,
                 rowid: rowid,
               ),
@@ -6313,7 +6254,9 @@ class $$MealPlansTableTableManager
                             p0,
                           ).mealPlanEntriesRefs,
                       referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.mealPlanId == item.id),
+                          referencedItems.where(
+                            (e) => e.weekStartDate == item.weekStartDate,
+                          ),
                       typedResults: items,
                     ),
                 ];
@@ -6341,7 +6284,7 @@ typedef $$MealPlansTableProcessedTableManager =
 typedef $$MealPlanEntriesTableCreateCompanionBuilder =
     MealPlanEntriesCompanion Function({
       required String id,
-      required String mealPlanId,
+      required DateTime weekStartDate,
       required DateTime date,
       required String mealType,
       Value<int> rowid,
@@ -6349,7 +6292,7 @@ typedef $$MealPlanEntriesTableCreateCompanionBuilder =
 typedef $$MealPlanEntriesTableUpdateCompanionBuilder =
     MealPlanEntriesCompanion Function({
       Value<String> id,
-      Value<String> mealPlanId,
+      Value<DateTime> weekStartDate,
       Value<DateTime> date,
       Value<String> mealType,
       Value<int> rowid,
@@ -6364,19 +6307,22 @@ final class $$MealPlanEntriesTableReferences
     super.$_typedResult,
   );
 
-  static $MealPlansTable _mealPlanIdTable(_$AppDatabase db) =>
+  static $MealPlansTable _weekStartDateTable(_$AppDatabase db) =>
       db.mealPlans.createAlias(
-        $_aliasNameGenerator(db.mealPlanEntries.mealPlanId, db.mealPlans.id),
+        $_aliasNameGenerator(
+          db.mealPlanEntries.weekStartDate,
+          db.mealPlans.weekStartDate,
+        ),
       );
 
-  $$MealPlansTableProcessedTableManager get mealPlanId {
-    final $_column = $_itemColumn<String>('meal_plan_id')!;
+  $$MealPlansTableProcessedTableManager get weekStartDate {
+    final $_column = $_itemColumn<DateTime>('week_start_date')!;
 
     final manager = $$MealPlansTableTableManager(
       $_db,
       $_db.mealPlans,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_mealPlanIdTable($_db));
+    ).filter((f) => f.weekStartDate.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_weekStartDateTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
@@ -6439,12 +6385,12 @@ class $$MealPlanEntriesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  $$MealPlansTableFilterComposer get mealPlanId {
+  $$MealPlansTableFilterComposer get weekStartDate {
     final $$MealPlansTableFilterComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.mealPlanId,
+      getCurrentColumn: (t) => t.weekStartDate,
       referencedTable: $db.mealPlans,
-      getReferencedColumn: (t) => t.id,
+      getReferencedColumn: (t) => t.weekStartDate,
       builder:
           (
             joinBuilder, {
@@ -6512,12 +6458,12 @@ class $$MealPlanEntriesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  $$MealPlansTableOrderingComposer get mealPlanId {
+  $$MealPlansTableOrderingComposer get weekStartDate {
     final $$MealPlansTableOrderingComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.mealPlanId,
+      getCurrentColumn: (t) => t.weekStartDate,
       referencedTable: $db.mealPlans,
-      getReferencedColumn: (t) => t.id,
+      getReferencedColumn: (t) => t.weekStartDate,
       builder:
           (
             joinBuilder, {
@@ -6554,12 +6500,12 @@ class $$MealPlanEntriesTableAnnotationComposer
   GeneratedColumn<String> get mealType =>
       $composableBuilder(column: $table.mealType, builder: (column) => column);
 
-  $$MealPlansTableAnnotationComposer get mealPlanId {
+  $$MealPlansTableAnnotationComposer get weekStartDate {
     final $$MealPlansTableAnnotationComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.mealPlanId,
+      getCurrentColumn: (t) => t.weekStartDate,
       referencedTable: $db.mealPlans,
-      getReferencedColumn: (t) => t.id,
+      getReferencedColumn: (t) => t.weekStartDate,
       builder:
           (
             joinBuilder, {
@@ -6618,7 +6564,7 @@ class $$MealPlanEntriesTableTableManager
           (MealPlanEntry, $$MealPlanEntriesTableReferences),
           MealPlanEntry,
           PrefetchHooks Function({
-            bool mealPlanId,
+            bool weekStartDate,
             bool mealPlanEntryRecipesRefs,
           })
         > {
@@ -6638,13 +6584,13 @@ class $$MealPlanEntriesTableTableManager
           updateCompanionCallback:
               ({
                 Value<String> id = const Value.absent(),
-                Value<String> mealPlanId = const Value.absent(),
+                Value<DateTime> weekStartDate = const Value.absent(),
                 Value<DateTime> date = const Value.absent(),
                 Value<String> mealType = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => MealPlanEntriesCompanion(
                 id: id,
-                mealPlanId: mealPlanId,
+                weekStartDate: weekStartDate,
                 date: date,
                 mealType: mealType,
                 rowid: rowid,
@@ -6652,13 +6598,13 @@ class $$MealPlanEntriesTableTableManager
           createCompanionCallback:
               ({
                 required String id,
-                required String mealPlanId,
+                required DateTime weekStartDate,
                 required DateTime date,
                 required String mealType,
                 Value<int> rowid = const Value.absent(),
               }) => MealPlanEntriesCompanion.insert(
                 id: id,
-                mealPlanId: mealPlanId,
+                weekStartDate: weekStartDate,
                 date: date,
                 mealType: mealType,
                 rowid: rowid,
@@ -6672,7 +6618,7 @@ class $$MealPlanEntriesTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({mealPlanId = false, mealPlanEntryRecipesRefs = false}) {
+              ({weekStartDate = false, mealPlanEntryRecipesRefs = false}) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
@@ -6694,18 +6640,18 @@ class $$MealPlanEntriesTableTableManager
                           dynamic
                         >
                       >(state) {
-                        if (mealPlanId) {
+                        if (weekStartDate) {
                           state =
                               state.withJoin(
                                     currentTable: table,
-                                    currentColumn: table.mealPlanId,
+                                    currentColumn: table.weekStartDate,
                                     referencedTable:
                                         $$MealPlanEntriesTableReferences
-                                            ._mealPlanIdTable(db),
+                                            ._weekStartDateTable(db),
                                     referencedColumn:
                                         $$MealPlanEntriesTableReferences
-                                            ._mealPlanIdTable(db)
-                                            .id,
+                                            ._weekStartDateTable(db)
+                                            .weekStartDate,
                                   )
                                   as T;
                         }
@@ -6755,7 +6701,10 @@ typedef $$MealPlanEntriesTableProcessedTableManager =
       $$MealPlanEntriesTableUpdateCompanionBuilder,
       (MealPlanEntry, $$MealPlanEntriesTableReferences),
       MealPlanEntry,
-      PrefetchHooks Function({bool mealPlanId, bool mealPlanEntryRecipesRefs})
+      PrefetchHooks Function({
+        bool weekStartDate,
+        bool mealPlanEntryRecipesRefs,
+      })
     >;
 typedef $$MealPlanEntryRecipesTableCreateCompanionBuilder =
     MealPlanEntryRecipesCompanion Function({

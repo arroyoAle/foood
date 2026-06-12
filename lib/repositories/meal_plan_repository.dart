@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 import '../data/database.dart' as db;
 import '../models/meal_plan.dart';
@@ -13,22 +14,21 @@ class MealPlanRepository {
   Future<List<MealPlanEntryModel>> getMealPlanForWeek(
     DateTime weekStartDate,
   ) async {
-    // 1. Get or create MealPlan for this week
-    var mealPlan = await _db.mealPlanDao.getMealPlanForWeek(weekStartDate);
+    final utcWeekStart = weekStartDate.toUtc();
+    var mealPlan = await _db.mealPlanDao.getMealPlanForWeek(utcWeekStart);
     if (mealPlan == null) {
-      final id = _uuid.v4();
       await _db.mealPlanDao.insertMealPlan(
-        db.MealPlansCompanion.insert(id: id, weekStartDate: weekStartDate),
+        db.MealPlansCompanion.insert(weekStartDate: utcWeekStart),
       );
-      return [];
+      // Refresh
+      mealPlan = await _db.mealPlanDao.getMealPlanForWeek(utcWeekStart);
+      if (mealPlan == null) return [];
     }
 
-    // 2. Get all entries for this plan
-    final entries = await _db.mealPlanDao.getEntriesForMealPlan(mealPlan.id);
+    final entries = await _db.mealPlanDao.getEntriesForMealPlan(utcWeekStart);
     final result = <MealPlanEntryModel>[];
 
     for (final entry in entries) {
-      // 3. Get recipes for each entry
       final recipeResults = await _db.mealPlanDao.getRecipesForEntry(entry.id);
       final recipeModels = <MealPlanEntryRecipeModel>[];
 
@@ -67,22 +67,23 @@ class MealPlanRepository {
     required String recipeId,
     required int servings,
   }) async {
-    // 1. Get or create MealPlan for this week
-    var mealPlan = await _db.mealPlanDao.getMealPlanForWeek(weekStartDate);
+    final utcWeekStart = weekStartDate.toUtc();
+    final utcDate = date.toUtc();
+
+    var mealPlan = await _db.mealPlanDao.getMealPlanForWeek(utcWeekStart);
     if (mealPlan == null) {
-      final id = _uuid.v4();
-      await _db.mealPlanDao.insertMealPlan(
-        db.MealPlansCompanion.insert(id: id, weekStartDate: weekStartDate),
+      await _db.into(_db.mealPlans).insert(
+        db.MealPlansCompanion.insert(weekStartDate: utcWeekStart),
+        mode: InsertMode.insertOrIgnore,
       );
-      mealPlan = await _db.mealPlanDao.getMealPlanForWeek(weekStartDate);
+      mealPlan = await _db.mealPlanDao.getMealPlanForWeek(utcWeekStart);
     }
 
     if (mealPlan == null) return;
 
-    // 2. Find or create entry for this day and mealType
-    final entries = await _db.mealPlanDao.getEntriesForMealPlan(mealPlan.id);
+    final entries = await _db.mealPlanDao.getEntriesForMealPlan(utcWeekStart);
     var entry = entries
-        .where((e) => e.date == date && e.mealType == mealType)
+        .where((e) => e.date.toUtc() == utcDate && e.mealType == mealType)
         .firstOrNull;
 
     if (entry == null) {
@@ -90,17 +91,16 @@ class MealPlanRepository {
       await _db.mealPlanDao.insertMealPlanEntry(
         db.MealPlanEntriesCompanion.insert(
           id: entryId,
-          mealPlanId: mealPlan.id,
-          date: date,
+          weekStartDate: utcWeekStart,
+          date: utcDate,
           mealType: mealType,
         ),
       );
       entry = (await _db.mealPlanDao.getEntriesForMealPlan(
-        mealPlan.id,
+        utcWeekStart,
       )).firstWhere((e) => e.id == entryId);
     }
 
-    // 3. Add recipe to entry
     await _db.mealPlanDao.insertMealPlanEntryRecipe(
       db.MealPlanEntryRecipesCompanion.insert(
         id: _uuid.v4(),
