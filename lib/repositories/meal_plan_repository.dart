@@ -1,4 +1,3 @@
-import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 import '../data/database.dart' as db;
 import '../models/meal_plan.dart';
@@ -118,10 +117,8 @@ class MealPlanRepository {
 
   Future<void> updateServings(String entryRecipeId, double servings) async {
     await _db.mealPlanDao.updateMealPlanEntryRecipe(
-      db.MealPlanEntryRecipesCompanion(
-        id: Value(entryRecipeId),
-        servings: Value(servings),
-      ),
+      id: entryRecipeId,
+      servings: servings,
     );
   }
 }

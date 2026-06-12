@@ -46,6 +46,12 @@ class DrawerPartial extends StatelessWidget {
             onTap: () => _navigate(context, '/', 'home_page'),
           ),
           ListTile(
+            leading: const Icon(Icons.calendar_month),
+            title: const Text('Meal Plan'),
+            selected: currentPage == 'meal_plan_page',
+            onTap: () => _navigate(context, '/mealPlan', 'meal_plan_page'),
+          ),
+          ListTile(
             leading: const Icon(Icons.change_circle),
             title: const Text('Spin Wheel'),
             selected: currentPage == 'spin_wheel_page',

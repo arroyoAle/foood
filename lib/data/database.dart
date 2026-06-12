@@ -334,9 +334,14 @@ class MealPlanDao extends DatabaseAccessor<AppDatabase>
   Future<void> deleteMealPlanEntryRecipe(String id) =>
       (delete(mealPlanEntryRecipes)..where((t) => t.id.equals(id))).go();
 
-  Future<void> updateMealPlanEntryRecipe(
-    Insertable<MealPlanEntryRecipe> entryRecipe,
-  ) => update(mealPlanEntryRecipes).replace(entryRecipe);
+  Future<void> updateMealPlanEntryRecipe({
+    required String id,
+    required double servings,
+  }) {
+    return (update(mealPlanEntryRecipes)..where((t) => t.id.equals(id))).write(
+      MealPlanEntryRecipesCompanion(servings: Value(servings)),
+    );
+  }
 }
 
 // --- Database ---

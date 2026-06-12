@@ -4,6 +4,7 @@ import 'package:foood/pages/all_lists.dart';
 import 'package:foood/pages/home.dart';
 import 'package:foood/pages/all_recipes.dart';
 import 'package:foood/pages/spin_wheel.dart';
+import 'package:foood/pages/week.dart';
 import 'package:foood/partials/page_routes.dart';
 
 void main() {
@@ -41,6 +42,8 @@ class MyApp extends StatelessWidget {
             page = const AllListsPage();
           case '/recipes':
             page = const AllRecipesPage();
+          case '/mealPlan':
+            page = const WeekPage();
           case '/':
           default:
             page = const MyHomePage();
