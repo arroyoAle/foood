@@ -292,15 +292,17 @@ class RecipeDao extends DatabaseAccessor<AppDatabase> with _$RecipeDaoMixin {
   }
 }
 
-@DriftAccessor(tables: [MealPlans, MealPlanEntries, MealPlanEntryRecipes, Recipes])
+@DriftAccessor(
+  tables: [MealPlans, MealPlanEntries, MealPlanEntryRecipes, Recipes],
+)
 class MealPlanDao extends DatabaseAccessor<AppDatabase>
     with _$MealPlanDaoMixin {
   MealPlanDao(super.db);
 
   Future<MealPlan?> getMealPlanForWeek(DateTime weekStartDate) {
-    return (select(mealPlans)
-          ..where((t) => t.weekStartDate.equals(weekStartDate)))
-        .getSingleOrNull();
+    return (select(
+      mealPlans,
+    )..where((t) => t.weekStartDate.equals(weekStartDate))).getSingleOrNull();
   }
 
   Future<List<MealPlanEntry>> getEntriesForMealPlan(String mealPlanId) {
@@ -322,8 +324,9 @@ class MealPlanDao extends DatabaseAccessor<AppDatabase>
   Future<void> insertMealPlanEntry(Insertable<MealPlanEntry> entry) =>
       into(mealPlanEntries).insert(entry);
 
-  Future<void> insertMealPlanEntryRecipe(Insertable<MealPlanEntryRecipe> entryRecipe) =>
-      into(mealPlanEntryRecipes).insert(entryRecipe);
+  Future<void> insertMealPlanEntryRecipe(
+    Insertable<MealPlanEntryRecipe> entryRecipe,
+  ) => into(mealPlanEntryRecipes).insert(entryRecipe);
 
   Future<void> deleteMealPlanEntry(String id) =>
       (delete(mealPlanEntries)..where((t) => t.id.equals(id))).go();
@@ -331,8 +334,9 @@ class MealPlanDao extends DatabaseAccessor<AppDatabase>
   Future<void> deleteMealPlanEntryRecipe(String id) =>
       (delete(mealPlanEntryRecipes)..where((t) => t.id.equals(id))).go();
 
-  Future<void> updateMealPlanEntryRecipe(Insertable<MealPlanEntryRecipe> entryRecipe) =>
-      update(mealPlanEntryRecipes).replace(entryRecipe);
+  Future<void> updateMealPlanEntryRecipe(
+    Insertable<MealPlanEntryRecipe> entryRecipe,
+  ) => update(mealPlanEntryRecipes).replace(entryRecipe);
 }
 
 // --- Database ---
@@ -360,17 +364,17 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (m) async {
-          await m.createAll();
-        },
-        onUpgrade: (m, from, to) async {
-          if (from < 2) {
-            await m.createTable(mealPlans);
-            await m.createTable(mealPlanEntries);
-            await m.createTable(mealPlanEntryRecipes);
-          }
-        },
-      );
+    onCreate: (m) async {
+      await m.createAll();
+    },
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.createTable(mealPlans);
+        await m.createTable(mealPlanEntries);
+        await m.createTable(mealPlanEntryRecipes);
+      }
+    },
+  );
 }
 
 LazyDatabase _openConnection() {

@@ -17,13 +17,20 @@ class RecipeRepository {
     final recipes = <Recipe>[];
 
     for (final row in recipeRows) {
-      recipes.add(await _hydrateRecipe(row));
+      recipes.add(await hydrateRecipe(row));
     }
 
     return recipes;
   }
 
-  Future<Recipe> _hydrateRecipe(db.Recipe row) async {
+  Future<Recipe?> getRecipeById(String id) async {
+    final query = _db.select(_db.recipes)..where((t) => t.id.equals(id));
+    final row = await query.getSingleOrNull();
+    if (row == null) return null;
+    return hydrateRecipe(row);
+  }
+
+  Future<Recipe> hydrateRecipe(db.Recipe row) async {
     final ingredientRows = await _db.recipeDao.getRecipeIngredients(row.id);
     final instructionRows = await _db.recipeDao.getRecipeInstructions(row.id);
 

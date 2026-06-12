@@ -10,6 +10,9 @@ import '../notifiers/recipe_notifier.dart';
 import '../repositories/shopping_list_repository.dart';
 import '../repositories/item_repository.dart';
 import '../repositories/recipe_repository.dart';
+import '../repositories/meal_plan_repository.dart';
+import '../models/meal_plan.dart';
+import '../notifiers/meal_plan_notifier.dart';
 
 final databaseProvider = Provider<db.AppDatabase>((ref) {
   final database = db.AppDatabase();
@@ -104,3 +107,23 @@ final selectedRecipeProvider = Provider<AsyncValue<Recipe?>>((ref) {
     }
   });
 });
+
+// Meal Plan providers
+final mealPlanRepositoryProvider = Provider<MealPlanRepository>((ref) {
+  return MealPlanRepository(
+    ref.watch(databaseProvider),
+    ref.watch(recipeRepositoryProvider),
+  );
+});
+
+final selectedWeekProvider = StateProvider<DateTime>((ref) {
+  final now = DateTime.now();
+  final date = DateTime(now.year, now.month, now.day);
+  // Find the most recent Monday
+  return date.subtract(Duration(days: date.weekday - 1));
+});
+
+final mealPlanProvider =
+    AsyncNotifierProvider<MealPlanNotifier, List<MealPlanEntryModel>>(
+      MealPlanNotifier.new,
+    );
