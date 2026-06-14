@@ -41,6 +41,14 @@ void main() {
       expect(find.text('Spin Wheel'), findsOneWidget);
       expect(find.text('Lists'), findsOneWidget);
       expect(find.text('Recipes'), findsOneWidget);
+      expect(find.text('Recipes'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(Drawer),
+          matching: find.text('Meal Plan'),
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('Drawer closes', (WidgetTester tester) async {
@@ -81,6 +89,24 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Recipes Home Page'), findsOneWidget);
+    });
+
+    testWidgets('Navigate to meal plan page', (WidgetTester tester) async {
+      await pumpMyApp(tester);
+
+      await tester.tap(find.byIcon(Icons.menu));
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.descendant(
+          of: find.byType(Drawer),
+          matching: find.text('Meal Plan'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Today's date will be in the title, so we just check for 'Week of'
+      expect(find.textContaining('Week of'), findsOneWidget);
     });
 
     testWidgets('Navigate to spin wheel page', (WidgetTester tester) async {

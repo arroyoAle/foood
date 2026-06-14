@@ -88,7 +88,7 @@ class WeekPage extends ConsumerWidget {
             itemBuilder: (context, index) {
               final dayDate = selectedWeek.add(Duration(days: index));
               final dayEntries = entries
-                  .where((e) => e.date == dayDate)
+                  .where((e) => DateUtils.isSameDay(e.date, dayDate))
                   .toList();
 
               return _DayCard(
@@ -131,34 +131,40 @@ class _DayCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       color: isToday ? Theme.of(context).colorScheme.primaryContainer : null,
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              formattedDate,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: isToday ? FontWeight.bold : null,
-              ),
-            ),
-            Divider(
-              color: isToday
-                  ? Theme.of(context).colorScheme.onPrimaryContainer
-                  : Theme.of(context).colorScheme.secondaryContainer,
-            ),
-            ...mealTypes.map((type) {
-              final entry = entries
-                  .where((e) => e.mealType == type)
-                  .firstOrNull;
-              return _MealTypeSection(
-                type: type,
-                entry: entry,
-                onAdd: () => onAddRecipe(type),
-              );
-            }),
-          ],
+      clipBehavior: Clip.antiAlias,
+      child: ExpansionTile(
+        initiallyExpanded: isToday,
+        title: Text(
+          formattedDate,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            fontWeight: isToday ? FontWeight.bold : null,
+            color: isToday
+                ? Theme.of(context).colorScheme.onPrimaryContainer
+                : null,
+          ),
         ),
+        shape: const Border(),
+        collapsedShape: const Border(),
+        childrenPadding: const EdgeInsets.only(
+          left: 16.0,
+          right: 16.0,
+          bottom: 8.0,
+        ),
+        children: [
+          Divider(
+            color: isToday
+                ? Theme.of(context).colorScheme.onPrimaryContainer.withAlpha(50)
+                : Theme.of(context).colorScheme.secondaryContainer,
+          ),
+          ...mealTypes.map((type) {
+            final entry = entries.where((e) => e.mealType == type).firstOrNull;
+            return _MealTypeSection(
+              type: type,
+              entry: entry,
+              onAdd: () => onAddRecipe(type),
+            );
+          }),
+        ],
       ),
     );
   }
@@ -196,7 +202,14 @@ class _MealTypeSection extends ConsumerWidget {
             ],
           ),
           if (entry != null)
-            ...entry!.recipes.map((r) => _RecipeItem(recipe: r)),
+            ...entry!.recipes.asMap().entries.map((e) {
+              final index = e.key;
+              final recipe = e.value;
+              return Padding(
+                padding: EdgeInsets.only(left: index > 0 ? 16.0 : 0.0),
+                child: _RecipeItem(recipe: recipe),
+              );
+            }),
           if (entry != null && entry!.recipes.isNotEmpty)
             Align(
               alignment: Alignment.centerRight,
