@@ -40,7 +40,7 @@
 ### 6. Spin Wheel
 - [ ] Create spin wheel page and add what should I eat today feature
 
-### 7. Shift Patterns linked to meals
+### 7. Shift Patterns/Office days linked to meals
 
 ---
 ## Future Enhancements
