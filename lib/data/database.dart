@@ -106,6 +106,9 @@ class MealPlanEntryRecipes extends Table {
   TextColumn get mealPlanEntryId => text().references(MealPlanEntries, #id)();
   TextColumn get recipeId => text().references(Recipes, #id)();
   IntColumn get servings => integer()();
+  TextColumn get parentId =>
+      text().nullable().references(MealPlanEntryRecipes, #id)();
+  IntColumn get ordering => integer().withDefault(const Constant(0))();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -314,8 +317,14 @@ class MealPlanDao extends DatabaseAccessor<AppDatabase>
 
   Future<List<TypedResult>> getRecipesForEntry(String entryId) {
     return (select(mealPlanEntryRecipes).join([
-      innerJoin(recipes, recipes.id.equalsExp(mealPlanEntryRecipes.recipeId)),
-    ])..where(mealPlanEntryRecipes.mealPlanEntryId.equals(entryId))).get();
+            innerJoin(
+              recipes,
+              recipes.id.equalsExp(mealPlanEntryRecipes.recipeId),
+            ),
+          ])
+          ..where(mealPlanEntryRecipes.mealPlanEntryId.equals(entryId))
+          ..orderBy([OrderingTerm.asc(mealPlanEntryRecipes.ordering)]))
+        .get();
   }
 
   Future<void> insertMealPlan(Insertable<MealPlan> mealPlan) =>
@@ -331,8 +340,13 @@ class MealPlanDao extends DatabaseAccessor<AppDatabase>
   Future<void> deleteMealPlanEntry(String id) =>
       (delete(mealPlanEntries)..where((t) => t.id.equals(id))).go();
 
-  Future<void> deleteMealPlanEntryRecipe(String id) =>
-      (delete(mealPlanEntryRecipes)..where((t) => t.id.equals(id))).go();
+  Future<void> deleteMealPlanEntryRecipe(String id) async {
+    // Also delete any sides where this recipe is the parent
+    await (delete(
+      mealPlanEntryRecipes,
+    )..where((t) => t.parentId.equals(id))).go();
+    await (delete(mealPlanEntryRecipes)..where((t) => t.id.equals(id))).go();
+  }
 
   Future<void> updateMealPlanEntryRecipe({
     required String id,
@@ -365,7 +379,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -394,6 +408,10 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 6) {
         // No schema changes in v6, just logic fixes in DAO
+      }
+      if (from < 7) {
+        await m.addColumn(mealPlanEntryRecipes, mealPlanEntryRecipes.parentId);
+        await m.addColumn(mealPlanEntryRecipes, mealPlanEntryRecipes.ordering);
       }
     },
   );

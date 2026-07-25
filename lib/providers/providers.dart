@@ -117,9 +117,10 @@ final mealPlanRepositoryProvider = Provider<MealPlanRepository>((ref) {
 });
 
 final selectedWeekProvider = StateProvider<DateTime>((ref) {
-  final now = DateTime.now();
-  final date = DateTime(now.year, now.month, now.day);
+  final now = DateTime.now().toUtc();
+  final date = DateTime.utc(now.year, now.month, now.day);
   // Find the most recent Monday
+  // In Dart, Monday is 1, Sunday is 7.
   return date.subtract(Duration(days: date.weekday - 1));
 });
 

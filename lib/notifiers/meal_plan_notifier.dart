@@ -37,6 +37,34 @@ class MealPlanNotifier extends AsyncNotifier<List<MealPlanEntryModel>> {
     });
   }
 
+  Future<void> addMealWithSides({
+    required DateTime date,
+    required String mealType,
+    required String mainRecipeId,
+    required int mainServings,
+    required List<({String recipeId, int servings})> sides,
+  }) async {
+    state = const AsyncLoading<List<MealPlanEntryModel>>().copyWithPrevious(
+      state,
+    );
+    state = await AsyncValue.guard(() async {
+      final weekStartDate = ref.read(selectedWeekProvider);
+      await ref
+          .read(mealPlanRepositoryProvider)
+          .addMealWithSides(
+            weekStartDate: weekStartDate,
+            date: date,
+            mealType: mealType,
+            mainRecipeId: mainRecipeId,
+            mainServings: mainServings,
+            sides: sides,
+          );
+      return ref
+          .read(mealPlanRepositoryProvider)
+          .getMealPlanForWeek(weekStartDate);
+    });
+  }
+
   Future<void> removeRecipeFromMeal(String entryRecipeId) async {
     state = const AsyncLoading<List<MealPlanEntryModel>>().copyWithPrevious(
       state,

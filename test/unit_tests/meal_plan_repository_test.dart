@@ -128,5 +128,58 @@ void main() {
         isTrue,
       );
     });
+
+    group('Hierarchy', () {
+      test('addMealWithSides links sides to main', () async {
+        final main = await recipeRepository.createRecipe('Burger');
+        final side1 = await recipeRepository.createRecipe('Fries');
+        final side2 = await recipeRepository.createRecipe('Shake');
+
+        await mealPlanRepository.addMealWithSides(
+          weekStartDate: monday,
+          date: monday,
+          mealType: 'Lunch',
+          mainRecipeId: main.id,
+          mainServings: 1,
+          sides: [
+            (recipeId: side1.id, servings: 1),
+            (recipeId: side2.id, servings: 1),
+          ],
+        );
+
+        final entries = await mealPlanRepository.getMealPlanForWeek(monday);
+        final lunchEntry = entries.firstWhere((e) => e.mealType == 'Lunch');
+
+        expect(lunchEntry.recipes.length, 1); // Only 1 main at the top level
+        final mainModel = lunchEntry.recipes.first;
+        expect(mainModel.recipe.name, 'Burger');
+        expect(mainModel.sides.length, 2);
+        expect(mainModel.sides.any((s) => s.recipe.name == 'Fries'), isTrue);
+        expect(mainModel.sides.any((s) => s.recipe.name == 'Shake'), isTrue);
+      });
+
+      test('Removing main dish cascades to sides (logic check)', () async {
+        final main = await recipeRepository.createRecipe('Burger');
+        final side = await recipeRepository.createRecipe('Fries');
+
+        await mealPlanRepository.addMealWithSides(
+          weekStartDate: monday,
+          date: monday,
+          mealType: 'Lunch',
+          mainRecipeId: main.id,
+          mainServings: 1,
+          sides: [(recipeId: side.id, servings: 1)],
+        );
+
+        var entries = await mealPlanRepository.getMealPlanForWeek(monday);
+        final mainId = entries.first.recipes.first.id;
+
+        // Removing main should trigger the DAO's custom delete which removes children
+        await mealPlanRepository.removeRecipeFromMeal(mainId);
+
+        entries = await mealPlanRepository.getMealPlanForWeek(monday);
+        expect(entries.isEmpty || entries.first.recipes.isEmpty, isTrue);
+      });
+    });
   });
 }

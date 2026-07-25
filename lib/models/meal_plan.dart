@@ -8,11 +8,15 @@ class MealPlanEntryRecipeModel {
   final String id;
   final Recipe recipe;
   final int servings;
+  final String? parentId;
+  final List<MealPlanEntryRecipeModel> sides;
 
   MealPlanEntryRecipeModel({
     required this.id,
     required this.recipe,
     required this.servings,
+    this.parentId,
+    this.sides = const [],
   });
 
   factory MealPlanEntryRecipeModel.fromJson(Map<String, dynamic> json) =>

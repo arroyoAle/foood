@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/meal_plan.dart';
-import '../models/recipe.dart';
 import '../partials/drawer.dart';
 import '../partials/top_bar.dart';
 import '../providers/providers.dart';
@@ -49,15 +48,23 @@ class WeekPage extends ConsumerWidget {
     DateTime date,
     String mealType,
   ) async {
-    final recipe = await showDialog<Recipe>(
+    final result = await showDialog<RecipePickerResult>(
       context: context,
       builder: (context) => const RecipePickerDialog(),
     );
 
-    if (recipe != null) {
+    if (result != null) {
       await ref
           .read(mealPlanProvider.notifier)
-          .addRecipeToMeal(date: date, mealType: mealType, recipeId: recipe.id);
+          .addMealWithSides(
+            date: date,
+            mealType: mealType,
+            mainRecipeId: result.main.id,
+            mainServings: 1,
+            sides: result.sides
+                .map((s) => (recipeId: s.id, servings: 1))
+                .toList(),
+          );
     }
   }
 
@@ -145,22 +152,17 @@ class _DayCard extends StatelessWidget {
         ),
         shape: const Border(),
         collapsedShape: const Border(),
-        childrenPadding: const EdgeInsets.only(
-          left: 16.0,
-          right: 16.0,
-          bottom: 8.0,
+        childrenPadding: const EdgeInsets.symmetric(
+          horizontal: 8.0,
+          vertical: 4.0,
         ),
         children: [
-          Divider(
-            color: isToday
-                ? Theme.of(context).colorScheme.onPrimaryContainer.withAlpha(50)
-                : Theme.of(context).colorScheme.secondaryContainer,
-          ),
           ...mealTypes.map((type) {
             final entry = entries.where((e) => e.mealType == type).firstOrNull;
             return _MealTypeSection(
               type: type,
               entry: entry,
+              isToday: isToday,
               onAdd: () => onAddRecipe(type),
             );
           }),
@@ -173,72 +175,139 @@ class _DayCard extends StatelessWidget {
 class _MealTypeSection extends ConsumerWidget {
   final String type;
   final MealPlanEntryModel? entry;
+  final bool isToday;
   final VoidCallback onAdd;
 
-  const _MealTypeSection({required this.type, this.entry, required this.onAdd});
+  const _MealTypeSection({
+    required this.type,
+    this.entry,
+    required this.isToday,
+    required this.onAdd,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                type,
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.secondary,
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 4.0),
+      elevation: 0,
+      color: isToday
+          ? Theme.of(context).colorScheme.surfaceContainerHighest.withAlpha(100)
+          : Theme.of(context).colorScheme.surfaceContainerLow,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: Theme.of(context).colorScheme.outlineVariant.withAlpha(50),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  type.toUpperCase(),
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.1,
+                  ),
                 ),
-              ),
-              if (entry == null || entry!.recipes.isEmpty)
                 IconButton(
-                  icon: const Icon(Icons.add, size: 20),
+                  icon: const Icon(Icons.add_circle_outline, size: 20),
                   onPressed: onAdd,
                   visualDensity: VisualDensity.compact,
+                  tooltip: 'Add Meal',
+                  color: Theme.of(context).colorScheme.primary,
                 ),
-            ],
-          ),
-          if (entry != null)
-            ...entry!.recipes.asMap().entries.map((e) {
-              final index = e.key;
-              final recipe = e.value;
-              return Padding(
-                padding: EdgeInsets.only(left: index > 0 ? 16.0 : 0.0),
-                child: _RecipeItem(recipe: recipe),
-              );
-            }),
-          if (entry != null && entry!.recipes.isNotEmpty)
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton.icon(
-                icon: const Icon(Icons.add, size: 16),
-                label: const Text('Add Side'),
-                onPressed: onAdd,
-                style: TextButton.styleFrom(
-                  visualDensity: VisualDensity.compact,
-                  textStyle: const TextStyle(fontSize: 12),
+              ],
+            ),
+            if (entry != null && entry!.recipes.isNotEmpty) ...[
+              const Divider(height: 24),
+              ...entry!.recipes.map((main) => _MainMealBlock(main: main)),
+            ] else
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  'No meals planned',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontStyle: FontStyle.italic,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
+    );
+  }
+}
+
+class _MainMealBlock extends StatelessWidget {
+  final MealPlanEntryRecipeModel main;
+
+  const _MainMealBlock({required this.main});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _RecipeItem(recipe: main, isMain: true),
+        if (main.sides.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(left: 12.0, bottom: 8.0, top: 4.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.subdirectory_arrow_right,
+                      size: 12,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'SIDES',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                ...main.sides.map((side) => _RecipeItem(recipe: side)),
+              ],
+            ),
+          ),
+        const SizedBox(height: 8),
+      ],
     );
   }
 }
 
 class _RecipeItem extends ConsumerWidget {
   final MealPlanEntryRecipeModel recipe;
+  final bool isMain;
 
-  const _RecipeItem({required this.recipe});
+  const _RecipeItem({required this.recipe, this.isMain = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      title: Text(recipe.recipe.name),
+      dense: !isMain,
+      title: Text(
+        recipe.recipe.name,
+        style: TextStyle(
+          fontWeight: isMain ? FontWeight.w500 : FontWeight.normal,
+        ),
+      ),
       subtitle: Text(
         '${recipe.servings} serving${recipe.servings == 1 ? "" : "s"}',
       ),
@@ -246,7 +315,7 @@ class _RecipeItem extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
-            icon: const Icon(Icons.remove_circle_outline, size: 20),
+            icon: const Icon(Icons.remove_circle_outline, size: 18),
             onPressed: () {
               if (recipe.servings > 1) {
                 ref
@@ -256,7 +325,7 @@ class _RecipeItem extends ConsumerWidget {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.add_circle_outline, size: 20),
+            icon: const Icon(Icons.add_circle_outline, size: 18),
             onPressed: () {
               ref
                   .read(mealPlanProvider.notifier)
@@ -264,7 +333,7 @@ class _RecipeItem extends ConsumerWidget {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.delete_outline, size: 20, color: Colors.red),
+            icon: const Icon(Icons.delete_outline, size: 18, color: Colors.red),
             onPressed: () {
               ref
                   .read(mealPlanProvider.notifier)

@@ -12,6 +12,14 @@ MealPlanEntryRecipeModel _$MealPlanEntryRecipeModelFromJson(
   id: json['id'] as String,
   recipe: Recipe.fromJson(json['recipe'] as Map<String, dynamic>),
   servings: (json['servings'] as num).toInt(),
+  parentId: json['parentId'] as String?,
+  sides:
+      (json['sides'] as List<dynamic>?)
+          ?.map(
+            (e) => MealPlanEntryRecipeModel.fromJson(e as Map<String, dynamic>),
+          )
+          .toList() ??
+      const [],
 );
 
 Map<String, dynamic> _$MealPlanEntryRecipeModelToJson(
@@ -20,6 +28,8 @@ Map<String, dynamic> _$MealPlanEntryRecipeModelToJson(
   'id': instance.id,
   'recipe': instance.recipe.toJson(),
   'servings': instance.servings,
+  'parentId': instance.parentId,
+  'sides': instance.sides.map((e) => e.toJson()).toList(),
 };
 
 MealPlanEntryModel _$MealPlanEntryModelFromJson(Map<String, dynamic> json) =>

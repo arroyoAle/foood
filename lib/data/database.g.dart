@@ -2973,12 +2973,40 @@ class $MealPlanEntryRecipesTable extends MealPlanEntryRecipes
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _parentIdMeta = const VerificationMeta(
+    'parentId',
+  );
+  @override
+  late final GeneratedColumn<String> parentId = GeneratedColumn<String>(
+    'parent_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES meal_plan_entry_recipes (id)',
+    ),
+  );
+  static const VerificationMeta _orderingMeta = const VerificationMeta(
+    'ordering',
+  );
+  @override
+  late final GeneratedColumn<int> ordering = GeneratedColumn<int>(
+    'ordering',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
     mealPlanEntryId,
     recipeId,
     servings,
+    parentId,
+    ordering,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -3024,6 +3052,18 @@ class $MealPlanEntryRecipesTable extends MealPlanEntryRecipes
     } else if (isInserting) {
       context.missing(_servingsMeta);
     }
+    if (data.containsKey('parent_id')) {
+      context.handle(
+        _parentIdMeta,
+        parentId.isAcceptableOrUnknown(data['parent_id']!, _parentIdMeta),
+      );
+    }
+    if (data.containsKey('ordering')) {
+      context.handle(
+        _orderingMeta,
+        ordering.isAcceptableOrUnknown(data['ordering']!, _orderingMeta),
+      );
+    }
     return context;
   }
 
@@ -3049,6 +3089,14 @@ class $MealPlanEntryRecipesTable extends MealPlanEntryRecipes
         DriftSqlType.int,
         data['${effectivePrefix}servings'],
       )!,
+      parentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}parent_id'],
+      ),
+      ordering: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ordering'],
+      )!,
     );
   }
 
@@ -3064,11 +3112,15 @@ class MealPlanEntryRecipe extends DataClass
   final String mealPlanEntryId;
   final String recipeId;
   final int servings;
+  final String? parentId;
+  final int ordering;
   const MealPlanEntryRecipe({
     required this.id,
     required this.mealPlanEntryId,
     required this.recipeId,
     required this.servings,
+    this.parentId,
+    required this.ordering,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3077,6 +3129,10 @@ class MealPlanEntryRecipe extends DataClass
     map['meal_plan_entry_id'] = Variable<String>(mealPlanEntryId);
     map['recipe_id'] = Variable<String>(recipeId);
     map['servings'] = Variable<int>(servings);
+    if (!nullToAbsent || parentId != null) {
+      map['parent_id'] = Variable<String>(parentId);
+    }
+    map['ordering'] = Variable<int>(ordering);
     return map;
   }
 
@@ -3086,6 +3142,10 @@ class MealPlanEntryRecipe extends DataClass
       mealPlanEntryId: Value(mealPlanEntryId),
       recipeId: Value(recipeId),
       servings: Value(servings),
+      parentId: parentId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(parentId),
+      ordering: Value(ordering),
     );
   }
 
@@ -3099,6 +3159,8 @@ class MealPlanEntryRecipe extends DataClass
       mealPlanEntryId: serializer.fromJson<String>(json['mealPlanEntryId']),
       recipeId: serializer.fromJson<String>(json['recipeId']),
       servings: serializer.fromJson<int>(json['servings']),
+      parentId: serializer.fromJson<String?>(json['parentId']),
+      ordering: serializer.fromJson<int>(json['ordering']),
     );
   }
   @override
@@ -3109,6 +3171,8 @@ class MealPlanEntryRecipe extends DataClass
       'mealPlanEntryId': serializer.toJson<String>(mealPlanEntryId),
       'recipeId': serializer.toJson<String>(recipeId),
       'servings': serializer.toJson<int>(servings),
+      'parentId': serializer.toJson<String?>(parentId),
+      'ordering': serializer.toJson<int>(ordering),
     };
   }
 
@@ -3117,11 +3181,15 @@ class MealPlanEntryRecipe extends DataClass
     String? mealPlanEntryId,
     String? recipeId,
     int? servings,
+    Value<String?> parentId = const Value.absent(),
+    int? ordering,
   }) => MealPlanEntryRecipe(
     id: id ?? this.id,
     mealPlanEntryId: mealPlanEntryId ?? this.mealPlanEntryId,
     recipeId: recipeId ?? this.recipeId,
     servings: servings ?? this.servings,
+    parentId: parentId.present ? parentId.value : this.parentId,
+    ordering: ordering ?? this.ordering,
   );
   MealPlanEntryRecipe copyWithCompanion(MealPlanEntryRecipesCompanion data) {
     return MealPlanEntryRecipe(
@@ -3131,6 +3199,8 @@ class MealPlanEntryRecipe extends DataClass
           : this.mealPlanEntryId,
       recipeId: data.recipeId.present ? data.recipeId.value : this.recipeId,
       servings: data.servings.present ? data.servings.value : this.servings,
+      parentId: data.parentId.present ? data.parentId.value : this.parentId,
+      ordering: data.ordering.present ? data.ordering.value : this.ordering,
     );
   }
 
@@ -3140,13 +3210,16 @@ class MealPlanEntryRecipe extends DataClass
           ..write('id: $id, ')
           ..write('mealPlanEntryId: $mealPlanEntryId, ')
           ..write('recipeId: $recipeId, ')
-          ..write('servings: $servings')
+          ..write('servings: $servings, ')
+          ..write('parentId: $parentId, ')
+          ..write('ordering: $ordering')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, mealPlanEntryId, recipeId, servings);
+  int get hashCode =>
+      Object.hash(id, mealPlanEntryId, recipeId, servings, parentId, ordering);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3154,7 +3227,9 @@ class MealPlanEntryRecipe extends DataClass
           other.id == this.id &&
           other.mealPlanEntryId == this.mealPlanEntryId &&
           other.recipeId == this.recipeId &&
-          other.servings == this.servings);
+          other.servings == this.servings &&
+          other.parentId == this.parentId &&
+          other.ordering == this.ordering);
 }
 
 class MealPlanEntryRecipesCompanion
@@ -3163,12 +3238,16 @@ class MealPlanEntryRecipesCompanion
   final Value<String> mealPlanEntryId;
   final Value<String> recipeId;
   final Value<int> servings;
+  final Value<String?> parentId;
+  final Value<int> ordering;
   final Value<int> rowid;
   const MealPlanEntryRecipesCompanion({
     this.id = const Value.absent(),
     this.mealPlanEntryId = const Value.absent(),
     this.recipeId = const Value.absent(),
     this.servings = const Value.absent(),
+    this.parentId = const Value.absent(),
+    this.ordering = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   MealPlanEntryRecipesCompanion.insert({
@@ -3176,6 +3255,8 @@ class MealPlanEntryRecipesCompanion
     required String mealPlanEntryId,
     required String recipeId,
     required int servings,
+    this.parentId = const Value.absent(),
+    this.ordering = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        mealPlanEntryId = Value(mealPlanEntryId),
@@ -3186,6 +3267,8 @@ class MealPlanEntryRecipesCompanion
     Expression<String>? mealPlanEntryId,
     Expression<String>? recipeId,
     Expression<int>? servings,
+    Expression<String>? parentId,
+    Expression<int>? ordering,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -3193,6 +3276,8 @@ class MealPlanEntryRecipesCompanion
       if (mealPlanEntryId != null) 'meal_plan_entry_id': mealPlanEntryId,
       if (recipeId != null) 'recipe_id': recipeId,
       if (servings != null) 'servings': servings,
+      if (parentId != null) 'parent_id': parentId,
+      if (ordering != null) 'ordering': ordering,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -3202,6 +3287,8 @@ class MealPlanEntryRecipesCompanion
     Value<String>? mealPlanEntryId,
     Value<String>? recipeId,
     Value<int>? servings,
+    Value<String?>? parentId,
+    Value<int>? ordering,
     Value<int>? rowid,
   }) {
     return MealPlanEntryRecipesCompanion(
@@ -3209,6 +3296,8 @@ class MealPlanEntryRecipesCompanion
       mealPlanEntryId: mealPlanEntryId ?? this.mealPlanEntryId,
       recipeId: recipeId ?? this.recipeId,
       servings: servings ?? this.servings,
+      parentId: parentId ?? this.parentId,
+      ordering: ordering ?? this.ordering,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -3228,6 +3317,12 @@ class MealPlanEntryRecipesCompanion
     if (servings.present) {
       map['servings'] = Variable<int>(servings.value);
     }
+    if (parentId.present) {
+      map['parent_id'] = Variable<String>(parentId.value);
+    }
+    if (ordering.present) {
+      map['ordering'] = Variable<int>(ordering.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -3241,6 +3336,8 @@ class MealPlanEntryRecipesCompanion
           ..write('mealPlanEntryId: $mealPlanEntryId, ')
           ..write('recipeId: $recipeId, ')
           ..write('servings: $servings, ')
+          ..write('parentId: $parentId, ')
+          ..write('ordering: $ordering, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -6712,6 +6809,8 @@ typedef $$MealPlanEntryRecipesTableCreateCompanionBuilder =
       required String mealPlanEntryId,
       required String recipeId,
       required int servings,
+      Value<String?> parentId,
+      Value<int> ordering,
       Value<int> rowid,
     });
 typedef $$MealPlanEntryRecipesTableUpdateCompanionBuilder =
@@ -6720,6 +6819,8 @@ typedef $$MealPlanEntryRecipesTableUpdateCompanionBuilder =
       Value<String> mealPlanEntryId,
       Value<String> recipeId,
       Value<int> servings,
+      Value<String?> parentId,
+      Value<int> ordering,
       Value<int> rowid,
     });
 
@@ -6776,6 +6877,28 @@ final class $$MealPlanEntryRecipesTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
+
+  static $MealPlanEntryRecipesTable _parentIdTable(_$AppDatabase db) =>
+      db.mealPlanEntryRecipes.createAlias(
+        $_aliasNameGenerator(
+          db.mealPlanEntryRecipes.parentId,
+          db.mealPlanEntryRecipes.id,
+        ),
+      );
+
+  $$MealPlanEntryRecipesTableProcessedTableManager? get parentId {
+    final $_column = $_itemColumn<String>('parent_id');
+    if ($_column == null) return null;
+    final manager = $$MealPlanEntryRecipesTableTableManager(
+      $_db,
+      $_db.mealPlanEntryRecipes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_parentIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
 }
 
 class $$MealPlanEntryRecipesTableFilterComposer
@@ -6794,6 +6917,11 @@ class $$MealPlanEntryRecipesTableFilterComposer
 
   ColumnFilters<int> get servings => $composableBuilder(
     column: $table.servings,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get ordering => $composableBuilder(
+    column: $table.ordering,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6842,6 +6970,29 @@ class $$MealPlanEntryRecipesTableFilterComposer
     );
     return composer;
   }
+
+  $$MealPlanEntryRecipesTableFilterComposer get parentId {
+    final $$MealPlanEntryRecipesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.parentId,
+      referencedTable: $db.mealPlanEntryRecipes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MealPlanEntryRecipesTableFilterComposer(
+            $db: $db,
+            $table: $db.mealPlanEntryRecipes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$MealPlanEntryRecipesTableOrderingComposer
@@ -6860,6 +7011,11 @@ class $$MealPlanEntryRecipesTableOrderingComposer
 
   ColumnOrderings<int> get servings => $composableBuilder(
     column: $table.servings,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get ordering => $composableBuilder(
+    column: $table.ordering,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -6908,6 +7064,30 @@ class $$MealPlanEntryRecipesTableOrderingComposer
     );
     return composer;
   }
+
+  $$MealPlanEntryRecipesTableOrderingComposer get parentId {
+    final $$MealPlanEntryRecipesTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.parentId,
+          referencedTable: $db.mealPlanEntryRecipes,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$MealPlanEntryRecipesTableOrderingComposer(
+                $db: $db,
+                $table: $db.mealPlanEntryRecipes,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
 }
 
 class $$MealPlanEntryRecipesTableAnnotationComposer
@@ -6924,6 +7104,9 @@ class $$MealPlanEntryRecipesTableAnnotationComposer
 
   GeneratedColumn<int> get servings =>
       $composableBuilder(column: $table.servings, builder: (column) => column);
+
+  GeneratedColumn<int> get ordering =>
+      $composableBuilder(column: $table.ordering, builder: (column) => column);
 
   $$MealPlanEntriesTableAnnotationComposer get mealPlanEntryId {
     final $$MealPlanEntriesTableAnnotationComposer composer = $composerBuilder(
@@ -6970,6 +7153,30 @@ class $$MealPlanEntryRecipesTableAnnotationComposer
     );
     return composer;
   }
+
+  $$MealPlanEntryRecipesTableAnnotationComposer get parentId {
+    final $$MealPlanEntryRecipesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.parentId,
+          referencedTable: $db.mealPlanEntryRecipes,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$MealPlanEntryRecipesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.mealPlanEntryRecipes,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
 }
 
 class $$MealPlanEntryRecipesTableTableManager
@@ -6985,7 +7192,11 @@ class $$MealPlanEntryRecipesTableTableManager
           $$MealPlanEntryRecipesTableUpdateCompanionBuilder,
           (MealPlanEntryRecipe, $$MealPlanEntryRecipesTableReferences),
           MealPlanEntryRecipe,
-          PrefetchHooks Function({bool mealPlanEntryId, bool recipeId})
+          PrefetchHooks Function({
+            bool mealPlanEntryId,
+            bool recipeId,
+            bool parentId,
+          })
         > {
   $$MealPlanEntryRecipesTableTableManager(
     _$AppDatabase db,
@@ -7012,12 +7223,16 @@ class $$MealPlanEntryRecipesTableTableManager
                 Value<String> mealPlanEntryId = const Value.absent(),
                 Value<String> recipeId = const Value.absent(),
                 Value<int> servings = const Value.absent(),
+                Value<String?> parentId = const Value.absent(),
+                Value<int> ordering = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => MealPlanEntryRecipesCompanion(
                 id: id,
                 mealPlanEntryId: mealPlanEntryId,
                 recipeId: recipeId,
                 servings: servings,
+                parentId: parentId,
+                ordering: ordering,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -7026,12 +7241,16 @@ class $$MealPlanEntryRecipesTableTableManager
                 required String mealPlanEntryId,
                 required String recipeId,
                 required int servings,
+                Value<String?> parentId = const Value.absent(),
+                Value<int> ordering = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => MealPlanEntryRecipesCompanion.insert(
                 id: id,
                 mealPlanEntryId: mealPlanEntryId,
                 recipeId: recipeId,
                 servings: servings,
+                parentId: parentId,
+                ordering: ordering,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -7042,64 +7261,80 @@ class $$MealPlanEntryRecipesTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({mealPlanEntryId = false, recipeId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (mealPlanEntryId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.mealPlanEntryId,
-                                referencedTable:
-                                    $$MealPlanEntryRecipesTableReferences
-                                        ._mealPlanEntryIdTable(db),
-                                referencedColumn:
-                                    $$MealPlanEntryRecipesTableReferences
-                                        ._mealPlanEntryIdTable(db)
-                                        .id,
-                              )
-                              as T;
-                    }
-                    if (recipeId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.recipeId,
-                                referencedTable:
-                                    $$MealPlanEntryRecipesTableReferences
-                                        ._recipeIdTable(db),
-                                referencedColumn:
-                                    $$MealPlanEntryRecipesTableReferences
-                                        ._recipeIdTable(db)
-                                        .id,
-                              )
-                              as T;
-                    }
+          prefetchHooksCallback:
+              ({mealPlanEntryId = false, recipeId = false, parentId = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (mealPlanEntryId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.mealPlanEntryId,
+                                    referencedTable:
+                                        $$MealPlanEntryRecipesTableReferences
+                                            ._mealPlanEntryIdTable(db),
+                                    referencedColumn:
+                                        $$MealPlanEntryRecipesTableReferences
+                                            ._mealPlanEntryIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (recipeId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.recipeId,
+                                    referencedTable:
+                                        $$MealPlanEntryRecipesTableReferences
+                                            ._recipeIdTable(db),
+                                    referencedColumn:
+                                        $$MealPlanEntryRecipesTableReferences
+                                            ._recipeIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (parentId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.parentId,
+                                    referencedTable:
+                                        $$MealPlanEntryRecipesTableReferences
+                                            ._parentIdTable(db),
+                                    referencedColumn:
+                                        $$MealPlanEntryRecipesTableReferences
+                                            ._parentIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [];
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -7116,7 +7351,11 @@ typedef $$MealPlanEntryRecipesTableProcessedTableManager =
       $$MealPlanEntryRecipesTableUpdateCompanionBuilder,
       (MealPlanEntryRecipe, $$MealPlanEntryRecipesTableReferences),
       MealPlanEntryRecipe,
-      PrefetchHooks Function({bool mealPlanEntryId, bool recipeId})
+      PrefetchHooks Function({
+        bool mealPlanEntryId,
+        bool recipeId,
+        bool parentId,
+      })
     >;
 
 class $AppDatabaseManager {
