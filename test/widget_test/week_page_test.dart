@@ -139,6 +139,59 @@ void main() {
     expect(dbEntries.first.recipes.first.sides.first.recipe.name, 'Fries');
   });
 
+  testWidgets('RecipePickerDialog shows correct selection indicators', (
+    WidgetTester tester,
+  ) async {
+    await recipeRepository.createRecipe('Pasta');
+    await recipeRepository.createRecipe('Bread');
+
+    await pumpWeekPage(tester);
+    await tester.tap(find.byType(ExpansionTile).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Add Meal').first);
+    await tester.pumpAndSettle();
+
+    // Step 0: Main selection
+    expect(find.text('Select Main Dish'), findsOneWidget);
+
+    // Should have unchecked icon initially
+    expect(find.byIcon(Icons.radio_button_unchecked), findsNWidgets(2));
+
+    // Tap Pasta
+    await tester.tap(find.text('Pasta'));
+    await tester.pumpAndSettle();
+
+    // Pasta should now have checked icon, Bread should still be unchecked
+    expect(find.byIcon(Icons.radio_button_checked), findsOneWidget);
+    expect(find.byIcon(Icons.radio_button_unchecked), findsOneWidget);
+
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+
+    // Step 1: Side selection
+    expect(find.text('Select Sides'), findsOneWidget);
+
+    // Bread should be available as side (Pasta was main)
+    expect(find.text('Bread'), findsOneWidget);
+
+    // Checkbox should be unchecked
+    final checkbox = tester.widget<Checkbox>(find.byType(Checkbox));
+    expect(checkbox.value, isFalse);
+
+    await tester.tap(find.text('Bread'));
+    await tester.pumpAndSettle();
+
+    // Checkbox should be checked
+    final checkedCheckbox = tester.widget<Checkbox>(find.byType(Checkbox));
+    expect(checkedCheckbox.value, isTrue);
+
+    await tester.tap(find.text('Add Meals'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Pasta'), findsOneWidget);
+    expect(find.text('Bread'), findsOneWidget);
+  });
+
   testWidgets('Adjusting servings and removing recipe', (
     WidgetTester tester,
   ) async {

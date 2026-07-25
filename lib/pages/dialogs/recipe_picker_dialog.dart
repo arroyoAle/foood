@@ -52,10 +52,34 @@ class _RecipePickerDialogState extends ConsumerState<RecipePickerDialog> {
                       final recipe = filteredRecipes[index];
 
                       if (_currentStep == 0) {
-                        return ListTile(
-                          title: Text(recipe.name),
-                          selected: _selectedMain?.id == recipe.id,
-                          onTap: () => setState(() => _selectedMain = recipe),
+                        final isSelected = _selectedMain?.id == recipe.id;
+                        return Container(
+                          margin: const EdgeInsets.symmetric(vertical: 2),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? Theme.of(context).colorScheme.primaryContainer
+                                : null,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: ListTile(
+                            title: Text(recipe.name),
+                            leading: Icon(
+                              isSelected
+                                  ? Icons.radio_button_checked
+                                  : Icons.radio_button_unchecked,
+                              color: isSelected
+                                  ? Theme.of(context).colorScheme.primary
+                                  : null,
+                            ),
+                            selected: isSelected,
+                            selectedTileColor: Theme.of(
+                              context,
+                            ).colorScheme.primaryContainer,
+                            onTap: () => setState(() => _selectedMain = recipe),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
                         );
                       } else {
                         // Don't show main in sides list
@@ -63,18 +87,32 @@ class _RecipePickerDialogState extends ConsumerState<RecipePickerDialog> {
                           return const SizedBox.shrink();
                         }
 
-                        return CheckboxListTile(
-                          title: Text(recipe.name),
-                          value: _selectedSideIds.contains(recipe.id),
-                          onChanged: (val) {
-                            setState(() {
-                              if (val == true) {
-                                _selectedSideIds.add(recipe.id);
-                              } else {
-                                _selectedSideIds.remove(recipe.id);
-                              }
-                            });
-                          },
+                        final isSelected = _selectedSideIds.contains(recipe.id);
+                        return Container(
+                          margin: const EdgeInsets.symmetric(vertical: 2),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? Theme.of(context).colorScheme.primaryContainer
+                                : null,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: CheckboxListTile(
+                            title: Text(recipe.name),
+                            value: isSelected,
+                            onChanged: (val) {
+                              setState(() {
+                                if (val == true) {
+                                  _selectedSideIds.add(recipe.id);
+                                } else {
+                                  _selectedSideIds.remove(recipe.id);
+                                }
+                              });
+                            },
+                            controlAffinity: ListTileControlAffinity.leading,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
                         );
                       }
                     },
