@@ -53,14 +53,8 @@ class _RecipePickerDialogState extends ConsumerState<RecipePickerDialog> {
 
                       if (_currentStep == 0) {
                         final isSelected = _selectedMain?.id == recipe.id;
-                        return Container(
-                          margin: const EdgeInsets.symmetric(vertical: 2),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? Theme.of(context).colorScheme.primaryContainer
-                                : null,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
                           child: ListTile(
                             title: Text(recipe.name),
                             leading: Icon(
@@ -88,17 +82,15 @@ class _RecipePickerDialogState extends ConsumerState<RecipePickerDialog> {
                         }
 
                         final isSelected = _selectedSideIds.contains(recipe.id);
-                        return Container(
-                          margin: const EdgeInsets.symmetric(vertical: 2),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? Theme.of(context).colorScheme.primaryContainer
-                                : null,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
                           child: CheckboxListTile(
                             title: Text(recipe.name),
                             value: isSelected,
+                            selected: isSelected,
+                            selectedTileColor: Theme.of(
+                              context,
+                            ).colorScheme.primaryContainer,
                             onChanged: (val) {
                               setState(() {
                                 if (val == true) {
