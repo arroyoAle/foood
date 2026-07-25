@@ -44,16 +44,16 @@ class MyHomePage extends ConsumerWidget {
           mainAxisSpacing: 16,
           children: [
             DashboardCard(
-              title: "Next Meal",
-              icon: Icons.restaurant,
+              title: "Meal Plan",
+              icon: Icons.calendar_month,
               child: const Center(
                 child: Text(
-                  "Test meal 1",
+                  "View this week",
                   textAlign: TextAlign.center,
                   style: TextStyle(fontStyle: FontStyle.italic),
                 ),
               ),
-              onTap: () => Navigator.of(context).pushNamed('/recipes'),
+              onTap: () => Navigator.of(context).pushNamed('/mealPlan'),
             ),
             DashboardCard(
               title: "Quick Access",

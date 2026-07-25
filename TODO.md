@@ -9,10 +9,11 @@
 - [x] Add "Recent Recipes" section.
 
 ### 2. Meal Planning
-- [ ] Implement `MealPlan` and `MealPlanEntry` database tables.
-- [ ] Create `MealPlanRepository` and Riverpod notifiers.
-- [ ] Develop `WeekPage` for weekly meal scheduling.
+- [x] Implement `MealPlan` and `MealPlanEntry` database tables.
+- [x] Create `MealPlanRepository` and Riverpod notifiers.
+- [x] Develop `WeekPage` for weekly meal scheduling.
 - [ ] Support scaling recipe portions in meal plan entries.
+- [ ] Delete weeks from more than 3? months ago
 
 ### 3. Shopping List Enhancements
 - [x] Add search functionality
@@ -38,6 +39,8 @@
 
 ### 6. Spin Wheel
 - [ ] Create spin wheel page and add what should I eat today feature
+
+### 7. Shift Patterns/Office days linked to meals
 
 ---
 ## Future Enhancements

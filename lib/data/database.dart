@@ -83,6 +83,37 @@ class Instructions extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+class MealPlans extends Table {
+  DateTimeColumn get weekStartDate => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {weekStartDate};
+}
+
+class MealPlanEntries extends Table {
+  TextColumn get id => text()();
+  DateTimeColumn get weekStartDate =>
+      dateTime().references(MealPlans, #weekStartDate)();
+  DateTimeColumn get date => dateTime()();
+  TextColumn get mealType => text()(); // breakfast, lunch, dinner, snack
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+class MealPlanEntryRecipes extends Table {
+  TextColumn get id => text()();
+  TextColumn get mealPlanEntryId => text().references(MealPlanEntries, #id)();
+  TextColumn get recipeId => text().references(Recipes, #id)();
+  IntColumn get servings => integer()();
+  TextColumn get parentId =>
+      text().nullable().references(MealPlanEntryRecipes, #id)();
+  IntColumn get ordering => integer().withDefault(const Constant(0))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 // --- DAO ---
 
 @DriftAccessor(tables: [ShoppingListItems, Items, PantryItems])
@@ -264,6 +295,69 @@ class RecipeDao extends DatabaseAccessor<AppDatabase> with _$RecipeDaoMixin {
   }
 }
 
+@DriftAccessor(
+  tables: [MealPlans, MealPlanEntries, MealPlanEntryRecipes, Recipes],
+)
+class MealPlanDao extends DatabaseAccessor<AppDatabase>
+    with _$MealPlanDaoMixin {
+  MealPlanDao(super.db);
+
+  Future<MealPlan?> getMealPlanForWeek(DateTime weekStartDate) {
+    return (select(mealPlans)
+          ..where((t) => t.weekStartDate.equals(weekStartDate.toUtc())))
+        .getSingleOrNull();
+  }
+
+  Future<List<MealPlanEntry>> getEntriesForMealPlan(DateTime weekStartDate) {
+    return (select(mealPlanEntries)
+          ..where((t) => t.weekStartDate.equals(weekStartDate.toUtc()))
+          ..orderBy([(t) => OrderingTerm.asc(t.date)]))
+        .get();
+  }
+
+  Future<List<TypedResult>> getRecipesForEntry(String entryId) {
+    return (select(mealPlanEntryRecipes).join([
+            innerJoin(
+              recipes,
+              recipes.id.equalsExp(mealPlanEntryRecipes.recipeId),
+            ),
+          ])
+          ..where(mealPlanEntryRecipes.mealPlanEntryId.equals(entryId))
+          ..orderBy([OrderingTerm.asc(mealPlanEntryRecipes.ordering)]))
+        .get();
+  }
+
+  Future<void> insertMealPlan(Insertable<MealPlan> mealPlan) =>
+      into(mealPlans).insert(mealPlan);
+
+  Future<void> insertMealPlanEntry(Insertable<MealPlanEntry> entry) =>
+      into(mealPlanEntries).insert(entry);
+
+  Future<void> insertMealPlanEntryRecipe(
+    Insertable<MealPlanEntryRecipe> entryRecipe,
+  ) => into(mealPlanEntryRecipes).insert(entryRecipe);
+
+  Future<void> deleteMealPlanEntry(String id) =>
+      (delete(mealPlanEntries)..where((t) => t.id.equals(id))).go();
+
+  Future<void> deleteMealPlanEntryRecipe(String id) async {
+    // Also delete any sides where this recipe is the parent
+    await (delete(
+      mealPlanEntryRecipes,
+    )..where((t) => t.parentId.equals(id))).go();
+    await (delete(mealPlanEntryRecipes)..where((t) => t.id.equals(id))).go();
+  }
+
+  Future<void> updateMealPlanEntryRecipe({
+    required String id,
+    required int servings,
+  }) {
+    return (update(mealPlanEntryRecipes)..where((t) => t.id.equals(id))).write(
+      MealPlanEntryRecipesCompanion(servings: Value(servings)),
+    );
+  }
+}
+
 // --- Database ---
 
 @DriftDatabase(
@@ -275,14 +369,52 @@ class RecipeDao extends DatabaseAccessor<AppDatabase> with _$RecipeDaoMixin {
     Recipes,
     RecipeIngredients,
     Instructions,
+    MealPlans,
+    MealPlanEntries,
+    MealPlanEntryRecipes,
   ],
-  daos: [ShoppingDao, RecipeDao],
+  daos: [ShoppingDao, RecipeDao, MealPlanDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 7;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onCreate: (m) async {
+      await m.createAll();
+    },
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.createTable(mealPlans);
+        await m.createTable(mealPlanEntries);
+        await m.createTable(mealPlanEntryRecipes);
+      }
+      if (from < 3) {
+        await m.drop(mealPlanEntryRecipes);
+        await m.createTable(mealPlanEntryRecipes);
+      }
+      if (from < 4) {
+        await m.drop(mealPlans);
+        await m.createTable(mealPlans);
+      }
+      if (from < 5) {
+        await m.drop(mealPlanEntries);
+        await m.drop(mealPlans);
+        await m.createTable(mealPlans);
+        await m.createTable(mealPlanEntries);
+      }
+      if (from < 6) {
+        // No schema changes in v6, just logic fixes in DAO
+      }
+      if (from < 7) {
+        await m.addColumn(mealPlanEntryRecipes, mealPlanEntryRecipes.parentId);
+        await m.addColumn(mealPlanEntryRecipes, mealPlanEntryRecipes.ordering);
+      }
+    },
+  );
 }
 
 LazyDatabase _openConnection() {

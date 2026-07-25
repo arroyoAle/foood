@@ -63,7 +63,7 @@ jobs:
             exit 1
           fi
 
-  build:
+  verify-and-test:
     runs-on: ubuntu-latest
 
     steps:

@@ -43,7 +43,7 @@ void main() {
 
     expect(find.text('No lists'), findsOneWidget);
     expect(find.text('No recipes'), findsOneWidget);
-    expect(find.text('Test meal 1'), findsOneWidget);
+    expect(find.text('View this week'), findsOneWidget);
   });
 
   testWidgets('Displays shopping lists and recipes when data exists', (

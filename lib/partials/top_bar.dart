@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
 class TopBarPartial extends StatelessWidget implements PreferredSizeWidget {
-  const TopBarPartial({super.key, required this.title});
+  const TopBarPartial({super.key, required this.title, this.actions});
 
   final String title;
+  final List<Widget>? actions;
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       title: Text(title),
+      actions: actions,
       leading: Builder(
         builder: (context) {
           return IconButton(
