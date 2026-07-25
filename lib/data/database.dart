@@ -410,8 +410,22 @@ class AppDatabase extends _$AppDatabase {
         // No schema changes in v6, just logic fixes in DAO
       }
       if (from < 7) {
-        await m.addColumn(mealPlanEntryRecipes, mealPlanEntryRecipes.parentId);
-        await m.addColumn(mealPlanEntryRecipes, mealPlanEntryRecipes.ordering);
+        final columnNames = await customSelect(
+          'PRAGMA table_info(meal_plan_entry_recipes)',
+        ).get().then((rows) => rows.map((row) => row.read<String>('name')));
+
+        if (!columnNames.contains('parent_id')) {
+          await m.addColumn(
+            mealPlanEntryRecipes,
+            mealPlanEntryRecipes.parentId,
+          );
+        }
+        if (!columnNames.contains('ordering')) {
+          await m.addColumn(
+            mealPlanEntryRecipes,
+            mealPlanEntryRecipes.ordering,
+          );
+        }
       }
     },
   );
